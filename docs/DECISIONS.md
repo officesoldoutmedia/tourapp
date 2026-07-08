@@ -48,3 +48,15 @@ utilizator).
    rânduri șterse; editorii le văd (trash/restore — aliniat cu §2.2.3 "datele
    de tur nu se pierd niciodată"). Query-urile de UI filtrează explicit
    `deleted_at is null`.
+
+## 2026-07-08 — Google Maps Platform configurat (proiect tourapp-501817)
+Proiect GCP dedicat `tourapp` (org soldoutmedia.ro, owner office@soldoutmedia.ro),
+billing pe "My Billing Account" (slot eliberat prin dezactivarea facturării pe
+proiectul adormit PODASK — proiectul și cheia lui au rămas intacte, reversibil).
+API-uri active: Places API (New), Distance Matrix API, Time Zone API. Cheia
+"Maps Platform API Key" e restricționată exact la aceste 3 API-uri (verificat:
+Geocoding → REQUEST_DENIED), fără application restriction (folosită DOAR
+server-side prin lib/googlePlaces.ts; stă în GOOGLE_MAPS_API_KEY din .env.local,
+gitignored). Teste live: Places găsește NIBIRU; Time Zone dă Europe/Bucharest;
+Distance Matrix Satu Mare→Cluj 189 km/3h (fix exemplul din DoD-ul Fazei 3).
+De făcut de utilizator (recomandat): buget + alertă în Billing → Budgets & alerts.
