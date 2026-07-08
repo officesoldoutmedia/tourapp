@@ -4,6 +4,7 @@ import { getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { aggregateAdvanceStatus, type AdvanceStatus } from "@/lib/advance";
 import { MiniCalendar } from "@/components/MiniCalendar";
+import { ModuleNav } from "@/components/ModuleNav";
 
 function monthKey(date: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
@@ -75,17 +76,18 @@ export default async function TourLayout({
 
   return (
     <div className="flex min-h-0 flex-1">
+      <ModuleNav passesHref={`/o/${orgSlug}/t/${tourId}/passes`} />
       <div className="min-w-0 flex-1">{children}</div>
 
       {/* Sidebar zile — dreapta, mereu vizibil [A.2] */}
-      <aside className="hidden w-64 shrink-0 overflow-y-auto border-l border-hairline lg:flex lg:flex-col">
+      <aside className="hidden w-[280px] shrink-0 overflow-y-auto border-l border-hairline bg-canvas lg:flex lg:flex-col">
         <div className="border-b border-hairline px-3 py-2">
           <span className="text-sm font-semibold">{tour.name}</span>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
         {[...groups.entries()].map(([month, monthDays]) => (
           <div key={month}>
-            <div className="sticky top-0 bg-subtle px-3 py-1 text-[11px] font-semibold tracking-wide text-secondary">
+            <div className="sticky top-0 z-10 bg-subtle px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-tertiary">
               {month}
             </div>
             <ul>
@@ -96,9 +98,9 @@ export default async function TourLayout({
                   <li key={day.id}>
                     <Link
                       href={`/o/${orgSlug}/t/${tourId}/d/${day.date}`}
-                      className="flex items-baseline gap-2 border-l-4 border-transparent px-3 py-1.5 text-sm hover:bg-subtle aria-[current=page]:border-accent aria-[current=page]:bg-subtle"
+                      className="flex items-baseline gap-2.5 border-l-2 border-transparent px-3 py-2 text-sm transition-colors hover:bg-subtle"
                     >
-                      <span className="font-mono text-xs text-secondary">
+                      <span className="font-mono text-xs text-tertiary">
                         {dd}/{mm}
                       </span>
                       <span
@@ -107,10 +109,10 @@ export default async function TourLayout({
                         {day.city || "—"}
                       </span>
                       {day.advanceStatus === "in_progress" && (
-                        <span className="ml-auto text-[10px]" title="Advance in progress">🔵</span>
+                        <span className="ml-auto h-2 w-2 shrink-0 self-center rounded-full bg-warning" title="Advance in progress" />
                       )}
                       {day.advanceStatus === "done" && (
-                        <span className="ml-auto text-[10px]" title="Advance done">✅</span>
+                        <span className="ml-auto h-2 w-2 shrink-0 self-center rounded-full bg-success" title="Advance done" />
                       )}
                     </Link>
                   </li>

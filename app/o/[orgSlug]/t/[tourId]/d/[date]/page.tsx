@@ -20,7 +20,8 @@ import {
   type AttachmentData,
   type TaskData,
 } from "./extras-client";
-import { formatTimeInZone } from "@/lib/datetime";
+import { formatTimeInZone, dayInstant } from "@/lib/datetime";
+import { TimeRail, type RailBlock } from "@/components/TimeRail";
 
 export default async function DayPage({
   params,
@@ -235,6 +236,50 @@ export default async function DayPage({
   const canEdit = can({ tier, permission }, "edit_tour_content");
   const location = [day.city, day.state, day.country].filter(Boolean).join(", ");
 
+  // §5.6 — blocurile ancorate pe time rail: schedule + travel
+  function addDaysIso(d: string, n: number): string {
+    const x = new Date(`${d}T00:00:00Z`);
+    x.setUTCDate(x.getUTCDate() + n);
+    return x.toISOString().slice(0, 10);
+  }
+  const railBlocks: RailBlock[] = [
+    ...(items ?? [])
+      .filter((i) => i.start_at)
+      .map((i) => ({
+        id: i.id,
+        kind: (i.item_type === "publicity" ? "publicity" : "schedule") as RailBlock["kind"],
+        title: i.title,
+        startAt: i.start_at as string,
+        endAt: i.end_at,
+        confirmed: i.is_confirmed,
+      })),
+    ...travelData
+      .filter((t) => t.depart_time)
+      .map((t) => {
+        const startAt = dayInstant(
+          addDaysIso(date, t.depart_day_offset),
+          (t.depart_time as string).slice(0, 5),
+          tz,
+        ).toISOString();
+        const endAt = t.arrive_time
+          ? dayInstant(
+              addDaysIso(date, t.arrive_day_offset),
+              t.arrive_time.slice(0, 5),
+              tz,
+            ).toISOString()
+          : null;
+        return {
+          id: t.id,
+          kind: t.travel_type as RailBlock["kind"],
+          title: t.title ?? "Travel",
+          startAt,
+          endAt,
+          confirmed: t.is_confirmed,
+          party: t.party,
+        };
+      }),
+  ];
+
   return (
     <main className="mx-auto w-full max-w-3xl space-y-8 p-6">
       <header className="space-y-1">
@@ -255,79 +300,94 @@ export default async function DayPage({
         )}
       </header>
 
-      <NotesSection
-        orgSlug={orgSlug}
-        tourId={tourId}
-        day={day as DayData}
-        canEdit={canEdit}
-      />
+      <div id="notes" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <NotesSection
+          orgSlug={orgSlug}
+          tourId={tourId}
+          day={day as DayData}
+          canEdit={canEdit}
+        />
+      </div>
 
       {day.day_type === "show" && (
-        <EventsSection
+        <div id="events" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+          <EventsSection
+            orgSlug={orgSlug}
+            tourId={tourId}
+            date={date}
+            dayId={day.id}
+            events={(events ?? []).map((e) => ({
+              id: e.id,
+              title: e.title,
+              venue_name:
+                (e.venues as unknown as { name: string } | null)?.name ?? null,
+            }))}
+            canEdit={canEdit}
+          />
+        </div>
+      )}
+
+      <div id="schedule" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs space-y-4">
+        <TimeRail date={date} tz={tz} blocks={railBlocks} />
+        <ScheduleSection
+          orgSlug={orgSlug}
+          tourId={tourId}
+          day={day as DayData}
+          items={(items ?? []) as ScheduleItemData[]}
+          templates={templates ?? []}
+          canEdit={canEdit}
+        />
+      </div>
+
+      <div id="travel" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <TravelSection
           orgSlug={orgSlug}
           tourId={tourId}
           date={date}
           dayId={day.id}
-          events={(events ?? []).map((e) => ({
-            id: e.id,
-            title: e.title,
-            venue_name:
-              (e.venues as unknown as { name: string } | null)?.name ?? null,
-          }))}
+          tz={tz}
+          items={travelData}
+          personnel={personnelOptions}
+          pins={pins}
           canEdit={canEdit}
         />
-      )}
+      </div>
 
-      <ScheduleSection
-        orgSlug={orgSlug}
-        tourId={tourId}
-        day={day as DayData}
-        items={(items ?? []) as ScheduleItemData[]}
-        templates={templates ?? []}
-        canEdit={canEdit}
-      />
+      <div id="hotels" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <HotelsSection
+          orgSlug={orgSlug}
+          tourId={tourId}
+          date={date}
+          dayId={day.id}
+          hotels={hotelData}
+          prevDayHotels={prevDayHotels ?? []}
+          personnel={personnelOptions}
+          canEdit={canEdit}
+        />
+      </div>
 
-      <TravelSection
-        orgSlug={orgSlug}
-        tourId={tourId}
-        date={date}
-        dayId={day.id}
-        tz={tz}
-        items={travelData}
-        personnel={personnelOptions}
-        pins={pins}
-        canEdit={canEdit}
-      />
+      <div id="tasks" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <TasksSection
+          orgSlug={orgSlug}
+          tourId={tourId}
+          date={date}
+          dayId={day.id}
+          tasks={(dayTasks ?? []) as TaskData[]}
+          canEdit={canEdit}
+        />
+      </div>
 
-      <HotelsSection
-        orgSlug={orgSlug}
-        tourId={tourId}
-        date={date}
-        dayId={day.id}
-        hotels={hotelData}
-        prevDayHotels={prevDayHotels ?? []}
-        personnel={personnelOptions}
-        canEdit={canEdit}
-      />
-
-      <TasksSection
-        orgSlug={orgSlug}
-        tourId={tourId}
-        date={date}
-        dayId={day.id}
-        tasks={(dayTasks ?? []) as TaskData[]}
-        canEdit={canEdit}
-      />
-
-      <AttachmentsSection
-        orgSlug={orgSlug}
-        tourId={tourId}
-        date={date}
-        dayId={day.id}
-        orgId={org.id}
-        attachments={(dayAttachments ?? []) as AttachmentData[]}
-        canEdit={canEdit}
-      />
+      <div id="attachments" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <AttachmentsSection
+          orgSlug={orgSlug}
+          tourId={tourId}
+          date={date}
+          dayId={day.id}
+          orgId={org.id}
+          attachments={(dayAttachments ?? []) as AttachmentData[]}
+          canEdit={canEdit}
+        />
+      </div>
     </main>
   );
 }
