@@ -12,11 +12,15 @@ necesar în MVP (doar Faza 2, flight tracking).
   `pnpm deploy`; build-ul OpenNext verificat local.
 - Cheia Google Maps (Places New / Distance Matrix / Time Zone) — server-only.
 
-## 1. Cloudflare (o singură dată)
+## 1. Cloudflare — FĂCUT 2026-07-08
+LIVE: **https://tourapp.office-2e5.workers.dev** (cont office@, worker `tourapp`).
+Secrete setate: SUPABASE_SERVICE_ROLE_KEY, GOOGLE_MAPS_API_KEY.
+Auth Supabase: Site URL = workers.dev; redirect-uri: workers.dev/** + localhost:3000/**.
+Redeploy la orice schimbare:
 ```sh
-npx wrangler login          # OAuth în browser, contul Cloudflare al firmei
-pnpm deploy                 # build OpenNext + deploy pe workers.dev
+NEXT_PUBLIC_APP_URL=https://tourapp.office-2e5.workers.dev pnpm deploy
 ```
+(APP_URL se COACE ÎN BUNDLE la build — nu uita variabila la rebuild!)
 Apoi în dashboardul Cloudflare → Workers → tourapp → Domains: atașezi
 domeniul ales (ex. app.tune-score.com). DNS-ul trebuie să fie pe Cloudflare.
 
