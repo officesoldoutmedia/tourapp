@@ -116,6 +116,43 @@ export async function searchGooglePlaces(
 }
 
 /**
+ * Distance Matrix — auto-calc ground travel [C §6.7]: distanță + durată
+ * între origin și destination (adrese text sau "lat,lng").
+ */
+export async function computeGroundDistance(
+  origin: string,
+  destination: string,
+): Promise<{ distanceKm: number; durationMin: number } | null> {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey || !origin.trim() || !destination.trim()) return null;
+
+  const url =
+    "https://maps.googleapis.com/maps/api/distancematrix/json" +
+    `?origins=${encodeURIComponent(origin)}` +
+    `&destinations=${encodeURIComponent(destination)}&key=${apiKey}`;
+  const response = await fetch(url, { cache: "no-store" });
+  if (!response.ok) return null;
+
+  const data = (await response.json()) as {
+    status: string;
+    rows?: {
+      elements?: {
+        status: string;
+        distance?: { value: number };
+        duration?: { value: number };
+      }[];
+    }[];
+  };
+  const element = data.rows?.[0]?.elements?.[0];
+  if (data.status !== "OK" || element?.status !== "OK") return null;
+
+  return {
+    distanceKm: Math.round((element.distance!.value / 1000) * 10) / 10,
+    durationMin: Math.round(element.duration!.value / 60),
+  };
+}
+
+/**
  * Time Zone API: IANA timezone din lat/lng — sursa de adevăr pentru
  * days.timezone când ziua are coordonate (blueprint §6.3.1 [C]).
  * Fallback-ul rămâne euristica din lib/tzLookup.ts.
