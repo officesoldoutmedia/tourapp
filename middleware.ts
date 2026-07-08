@@ -3,7 +3,7 @@ import { NextResponse, type NextRequest } from "next/server";
 
 const PROTECTED_PREFIXES = ["/app", "/o"];
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(
@@ -27,6 +27,8 @@ export async function proxy(request: NextRequest) {
     },
   );
 
+  // NOTĂ: middleware.ts (nu proxy.ts) fiindcă OpenNext/Cloudflare nu
+  // suportă încă Node middleware; convenția legacy rulează pe Edge.
   // Nu pune cod între createServerClient și getUser — sesiunea trebuie
   // revalidată înainte de orice decizie de rutare.
   const {
