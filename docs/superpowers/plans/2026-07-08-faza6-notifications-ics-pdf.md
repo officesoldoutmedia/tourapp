@@ -26,7 +26,7 @@
 - [x] Commit
 
 ### Task 4: Notificări in-app (§6.15 MVP)
-- [x] `/o/[slug]/notifications`: lista mea + mark read; compose (manager+pro): toți / useri selectați → insert în notifications
-- [x] Realtime: bell cu count necitite în headerul org
+- [x] `/o/[slug]/notifications`: lista mea + mark read; compose (manager+pro) către TOȚI membrii; către grupuri/useri selectați = REST DE FĂCUT (cu UI-ul de users)
+- [ ] Realtime: bell cu count necitite — REST DE FĂCUT (acum e link static 🔔 în header)
 - [ ] Web Push = REST DE FĂCUT (tabelul push_subscriptions e gata; VAPID + SW în faza de hardening)
 - [x] Commit + verificări verzi
