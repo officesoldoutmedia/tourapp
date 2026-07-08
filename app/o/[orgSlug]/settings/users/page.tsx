@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { sendEmail } from "@/lib/email";
+import { CopyButton } from "@/components/CopyButton";
 
 const PERMISSIONS = [
   "administrator",
