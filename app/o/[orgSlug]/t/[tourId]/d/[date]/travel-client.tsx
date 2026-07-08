@@ -53,6 +53,13 @@ export interface PersonnelOption {
   name: string;
 }
 
+/** Pin-picker [C-S]: venue-urile și hotelurile turului ca origin/dest. */
+export interface TravelPin {
+  type: "venue" | "hotel";
+  id: string;
+  label: string;
+}
+
 function clock(t: string | null): string {
   return t ? t.slice(0, 5) : "";
 }
@@ -65,6 +72,7 @@ export function TravelSection({
   tz,
   items,
   personnel,
+  pins,
   canEdit,
 }: {
   orgSlug: string;
@@ -74,6 +82,7 @@ export function TravelSection({
   tz: string;
   items: TravelItemData[];
   personnel: PersonnelOption[];
+  pins: TravelPin[];
   canEdit: boolean;
 }) {
   const t = useTranslations("travel");
@@ -208,6 +217,7 @@ export function TravelSection({
           key={editing?.id ?? "new"}
           initial={editing}
           dayId={dayId}
+          pins={pins}
           pending={pending}
           onCancel={() => {
             setAdding(false);
@@ -223,12 +233,14 @@ export function TravelSection({
 function TravelForm({
   initial,
   dayId,
+  pins,
   pending,
   onSave,
   onCancel,
 }: {
   initial: TravelItemData | null;
   dayId: string;
+  pins: TravelPin[];
   pending: boolean;
   onSave: (input: TravelItemInput) => void;
   onCancel: () => void;
@@ -290,18 +302,52 @@ function TravelForm({
       </div>
 
       <div className="flex flex-wrap gap-2">
-        <input
-          value={origin}
-          onChange={(e) => setOrigin(e.target.value)}
-          placeholder={t("origin")}
-          className="min-w-36 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
-        />
-        <input
-          value={dest}
-          onChange={(e) => setDest(e.target.value)}
-          placeholder={t("destination")}
-          className="min-w-36 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
-        />
+        <span className="flex min-w-36 flex-1 gap-1">
+          <input
+            value={origin}
+            onChange={(e) => setOrigin(e.target.value)}
+            placeholder={t("origin")}
+            className="min-w-0 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+          />
+          {pins.length > 0 && (
+            <select
+              value=""
+              title={t("pinPicker")}
+              onChange={(e) => e.target.value && setOrigin(e.target.value)}
+              className="w-9 rounded border border-neutral-300 text-sm"
+            >
+              <option value="">📍</option>
+              {pins.map((pin) => (
+                <option key={`${pin.type}:${pin.id}`} value={pin.label}>
+                  {pin.type === "venue" ? "🎪" : "🏨"} {pin.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </span>
+        <span className="flex min-w-36 flex-1 gap-1">
+          <input
+            value={dest}
+            onChange={(e) => setDest(e.target.value)}
+            placeholder={t("destination")}
+            className="min-w-0 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+          />
+          {pins.length > 0 && (
+            <select
+              value=""
+              title={t("pinPicker")}
+              onChange={(e) => e.target.value && setDest(e.target.value)}
+              className="w-9 rounded border border-neutral-300 text-sm"
+            >
+              <option value="">📍</option>
+              {pins.map((pin) => (
+                <option key={`${pin.type}:${pin.id}`} value={pin.label}>
+                  {pin.type === "venue" ? "🎪" : "🏨"} {pin.label}
+                </option>
+              ))}
+            </select>
+          )}
+        </span>
         <label className="flex items-center gap-1 text-xs">
           {t("depart")}
           <input

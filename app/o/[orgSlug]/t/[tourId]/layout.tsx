@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { aggregateAdvanceStatus, type AdvanceStatus } from "@/lib/advance";
+import { MiniCalendar } from "@/components/MiniCalendar";
 
 function monthKey(date: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
@@ -77,10 +78,11 @@ export default async function TourLayout({
       <div className="min-w-0 flex-1">{children}</div>
 
       {/* Sidebar zile — dreapta, mereu vizibil [A.2] */}
-      <aside className="hidden w-64 shrink-0 overflow-y-auto border-l border-neutral-200 lg:block">
+      <aside className="hidden w-64 shrink-0 overflow-y-auto border-l border-neutral-200 lg:flex lg:flex-col">
         <div className="border-b border-neutral-200 px-3 py-2">
           <span className="text-sm font-semibold">{tour.name}</span>
         </div>
+        <div className="min-h-0 flex-1 overflow-y-auto">
         {[...groups.entries()].map(([month, monthDays]) => (
           <div key={month}>
             <div className="sticky top-0 bg-neutral-50 px-3 py-1 text-[11px] font-semibold tracking-wide text-neutral-500">
@@ -117,6 +119,12 @@ export default async function TourLayout({
             </ul>
           </div>
         ))}
+        </div>
+        <MiniCalendar
+          baseHref={`/o/${orgSlug}/t/${tourId}/d`}
+          dates={(days ?? []).map((d) => d.date)}
+          locale={locale}
+        />
       </aside>
     </div>
   );

@@ -260,7 +260,12 @@
     "laborCut": "Cut",
     "advances": "Advances",
     "sourceOrg": "bibliotecă",
-    "sourceCatalog": "catalog"
+    "sourceCatalog": "catalog",
+    "editVenue": "Editează venue-ul",
+    "unlinkVenue": "Unlink",
+    "unlinkHint": "Creează o copie independentă a venue-ului pentru acest event",
+    "cowHint": "Venue din catalogul global: la salvare se creează o copie locală a organizației (copy-on-write).",
+    "localCopy": "copie locală"
   },
   "advance": {
     "title": "Advance",
@@ -315,7 +320,8 @@
     "passengers": "Pasageri",
     "noItems": "Niciun travel item pe această zi.",
     "km": "km",
-    "miles": "mi"
+    "miles": "mi",
+    "pinPicker": "📍 din tur"
   },
   "hotels": {
     "title": "Hoteluri",
@@ -344,5 +350,9 @@
     "copied": "Copiat!",
     "noHotels": "Niciun hotel pe această zi.",
     "party": "Party"
+  },
+  "calendar": {
+    "prev": "‹",
+    "next": "›"
   }
 }

@@ -260,7 +260,12 @@
     "laborCut": "Cut",
     "advances": "Advances",
     "sourceOrg": "library",
-    "sourceCatalog": "catalog"
+    "sourceCatalog": "catalog",
+    "editVenue": "Edit venue",
+    "unlinkVenue": "Unlink",
+    "unlinkHint": "Creates an independent copy of the venue for this event",
+    "cowHint": "Global catalog venue: saving creates a local organization copy (copy-on-write).",
+    "localCopy": "local copy"
   },
   "advance": {
     "title": "Advance",
@@ -315,7 +320,8 @@
     "passengers": "Passengers",
     "noItems": "No travel items on this day.",
     "km": "km",
-    "miles": "mi"
+    "miles": "mi",
+    "pinPicker": "📍 from tour"
   },
   "hotels": {
     "title": "Hotels",
@@ -344,5 +350,9 @@
     "copied": "Copied!",
     "noHotels": "No hotels on this day.",
     "party": "Party"
+  },
+  "calendar": {
+    "prev": "‹",
+    "next": "›"
   }
 }

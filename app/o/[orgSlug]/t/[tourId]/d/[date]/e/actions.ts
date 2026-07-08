@@ -352,6 +352,115 @@ export async function deleteLaborCall(
   return {};
 }
 
+export interface VenuePatch {
+  name?: string;
+  address_line1?: string | null;
+  city?: string | null;
+  country?: string | null;
+  capacity?: number | null;
+  public_notes?: string | null;
+}
+
+/**
+ * [C §3.4] Copy-on-write: editarea unui venue GLOBAL (catalog) de către
+ * org creează o copie locală și re-leagă event-ul la ea; venue-urile
+ * org-ului se editează direct.
+ */
+export async function updateEventVenue(
+  orgSlug: string,
+  eventId: string,
+  patch: VenuePatch,
+): Promise<{ error?: string; copied?: boolean }> {
+  const { supabase, org } = await requireEditor(orgSlug);
+
+  const { data: event } = await supabase
+    .from("events")
+    .select("venue_id, venues(*)")
+    .eq("id", eventId)
+    .single();
+  const venue = event?.venues as unknown as Record<string, unknown> | null;
+  if (!event?.venue_id || !venue) return { error: "no_venue" };
+
+  if (venue.organization_id === null) {
+    // copy-on-write: copie locală + re-link
+    const {
+      id: sourceId,
+      created_at: _c,
+      updated_at: _u,
+      deleted_at: _d,
+      ...fields
+    } = venue as { id: string; created_at: unknown; updated_at: unknown; deleted_at: unknown };
+    void _c; void _u; void _d;
+    const { data: copy, error } = await supabase
+      .from("venues")
+      .insert({
+        ...fields,
+        ...patch,
+        organization_id: org.id,
+        copied_from: sourceId,
+      })
+      .select("id")
+      .single();
+    if (error || !copy) return { error: error?.message ?? "copy_failed" };
+    const { error: linkError } = await supabase
+      .from("events")
+      .update({ venue_id: copy.id })
+      .eq("id", eventId);
+    if (linkError) return { error: linkError.message };
+    return { copied: true };
+  }
+
+  const { error } = await supabase
+    .from("venues")
+    .update(patch)
+    .eq("id", event.venue_id);
+  if (error) return { error: error.message };
+  return {};
+}
+
+/**
+ * [C-S] UNLINK pe venue-ul event-ului = copy-on-write manual: creează o
+ * copie independentă (a org-ului) și re-leagă event-ul la ea.
+ */
+export async function unlinkEventVenue(
+  orgSlug: string,
+  eventId: string,
+): Promise<{ error?: string }> {
+  const result = await updateEventVenue(orgSlug, eventId, {});
+  if (result.error) return { error: result.error };
+  if (!result.copied) {
+    // venue-ul era deja al org-ului → forțăm o copie independentă
+    const { supabase, org } = await requireEditor(orgSlug);
+    const { data: event } = await supabase
+      .from("events")
+      .select("venue_id, venues(*)")
+      .eq("id", eventId)
+      .single();
+    const venue = event?.venues as unknown as Record<string, unknown> | null;
+    if (!event?.venue_id || !venue) return { error: "no_venue" };
+    const {
+      id: sourceId,
+      created_at: _c,
+      updated_at: _u,
+      deleted_at: _d,
+      ...fields
+    } = venue as { id: string; created_at: unknown; updated_at: unknown; deleted_at: unknown };
+    void _c; void _u; void _d;
+    const { data: copy, error } = await supabase
+      .from("venues")
+      .insert({ ...fields, organization_id: org.id, copied_from: sourceId })
+      .select("id")
+      .single();
+    if (error || !copy) return { error: error?.message ?? "copy_failed" };
+    const { error: linkError } = await supabase
+      .from("events")
+      .update({ venue_id: copy.id })
+      .eq("id", eventId);
+    if (linkError) return { error: linkError.message };
+  }
+  return {};
+}
+
 export async function refreshEventPath(
   orgSlug: string,
   tourId: string,

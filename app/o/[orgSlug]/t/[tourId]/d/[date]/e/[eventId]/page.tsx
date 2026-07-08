@@ -5,6 +5,7 @@ import { requireOrg } from "@/lib/org";
 import { can, hasMinPermission } from "@/lib/permissions";
 import { aggregateAdvanceStatus, type AdvanceStatus } from "@/lib/advance";
 import { EventSections, type FieldDef } from "./event-client";
+import { VenueSection } from "./venue-client";
 
 export default async function EventPage({
   params,
@@ -18,7 +19,9 @@ export default async function EventPage({
 
   const { data: event } = await supabase
     .from("events")
-    .select("id, title, status, notes, venues(id, name, address_line1, city, country, capacity, phones, urls)")
+    .select(
+      "id, title, status, notes, venues(id, name, address_line1, city, country, capacity, phones, urls, organization_id, copied_from, source)",
+    )
     .eq("id", eventId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -71,6 +74,9 @@ export default async function EventPage({
     city: string | null;
     country: string | null;
     capacity: number | null;
+    organization_id: string | null;
+    copied_from: string | null;
+    source: string;
   } | null;
 
   const canEdit = can({ tier, permission }, "edit_tour_content");
@@ -95,14 +101,16 @@ export default async function EventPage({
           ← {date}
         </Link>
         <h1 className="text-xl font-semibold">{event.title ?? venue?.name ?? "—"}</h1>
-        {venue && (
-          <p className="text-sm text-neutral-500">
-            {t("venue")}: {venue.name}
-            {venue.city && ` — ${[venue.address_line1, venue.city, venue.country].filter(Boolean).join(", ")}`}
-            {venue.capacity != null && ` · ${t("capacity")}: ${venue.capacity}`}
-          </p>
-        )}
       </header>
+
+      {venue && (
+        <VenueSection
+          orgSlug={orgSlug}
+          eventId={eventId}
+          venue={venue}
+          canEdit={canEdit}
+        />
+      )}
 
       <section className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-3">
         <span className="text-sm font-medium">

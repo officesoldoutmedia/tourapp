@@ -106,6 +106,44 @@ export default async function DayPage({
       .maybeSingle(),
   ]);
 
+  // Pin-picker [C-S]: venue-urile events-urilor turului + hotelurile turului
+  const [{ data: tourVenues }, { data: tourHotels }] = await Promise.all([
+    supabase
+      .from("events")
+      .select("venue_id, venues(id, name, city), days!inner(tour_id)")
+      .eq("days.tour_id", tourId)
+      .is("deleted_at", null),
+    supabase
+      .from("day_hotels")
+      .select("id, name, city, days!inner(tour_id)")
+      .eq("days.tour_id", tourId)
+      .is("deleted_at", null),
+  ]);
+
+  const pinSeen = new Set<string>();
+  const pins = [
+    ...(tourVenues ?? []).flatMap((e) => {
+      const v = e.venues as unknown as { id: string; name: string; city: string | null } | null;
+      if (!v || pinSeen.has(`v:${v.id}`)) return [];
+      pinSeen.add(`v:${v.id}`);
+      return [{
+        type: "venue" as const,
+        id: v.id,
+        label: [v.name, v.city].filter(Boolean).join(", "),
+      }];
+    }),
+    ...(tourHotels ?? []).flatMap((h) => {
+      const key = `h:${h.name}|${h.city ?? ""}`;
+      if (pinSeen.has(key)) return [];
+      pinSeen.add(key);
+      return [{
+        type: "hotel" as const,
+        id: h.id,
+        label: [h.name, h.city].filter(Boolean).join(", "),
+      }];
+    }),
+  ];
+
   const { data: prevDayHotels } = prevDay
     ? await supabase
         .from("day_hotels")
@@ -233,6 +271,7 @@ export default async function DayPage({
         tz={tz}
         items={travelData}
         personnel={personnelOptions}
+        pins={pins}
         canEdit={canEdit}
       />
 
