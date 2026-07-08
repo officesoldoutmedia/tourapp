@@ -403,5 +403,60 @@
     "name": "Nume (ex. AAA)",
     "description": "Descriere",
     "empty": "Niciun pass definit pe tur. Pass-urile apar drept coloane în guest list."
+  },
+  "songs": {
+    "title": "Song Library",
+    "add": "Adaugă piesă",
+    "songTitle": "Titlu",
+    "length": "Durată (m:ss)",
+    "bpm": "BPM",
+    "key": "Tonalitate",
+    "techNotes": "Tech notes",
+    "empty": "Nicio piesă în bibliotecă."
+  },
+  "setlist": {
+    "title": "Set List",
+    "addSong": "ADD SONG",
+    "addBreak": "ADD BREAK",
+    "breakLabel": "Etichetă break",
+    "notes": "Set notes",
+    "performers": "Guest performers",
+    "editSongList": "EDIT SONG LIST",
+    "songsNotInList": "doar piesele nefolosite",
+    "totals": "{songs} songs · {breaks} breaks · {duration}",
+    "copy": "Copiază set list",
+    "copied": "Copiat!",
+    "pdf": "PDF",
+    "empty": "Set list gol."
+  },
+  "tasks": {
+    "title": "Tasks",
+    "add": "Adaugă task",
+    "taskTitle": "Titlu",
+    "due": "Termen",
+    "overdue": "OVERDUE",
+    "empty": "Niciun task pe această zi."
+  },
+  "attachments": {
+    "title": "Attachments",
+    "upload": "Încarcă fișier",
+    "tags": "Tag-uri (virgulă)",
+    "download": "Descarcă",
+    "empty": "Niciun fișier.",
+    "uploading": "Se încarcă…",
+    "needsStack": "Upload-ul cere stack-ul Supabase (storage)."
+  },
+  "contacts": {
+    "title": "Companies & Contacts",
+    "companies": "Companii",
+    "contactsList": "Contacte",
+    "addCompany": "Adaugă companie",
+    "addContact": "Adaugă contact",
+    "kind": "Tip (ex. Booking)",
+    "role": "Rol",
+    "company": "Companie",
+    "none": "—",
+    "emptyCompanies": "Nicio companie.",
+    "emptyContacts": "Niciun contact."
   }
 }

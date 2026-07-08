@@ -403,5 +403,60 @@
     "name": "Name (e.g. AAA)",
     "description": "Description",
     "empty": "No passes defined on this tour. Passes show up as guest list columns."
+  },
+  "songs": {
+    "title": "Song Library",
+    "add": "Add song",
+    "songTitle": "Title",
+    "length": "Length (m:ss)",
+    "bpm": "BPM",
+    "key": "Key",
+    "techNotes": "Tech notes",
+    "empty": "No songs in the library."
+  },
+  "setlist": {
+    "title": "Set List",
+    "addSong": "ADD SONG",
+    "addBreak": "ADD BREAK",
+    "breakLabel": "Break label",
+    "notes": "Set notes",
+    "performers": "Guest performers",
+    "editSongList": "EDIT SONG LIST",
+    "songsNotInList": "songs not in list",
+    "totals": "{songs} songs · {breaks} breaks · {duration}",
+    "copy": "Copy set list",
+    "copied": "Copied!",
+    "pdf": "PDF",
+    "empty": "Empty set list."
+  },
+  "tasks": {
+    "title": "Tasks",
+    "add": "Add task",
+    "taskTitle": "Title",
+    "due": "Due",
+    "overdue": "OVERDUE",
+    "empty": "No tasks on this day."
+  },
+  "attachments": {
+    "title": "Attachments",
+    "upload": "Upload file",
+    "tags": "Tags (comma)",
+    "download": "Download",
+    "empty": "No files.",
+    "uploading": "Uploading…",
+    "needsStack": "Upload requires the Supabase stack (storage)."
+  },
+  "contacts": {
+    "title": "Companies & Contacts",
+    "companies": "Companies",
+    "contactsList": "Contacts",
+    "addCompany": "Add company",
+    "addContact": "Add contact",
+    "kind": "Kind (e.g. Booking)",
+    "role": "Role",
+    "company": "Company",
+    "none": "—",
+    "emptyCompanies": "No companies.",
+    "emptyContacts": "No contacts."
   }
 }

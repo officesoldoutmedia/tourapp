@@ -13,6 +13,12 @@ import {
 import { EventsSection } from "./events-client";
 import { TravelSection, type TravelItemData } from "./travel-client";
 import { HotelsSection, type HotelData } from "./hotels-client";
+import {
+  AttachmentsSection,
+  TasksSection,
+  type AttachmentData,
+  type TaskData,
+} from "./extras-client";
 import { formatTimeInZone } from "@/lib/datetime";
 
 export default async function DayPage({
@@ -143,6 +149,22 @@ export default async function DayPage({
       }];
     }),
   ];
+
+  const [{ data: dayTasks }, { data: dayAttachments }] = await Promise.all([
+    supabase
+      .from("tasks")
+      .select("id, title, due_at, is_complete")
+      .eq("day_id", day.id)
+      .is("deleted_at", null)
+      .order("due_at", { ascending: true, nullsFirst: false }),
+    supabase
+      .from("attachments")
+      .select("id, file_name, size_bytes, tags")
+      .eq("parent_type", "day")
+      .eq("parent_id", day.id)
+      .is("deleted_at", null)
+      .order("created_at"),
+  ]);
 
   const { data: prevDayHotels } = prevDay
     ? await supabase
@@ -283,6 +305,25 @@ export default async function DayPage({
         hotels={hotelData}
         prevDayHotels={prevDayHotels ?? []}
         personnel={personnelOptions}
+        canEdit={canEdit}
+      />
+
+      <TasksSection
+        orgSlug={orgSlug}
+        tourId={tourId}
+        date={date}
+        dayId={day.id}
+        tasks={(dayTasks ?? []) as TaskData[]}
+        canEdit={canEdit}
+      />
+
+      <AttachmentsSection
+        orgSlug={orgSlug}
+        tourId={tourId}
+        date={date}
+        dayId={day.id}
+        orgId={org.id}
+        attachments={(dayAttachments ?? []) as AttachmentData[]}
         canEdit={canEdit}
       />
     </main>

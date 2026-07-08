@@ -121,6 +121,12 @@ export default async function EventPage({
         </span>
         <span className="flex gap-2">
           <Link
+            href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/set-list`}
+            className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
+          >
+            Set List →
+          </Link>
+          <Link
             href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/guest-list`}
             className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
           >

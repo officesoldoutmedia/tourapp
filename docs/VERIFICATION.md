@@ -122,3 +122,20 @@ Faza 1; la nivelul Fazei 0 verificăm motorul: `visibility_rules` +
       mod log fără cheie.
 - [ ] DoD manual pe stack live: emailul real prin Resend (cere RESEND_API_KEY)
       + fluxul cu 2 useri prin UI.
+
+## Faza 5 — Stare
+
+- [x] Migrația 00010 (songs/set lists/tasks/attachments/companies/contacts +
+      FK-urile amânate + bucket Storage guarded) — `faza5_rls.test.sql`:
+      7 probe PASS, inclusiv toate cele 3 DoD-uri (song edit → set list;
+      attachment cu visibility ascuns; accounting attachments doar
+      admin/accounting) + task restricționat.
+- [x] lib/setlist.ts (totaluri N song/N break/MM:SS + parse m:ss) — 4 teste.
+- [x] Set List PDF stage-ready (/api/pdf/setlist/[eventId], @react-pdf/renderer).
+- [x] UI: Song Library (/settings/songs, edit inline propagat prin referință),
+      Set List editor (picker songsNotInList, breaks, notes/performers,
+      reorder, copy clipboard, totaluri live), Tasks pe zi (OVERDUE roșu),
+      Attachments pe zi (upload Storage, tags, URL semnat), Companies &
+      Contacts (/contacts, tap-to-call/email).
+- [ ] Upload-ul real în Storage cere stack-ul Supabase (bucket-ul se creează
+      din migrație, guarded).
