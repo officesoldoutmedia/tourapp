@@ -1,0 +1,53 @@
+{
+  "common": {
+    "appName": "TourApp",
+    "loading": "Loading…",
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "error": "Something went wrong. Please try again.",
+    "signOut": "Sign out"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Password",
+    "logIn": "Log in",
+    "signUp": "Sign up",
+    "magicLink": "Send me a magic link",
+    "magicLinkSent": "Check your email — we sent you a sign-in link.",
+    "confirmEmailSent": "Check your email to confirm your account.",
+    "noAccount": "Don't have an account?",
+    "haveAccount": "Already have an account?",
+    "orSeparator": "or",
+    "invalidCredentials": "Invalid email or password.",
+    "firstName": "First name",
+    "lastName": "Last name"
+  },
+  "invite": {
+    "title": "Organization invitation",
+    "body": "You've been invited to join {orgName} as {permission}.",
+    "accept": "Accept invitation",
+    "invalid": "This invitation doesn't exist or has expired.",
+    "needAccount": "To accept, log in or create an account with {email}.",
+    "accepted": "Invitation accepted. Welcome!"
+  },
+  "orgs": {
+    "yourOrganizations": "Your organizations",
+    "createFirst": "Create your first organization",
+    "create": "Create organization",
+    "name": "Organization name",
+    "orgType": "Organization type",
+    "orgTypeMusic": "Music",
+    "orgTypeOther": "Other",
+    "empty": "You're not a member of any organization yet."
+  },
+  "permissions": {
+    "administrator": "Administrator",
+    "accounting": "Accounting",
+    "manager": "Manager",
+    "gl_manage_all": "Guest List — manage all",
+    "gl_view_all_submit": "Guest List — view all & submit",
+    "gl_submit": "Guest List — submit",
+    "mobile_access": "View access"
+  }
+}

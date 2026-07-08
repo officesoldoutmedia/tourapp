@@ -1,0 +1,53 @@
+{
+  "common": {
+    "appName": "TourApp",
+    "loading": "Se încarcă…",
+    "save": "Salvează",
+    "cancel": "Anulează",
+    "delete": "Șterge",
+    "error": "A apărut o eroare. Încearcă din nou.",
+    "signOut": "Deconectare"
+  },
+  "auth": {
+    "email": "Email",
+    "password": "Parolă",
+    "logIn": "Autentificare",
+    "signUp": "Creează cont",
+    "magicLink": "Trimite-mi link de autentificare",
+    "magicLinkSent": "Verifică-ți emailul — ți-am trimis un link de autentificare.",
+    "confirmEmailSent": "Verifică-ți emailul pentru a confirma contul.",
+    "noAccount": "Nu ai cont?",
+    "haveAccount": "Ai deja cont?",
+    "orSeparator": "sau",
+    "invalidCredentials": "Email sau parolă incorecte.",
+    "firstName": "Prenume",
+    "lastName": "Nume"
+  },
+  "invite": {
+    "title": "Invitație în organizație",
+    "body": "Ai fost invitat(ă) în organizația {orgName} cu rolul {permission}.",
+    "accept": "Acceptă invitația",
+    "invalid": "Invitația nu există sau a expirat.",
+    "needAccount": "Pentru a accepta, autentifică-te sau creează un cont cu adresa {email}.",
+    "accepted": "Invitație acceptată. Bine ai venit!"
+  },
+  "orgs": {
+    "yourOrganizations": "Organizațiile tale",
+    "createFirst": "Creează prima ta organizație",
+    "create": "Creează organizația",
+    "name": "Numele organizației",
+    "orgType": "Tipul organizației",
+    "orgTypeMusic": "Muzică",
+    "orgTypeOther": "Altele",
+    "empty": "Nu ești membru în nicio organizație încă."
+  },
+  "permissions": {
+    "administrator": "Administrator",
+    "accounting": "Contabilitate",
+    "manager": "Manager",
+    "gl_manage_all": "Guest List — gestionare completă",
+    "gl_view_all_submit": "Guest List — vede tot & trimite",
+    "gl_submit": "Guest List — trimite",
+    "mobile_access": "Acces vizualizare"
+  }
+}
