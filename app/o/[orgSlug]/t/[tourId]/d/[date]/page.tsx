@@ -10,6 +10,7 @@ import {
   type DayData,
   type ScheduleItemData,
 } from "./day-client";
+import { EventsSection } from "./events-client";
 
 export default async function DayPage({
   params,
@@ -35,7 +36,7 @@ export default async function DayPage({
   if (!day) notFound();
   const tz = day.timezone ?? DEFAULT_TZ;
 
-  const [{ data: items }, { data: templates }] = await Promise.all([
+  const [{ data: items }, { data: templates }, { data: events }] = await Promise.all([
     supabase
       .from("schedule_items")
       .select(
@@ -52,6 +53,12 @@ export default async function DayPage({
       .eq("organization_id", org.id)
       .is("deleted_at", null)
       .order("name"),
+    supabase
+      .from("events")
+      .select("id, title, venues(name)")
+      .eq("day_id", day.id)
+      .is("deleted_at", null)
+      .order("created_at"),
   ]);
 
   const canEdit = can({ tier, permission }, "edit_tour_content");
@@ -82,6 +89,22 @@ export default async function DayPage({
         day={day as DayData}
         canEdit={canEdit}
       />
+
+      {day.day_type === "show" && (
+        <EventsSection
+          orgSlug={orgSlug}
+          tourId={tourId}
+          date={date}
+          dayId={day.id}
+          events={(events ?? []).map((e) => ({
+            id: e.id,
+            title: e.title,
+            venue_name:
+              (e.venues as unknown as { name: string } | null)?.name ?? null,
+          }))}
+          canEdit={canEdit}
+        />
+      )}
 
       <ScheduleSection
         orgSlug={orgSlug}

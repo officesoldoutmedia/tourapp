@@ -25,17 +25,17 @@
 - [x] Commit
 
 ### Task 4: Venue attach flow (§6.5.1) + Events UI
-- [ ] Add Event pe Show Day → căutare venues (org + catalog) cu badge sursă; creare manuală; duplicate matching pe (nume normalizat + oraș) cu dialog; Google Places în spatele unui flag (fără API key în dev)
-- [ ] Event overview + tabs Production/Facilities/Equipment/Logistics (+ADDFIELD, hide 👁 per org [C]) + Local Crew + Labor Call grid
-- [ ] Copy-on-write la editarea unui venue global [C §3.4]
-- [ ] Commit
+- [x] Add Event pe Show Day → căutare venues (org + catalog) cu badge sursă; creare manuală; duplicate matching pe (nume normalizat + oraș) cu dialog; Google Places = REST DE FĂCUT (fără API key în dev)
+- [x] Event overview + tabs Production/Facilities/Equipment/Logistics (+ADDFIELD, hide 👁 per org [C]) + Local Crew + Labor Call grid
+- [ ] Copy-on-write la editarea unui venue global [C §3.4] — REST DE FĂCUT (editorul de venue nu e construit încă)
+- [x] Commit
 
 ### Task 5: Advance editor
-- [ ] Lista advances per event cu status; +ADDADVANCE, SAVEASTEMPLATE, REMOVE
-- [ ] Design mode: adaugi fields (dropdown pe secțiuni cu search), Titles, schedule_row; drag reorder; trash
-- [ ] Advance mode: completezi valorile → scrise în event_field_values (sync cu Events tab by-design); schedule_row scrie schedule item real pe zi [C-S]
-- [ ] Status agregat pe sidebar-ul zilelor (pie/check)
-- [ ] Commit
+- [x] Lista advances per event cu status; +ADDADVANCE, SAVEASTEMPLATE, REMOVE
+- [x] Design mode: adaugi fields (dropdown pe secțiuni), Titles, schedule_row; reorder ↑↓; trash
+- [x] Advance mode: completezi valorile → scrise în event_field_values (sync cu Events tab by-design); schedule_row scrie schedule item real pe zi [C-S]
+- [ ] Status agregat pe sidebar-ul ZILELOR (pie/check) — REST DE FĂCUT (e afișat pe event overview; sidebar-ul zilelor nu-l arată încă)
+- [x] Commit
 
 ### Task 6: Verificare
 - [ ] DoD: advance din template → valorile apar în Events tab și invers; status agregat corect; RLS suite verde; lint/typecheck/test/build verzi
