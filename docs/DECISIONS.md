@@ -84,3 +84,12 @@ dark mode de sistem (raportat de Stefan la primul test). Am forțat
 `color-scheme: light`. Dark mode-ul COMPLET e cerință [C §9] ("crew-ul
 lucrează noaptea — e funcțional, nu estetic") și se face ca pas de design
 dedicat (tokens + variante dark pe toate componentele), nu acum.
+
+## 2026-07-08 — Design system v1 aplicat (TOURAPP_DESIGN_SYSTEM.md)
+Faza 1 din §9: tokens compleți în globals.css (light + [data-theme=dark]
+pregătit), fonturi self-hosted (General Sans display / Inter body / JetBrains
+Mono data, tabular-nums global pe .font-mono), limbă default EN, focus rings
+globale, sweep pe toate ecranele (0 clase hardcodate rămase — verificat cu
+grep). Rămase pt faza 2 de design: time rail (semnătura §5.6), dashboard
+cards §5.5, nav stânga de module §4.4, bottom-tabs mobil §6, primitive React
+în components/ui, dark mode activat.
