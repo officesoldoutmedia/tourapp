@@ -103,3 +103,9 @@ vizită a unui editor. Harta: embed Google keyless centrat pe zi (cheia
 server-side nu se expune) + listă de pins venue (accent) / hotel cu link
 spre Google Maps — pin-uri multiple pe embed ar cere Maps JS API cu cheie
 publică; reevaluăm la faza mobilă.
+
+## 2026-07-08 — Mobil: aplicații NATIVE (iOS + Google Play), nu PWA
+Decizia lui Ștefan: după stabilizarea web-ului facem aplicații de mobil
+native/store, nu PWA responsive. Bottom-tabs §6 din design system rămân
+relevante doar ca referință de UX pt. aplicația mobilă. Web-ul rămâne
+desktop-first. Timeline: după runda de testare + bug-fixing pe web.
