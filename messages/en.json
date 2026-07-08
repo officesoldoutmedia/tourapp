@@ -39,7 +39,11 @@
     "orgType": "Organization type",
     "orgTypeMusic": "Music",
     "orgTypeOther": "Other",
-    "empty": "You're not a member of any organization yet."
+    "empty": "You're not a member of any organization yet.",
+    "errorProRequired": "Creating organizations requires a Pro account. Ask your administrator for an upgrade or an invitation to your team's organization.",
+    "errorNameRequired": "Enter an organization name.",
+    "errorCreateFailed": "Could not create the organization. Please try again.",
+    "proGate": "Creating organizations requires a Pro account. If you're part of an existing team, ask for an invitation — you'll get an email with a join link."
   },
   "permissions": {
     "administrator": "Administrator",

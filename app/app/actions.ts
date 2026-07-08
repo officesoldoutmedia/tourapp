@@ -38,7 +38,11 @@ export async function createOrganization(formData: FormData): Promise<void> {
     }
     // 23505 = unique_violation pe slug → încearcă următorul candidat.
     if (error.code !== "23505") {
-      redirect("/app?error=create_failed");
+      redirect(
+        error.message.includes("pro account required")
+          ? "/app?error=pro_required"
+          : "/app?error=create_failed",
+      );
     }
     void data;
   }

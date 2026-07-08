@@ -39,7 +39,11 @@
     "orgType": "Tipul organizației",
     "orgTypeMusic": "Muzică",
     "orgTypeOther": "Altele",
-    "empty": "Nu ești membru în nicio organizație încă."
+    "empty": "Nu ești membru în nicio organizație încă.",
+    "errorProRequired": "Crearea de organizații cere un cont Pro. Cere administratorului un upgrade sau o invitație în organizația echipei.",
+    "errorNameRequired": "Scrie un nume pentru organizație.",
+    "errorCreateFailed": "Nu am putut crea organizația. Încearcă din nou.",
+    "proGate": "Crearea de organizații cere un cont Pro. Dacă faci parte dintr-o echipă existentă, cere o invitație — vei primi un email cu link de alăturare."
   },
   "permissions": {
     "administrator": "Administrator",

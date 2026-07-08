@@ -3,10 +3,22 @@ import { getTranslations } from "next-intl/server";
 import { requireUser } from "@/lib/auth";
 import { createOrganization } from "./actions";
 
-export default async function AppPage() {
-  const { supabase } = await requireUser();
+export default async function AppPage({
+  searchParams,
+}: {
+  searchParams: Promise<{ error?: string }>;
+}) {
+  const { supabase, user } = await requireUser();
   const t = await getTranslations("orgs");
   const tp = await getTranslations("permissions");
+  const { error } = await searchParams;
+
+  const { data: profile } = await supabase
+    .from("profiles")
+    .select("user_tier")
+    .eq("id", user.id)
+    .maybeSingle();
+  const isPro = profile?.user_tier === "pro";
 
   const { data: memberships } = await supabase
     .from("organization_members")
@@ -25,6 +37,15 @@ export default async function AppPage() {
 
   return (
     <main className="mx-auto w-full max-w-2xl space-y-10 p-6">
+      {error && (
+        <div className="rounded-md border border-danger bg-danger-subtle px-4 py-3 text-sm text-danger">
+          {error === "pro_required"
+            ? t("errorProRequired")
+            : error === "name_required"
+              ? t("errorNameRequired")
+              : t("errorCreateFailed")}
+        </div>
+      )}
       <section className="space-y-4">
         <h1 className="font-display text-2xl font-semibold tracking-tight">{t("yourOrganizations")}</h1>
         {orgs.length === 0 ? (
@@ -52,6 +73,12 @@ export default async function AppPage() {
         <h2 className="font-display text-lg font-semibold tracking-tight">
           {orgs.length === 0 ? t("createFirst") : t("create")}
         </h2>
+        {!isPro && (
+          <div className="rounded-md border border-hairline bg-subtle px-4 py-3 text-sm text-secondary">
+            {t("proGate")}
+          </div>
+        )}
+        {isPro && (
         <form action={createOrganization} className="space-y-4">
           <label className="block space-y-1">
             <span className="text-sm font-medium">{t("name")}</span>
@@ -79,6 +106,7 @@ export default async function AppPage() {
             {t("create")}
           </button>
         </form>
+        )}
       </section>
     </main>
   );
