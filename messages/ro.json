@@ -87,7 +87,10 @@
     "notesHotel": "Note hotel",
     "schedule": "Program",
     "dstNotice": "Zi cu schimbare de oră — verifică orele!",
-    "saved": "Salvat"
+    "saved": "Salvat",
+    "pdf": "Day sheet PDF",
+    "share": "Share day sheet",
+    "copied": "Copiat!"
   },
   "schedule": {
     "add": "Adaugă",
@@ -458,5 +461,16 @@
     "none": "—",
     "emptyCompanies": "Nicio companie.",
     "emptyContacts": "Niciun contact."
+  },
+  "notifications": {
+    "title": "Notificări",
+    "empty": "Nicio notificare.",
+    "markRead": "Marchează citit",
+    "compose": "Trimite mesaj",
+    "toAll": "Către toți membrii",
+    "subject": "Titlu",
+    "body": "Mesaj",
+    "send": "Trimite",
+    "sent": "Trimis!"
   }
 }

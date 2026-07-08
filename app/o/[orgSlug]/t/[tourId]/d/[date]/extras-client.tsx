@@ -4,6 +4,7 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/browser";
 import {
+  createShareLink,
   deleteAttachment,
   deleteTask,
   getAttachmentUrl,
@@ -271,5 +272,60 @@ export function AttachmentsSection({
         </div>
       )}
     </section>
+  );
+}
+
+// ── Bara de share + PDF a zilei [N §6.3.4] ──────────────────────────
+export function DayActionsBar({
+  orgSlug,
+  dayId,
+  canEdit,
+}: {
+  orgSlug: string;
+  dayId: string;
+  canEdit: boolean;
+}) {
+  const t = useTranslations("day");
+  const [pending, startTransition] = useTransition();
+  const [url, setUrl] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+
+  return (
+    <div className="flex flex-wrap items-center gap-2 text-xs">
+      <a
+        href={`/api/pdf/daysheet/${dayId}?rooms=1`}
+        target="_blank"
+        className="rounded border border-neutral-300 px-3 py-1 font-medium"
+      >
+        🖨 {t("pdf")}
+      </a>
+      {canEdit && !url && (
+        <button
+          disabled={pending}
+          onClick={() =>
+            startTransition(async () => {
+              const r = await createShareLink(orgSlug, dayId, null);
+              if (r.url) setUrl(r.url);
+            })
+          }
+          className="rounded border border-neutral-300 px-3 py-1 font-medium disabled:opacity-40"
+        >
+          🔗 {t("share")}
+        </button>
+      )}
+      {url && (
+        <button
+          onClick={() => {
+            void navigator.clipboard.writeText(url);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+          }}
+          className="max-w-72 truncate rounded bg-neutral-100 px-3 py-1 font-mono"
+          title={url}
+        >
+          {copied ? t("copied") : url}
+        </button>
+      )}
+    </div>
   );
 }

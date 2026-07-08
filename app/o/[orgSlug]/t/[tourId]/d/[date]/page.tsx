@@ -15,6 +15,7 @@ import { TravelSection, type TravelItemData } from "./travel-client";
 import { HotelsSection, type HotelData } from "./hotels-client";
 import {
   AttachmentsSection,
+  DayActionsBar,
   TasksSection,
   type AttachmentData,
   type TaskData,
@@ -246,6 +247,7 @@ export default async function DayPage({
         <p className="text-sm text-neutral-500">
           {formatDayHeader(day.date, tz, locale)}
         </p>
+        <DayActionsBar orgSlug={orgSlug} dayId={day.id} canEdit={canEdit} />
         {isDstTransitionDay(day.date, tz) && (
           <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs text-amber-900">
             {t("dstNotice")}

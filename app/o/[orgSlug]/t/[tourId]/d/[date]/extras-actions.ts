@@ -141,3 +141,26 @@ export async function deleteAttachment(
   revalidatePath(dayPath(orgSlug, tourId, date));
   return {};
 }
+
+// ── Share link [N §6.17.4] ──────────────────────────────────────────
+export async function createShareLink(
+  orgSlug: string,
+  dayId: string,
+  expiresDays: number | null,
+): Promise<{ url?: string; error?: string }> {
+  const { supabase, user } = await requireEditor(orgSlug);
+  const { data, error } = await supabase
+    .from("share_links")
+    .insert({
+      day_id: dayId,
+      created_by: user.id,
+      expires_at: expiresDays
+        ? new Date(Date.now() + expiresDays * 86400000).toISOString()
+        : null,
+    })
+    .select("token")
+    .single();
+  if (error || !data) return { error: error?.message ?? "failed" };
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  return { url: `${base}/share/day/${data.token}` };
+}

@@ -139,3 +139,22 @@ Faza 1; la nivelul Fazei 0 verificăm motorul: `visibility_rules` +
       Contacts (/contacts, tap-to-call/email).
 - [ ] Upload-ul real în Storage cere stack-ul Supabase (bucket-ul se creează
       din migrație, guarded).
+
+## Faza 6 — Stare
+
+- [x] Migrația 00011: refactor visibility-for-user (private.*_for), ical_tokens,
+      share_links, push_subscriptions, public.ical_feed (doar service_role) —
+      `faza6_rls.test.sql`: 4 probe PASS, inclusiv DoD-ul: feed-ul crew exclude
+      itemul restricționat și ziua restricționată; token revocat = mort.
+- [x] lib/ics.ts: summary (all-day per Tour Date) + items (schedule+travel),
+      instante UTC corecte peste DST (testat pe 25 oct 2026), escaping +
+      folding RFC 5545 — 7 teste. Ruta /api/ical/[token]?mode=….
+- [x] Day Sheets: lib/daysheet.ts (visibility prin RLS = DoD; publicOnly pt
+      share) + PDF-uri: /api/pdf/daysheet/[dayId], /api/pdf/tourbook/[tourId]
+      ?from&to, /api/pdf/rooming/[hotelId]; /share/day/[token] public cu
+      expirare/revocare + butonul Share pe pagina zilei.
+- [x] Notificări in-app: /o/[slug]/notifications (listă + mark read + compose
+      către toți membrii, gated pe send_push).
+- [ ] Web Push (VAPID + service worker) — tabelul push_subscriptions e gata;
+      trimiterea vine în hardening. Compose către grupuri/useri selectați —
+      odată cu UI-ul de users.

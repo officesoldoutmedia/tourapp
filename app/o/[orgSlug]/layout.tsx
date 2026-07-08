@@ -20,6 +20,10 @@ export default async function OrgLayout({
         <Link href={`/o/${org.slug}`} className="text-sm font-semibold">
           {org.name}
         </Link>
+        <span className="ml-auto flex items-center gap-3 text-sm">
+          <Link href={`/o/${org.slug}/contacts`} title="Contacts" className="hover:opacity-70">👥</Link>
+          <Link href={`/o/${org.slug}/notifications`} title="Notifications" className="hover:opacity-70">🔔</Link>
+        </span>
       </header>
       <div className="flex-1">{children}</div>
     </div>
