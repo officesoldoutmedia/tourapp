@@ -158,3 +158,21 @@ Faza 1; la nivelul Fazei 0 verificăm motorul: `visibility_rules` +
 - [ ] Web Push (VAPID + service worker) — tabelul push_subscriptions e gata;
       trimiterea vine în hardening. Compose către grupuri/useri selectați —
       odată cu UI-ul de users.
+
+## Faza 7 — Stare
+
+- [x] Migrația 00012 (settlements/ticket_sales cu kills+scans/expenses pe
+      3 etape/non_settlement_items) — `faza7_rls.test.sql`: 3 probe PASS,
+      inclusiv [C]: MANAGERUL nu vede și nu scrie accounting; accounting
+      + admin da; crew nu.
+- [x] lib/settlement.ts — computeSettlement() cu ordinea EXACTĂ A.4 +
+      evalExpenseFormula — 8 teste, inclusiv DoD-ul: 85/15 cu taxe și
+      withholding (gross 100k, taxe 19k, expenses 20k, guarantee 10k,
+      deposit 5k, withholding 2k → AMOUNT DUE 46.350) ✓.
+- [x] UI /e/[eventId]/accounting (guard view_accounting): waterfall vizual
+      în ordinea calculului cu derivatele read-only, Ticket Sales grid cu
+      kills/scans + totaluri, Expenses pe 3 etape vizual distincte cu
+      formule, Line Items cu TOTAL/GRAND TOTAL, Copy From Another Event,
+      selector Currency.
+- [x] Exporturi: /api/csv/settlement/[eventId] (settlement + expenses +
+      line items) și /api/pdf/settlement/[eventId].

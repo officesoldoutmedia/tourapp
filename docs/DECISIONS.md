@@ -70,3 +70,9 @@ De făcut de utilizator (recomandat): buget + alertă în Billing → Budgets & 
    ne-declined (nu doar cele filtrate).
 3. Tastatură pe rândul New Guest: Enter salvează din orice câmp; Tab din Notes
    salvează și mută focusul pe Last Name [C]; Tab/Shift-Tab navighează nativ.
+
+## 2026-07-08 — Settlement: decizii [D]
+Overage = split% × max(0, AmountToPot − Guarantee) pentru vs_split/door_deal;
+override manual posibil (coloana overage). Total expenses rămâne input manual
+pe settlement (suma pre-split din tab e afișată ca hint) — de validat cu
+fixtures reale de la Stefan (§10 Faza 7 DoD) și în trialul Eventric.

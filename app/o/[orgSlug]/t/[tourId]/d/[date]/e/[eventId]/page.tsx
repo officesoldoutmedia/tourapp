@@ -120,6 +120,14 @@ export default async function EventPage({
           </span>
         </span>
         <span className="flex gap-2">
+          {can({ tier, permission }, "view_accounting") && (
+            <Link
+              href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/accounting`}
+              className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
+            >
+              Accounting →
+            </Link>
+          )}
           <Link
             href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/set-list`}
             className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
