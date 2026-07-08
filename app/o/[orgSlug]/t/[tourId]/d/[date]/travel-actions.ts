@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { travelAutoTitle, arrivalFrom } from "@/lib/travel";
+import { dayInstant } from "@/lib/datetime";
 import { computeGroundDistance } from "@/lib/googlePlaces";
 
 async function requireEditor(orgSlug: string) {
@@ -33,11 +34,14 @@ export interface TravelItemInput {
   arriveDayOffset: number;
   detail: string;
   distanceUnit: "kilometers" | "miles";
-  // rail/sea extra
+  // rail/sea extra (la sea: railLine = operator, trainNumber = vas/voiaj)
   railLine: string;
   trainNumber: string;
   ticketStatus: string;
   confirmationNumber: string;
+  // air: creează/actualizează primul flight leg (numărul e trackabil)
+  airline?: string;
+  flightNumber?: string;
   /** true → recalculează distanța/durata/sosirea prin Distance Matrix [C] */
   autoCalc: boolean;
 }
@@ -113,10 +117,44 @@ export async function upsertTravelItem(
       })
     : input.title.trim() || null;
 
-  const { error } = input.id
-    ? await supabase.from("travel_items").update(row).eq("id", input.id)
-    : await supabase.from("travel_items").insert(row);
-  if (error) return { error: error.message };
+  let itemId = input.id ?? null;
+  if (input.id) {
+    const { error } = await supabase.from("travel_items").update(row).eq("id", input.id);
+    if (error) return { error: error.message };
+  } else {
+    const { data, error } = await supabase
+      .from("travel_items")
+      .insert(row)
+      .select("id")
+      .single();
+    if (error) return { error: error.message };
+    itemId = data.id;
+  }
+
+  // AIR: numărul de zbor din formular → primul flight leg [cererea lui Ștefan]
+  if (input.travelType === "air" && input.flightNumber?.trim() && itemId) {
+    const { data: legs } = await supabase
+      .from("flight_legs")
+      .select("id")
+      .eq("travel_item_id", itemId)
+      .order("created_at")
+      .limit(1);
+    const legRow = {
+      airline: input.airline?.trim() || null,
+      flight_number: input.flightNumber.trim().toUpperCase(),
+    };
+    if (legs?.[0]) {
+      await supabase.from("flight_legs").update(legRow).eq("id", legs[0].id);
+    } else {
+      await supabase.from("flight_legs").insert({
+        travel_item_id: itemId,
+        ...legRow,
+        dep_time: input.departTime ? dayInstant(date, input.departTime, tz).toISOString() : null,
+        arr_time: arriveTime ? dayInstant(date, arriveTime, tz).toISOString() : null,
+      });
+    }
+  }
+
   revalidatePath(dayPath(orgSlug, tourId, date));
   return {};
 }

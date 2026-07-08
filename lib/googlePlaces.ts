@@ -175,3 +175,40 @@ export async function lookupTimezoneByLatLng(
   };
   return data.status === "OK" ? (data.timeZoneId ?? null) : null;
 }
+
+/**
+ * Autocomplete (New) — sugestii de adrese/POI-uri în timp ce userul
+ * tastează în origin/destination (travel). Max 5, doar descrieri text.
+ */
+export async function autocompletePlaces(
+  input: string,
+  includedPrimaryTypes?: string[],
+): Promise<string[]> {
+  const apiKey = process.env.GOOGLE_MAPS_API_KEY;
+  if (!apiKey || input.trim().length < 3) return [];
+
+  const response = await fetch(
+    "https://places.googleapis.com/v1/places:autocomplete",
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-Goog-Api-Key": apiKey,
+      },
+      body: JSON.stringify({
+        input,
+        ...(includedPrimaryTypes?.length ? { includedPrimaryTypes } : {}),
+      }),
+      cache: "no-store",
+    },
+  );
+  if (!response.ok) return [];
+
+  const data = (await response.json()) as {
+    suggestions?: { placePrediction?: { text?: { text?: string } } }[];
+  };
+  return (data.suggestions ?? [])
+    .map((s) => s.placePrediction?.text?.text)
+    .filter((t): t is string => Boolean(t))
+    .slice(0, 5);
+}

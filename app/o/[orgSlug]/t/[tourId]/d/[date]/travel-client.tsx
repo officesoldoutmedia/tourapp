@@ -65,6 +65,81 @@ function clock(t: string | null): string {
   return t ? t.slice(0, 5) : "";
 }
 
+/**
+ * Input cu autocomplete Google Places (adrese/POI-uri; la air → aeroporturi,
+ * rail → gări, sea → porturi). Sugestiile vin prin API-ul nostru — cheia
+ * Google nu ajunge în browser.
+ */
+function PlaceInput({
+  value,
+  onChange,
+  placeholder,
+  mode,
+}: {
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  mode: TravelType;
+}) {
+  const [result, setResult] = useState<{ query: string; items: string[] } | null>(null);
+  const [focused, setFocused] = useState(false);
+  const [picked, setPicked] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (value.trim().length < 3) return;
+    const timer = setTimeout(async () => {
+      try {
+        const res = await fetch("/api/travel/autocomplete", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ input: value, mode }),
+        });
+        const data = await res.json();
+        setResult({ query: value, items: data.suggestions ?? [] });
+      } catch {
+        /* sugestiile sunt best-effort */
+      }
+    }, 300);
+    return () => clearTimeout(timer);
+  }, [value, mode]);
+
+  const items =
+    focused && value !== picked && result?.query === value ? result.items : [];
+
+  return (
+    <span className="relative min-w-0 flex-1">
+      <input
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onFocus={() => setFocused(true)}
+        onBlur={() => setFocused(false)}
+        placeholder={placeholder}
+        className="w-full rounded border border-hairline px-2 py-1 text-sm"
+      />
+      {items.length > 0 && (
+        <ul className="absolute left-0 top-full z-20 mt-1 w-max min-w-full max-w-[28rem] overflow-hidden rounded-md border border-hairline bg-surface shadow-md">
+          {items.map((sug) => (
+            <li key={sug}>
+              <button
+                type="button"
+                // mousedown, nu click — altfel blur-ul închide lista înainte
+                onMouseDown={(e) => {
+                  e.preventDefault();
+                  onChange(sug);
+                  setPicked(sug);
+                }}
+                className="block w-full max-w-[28rem] truncate px-2.5 py-1.5 text-left text-sm hover:bg-subtle"
+              >
+                {sug}
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </span>
+  );
+}
+
 export function TravelSection({
   orgSlug,
   tourId,
@@ -267,6 +342,9 @@ function TravelForm({
   const [trainNumber, setTrainNumber] = useState(initial?.train_number ?? "");
   const [ticketStatus, setTicketStatus] = useState(initial?.ticket_status ?? "");
   const [confirmation, setConfirmation] = useState(initial?.confirmation_number ?? "");
+  const firstLeg = initial?.legs?.[0] ?? null;
+  const [airline, setAirline] = useState(firstLeg?.airline ?? "");
+  const [flightNumber, setFlightNumber] = useState(firstLeg?.flight_number ?? "");
 
   // ── Rută live [C §6.7 extins]: origin+dest → km/durată + sugestie plecare ──
   // rezultatul poartă cheia (origin/dest) pentru care a fost calculat —
@@ -336,6 +414,8 @@ function TravelForm({
       party,
       originLabel: origin,
       destLabel: dest,
+      airline,
+      flightNumber,
       departTime: depart,
       departDayOffset: initial?.depart_day_offset ?? 0,
       arriveTime: arrive,
@@ -367,12 +447,7 @@ function TravelForm({
 
       <div className="flex flex-wrap gap-2">
         <span className="flex min-w-36 flex-1 gap-1">
-          <input
-            value={origin}
-            onChange={(e) => setOrigin(e.target.value)}
-            placeholder={t("origin")}
-            className="min-w-0 flex-1 rounded border border-hairline px-2 py-1 text-sm"
-          />
+          <PlaceInput value={origin} onChange={setOrigin} placeholder={t("origin")} mode={type} />
           {pins.length > 0 && (
             <select
               value=""
@@ -390,12 +465,7 @@ function TravelForm({
           )}
         </span>
         <span className="flex min-w-36 flex-1 gap-1">
-          <input
-            value={dest}
-            onChange={(e) => setDest(e.target.value)}
-            placeholder={t("destination")}
-            className="min-w-0 flex-1 rounded border border-hairline px-2 py-1 text-sm"
-          />
+          <PlaceInput value={dest} onChange={setDest} placeholder={t("destination")} mode={type} />
           {pins.length > 0 && (
             <select
               value=""
@@ -487,6 +557,24 @@ function TravelForm({
           <input value={railLine} onChange={(e) => setRailLine(e.target.value)} placeholder={t("railLine")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
           <input value={trainNumber} onChange={(e) => setTrainNumber(e.target.value)} placeholder={t("trainNumber")} className="w-24 rounded border border-hairline px-2 py-1 text-sm" />
           <input value={ticketStatus} onChange={(e) => setTicketStatus(e.target.value)} placeholder={t("ticketStatus")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
+          <input value={confirmation} onChange={(e) => setConfirmation(e.target.value)} placeholder={t("confirmation")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
+        </div>
+      )}
+
+      {/* air: nr. de zbor trackabil (devine primul flight leg) */}
+      {type === "air" && (
+        <div className="flex flex-wrap gap-2">
+          <input value={airline} onChange={(e) => setAirline(e.target.value)} placeholder={t("airline")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
+          <input value={flightNumber} onChange={(e) => setFlightNumber(e.target.value)} placeholder={t("flightNumber")} className="w-28 rounded border border-hairline px-2 py-1 font-mono text-sm" />
+          <input value={confirmation} onChange={(e) => setConfirmation(e.target.value)} placeholder={t("confirmation")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
+        </div>
+      )}
+
+      {/* sea: operator + vas/voiaj (refolosește coloanele rail) */}
+      {type === "sea" && (
+        <div className="flex flex-wrap gap-2">
+          <input value={railLine} onChange={(e) => setRailLine(e.target.value)} placeholder={t("seaOperator")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
+          <input value={trainNumber} onChange={(e) => setTrainNumber(e.target.value)} placeholder={t("seaVessel")} className="w-32 rounded border border-hairline px-2 py-1 font-mono text-sm" />
           <input value={confirmation} onChange={(e) => setConfirmation(e.target.value)} placeholder={t("confirmation")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
         </div>
       )}
@@ -586,7 +674,16 @@ function FlightLegs({
         {item.legs.map((leg) => (
           <li key={leg.id} className="flex items-center gap-2">
             <span className="font-mono">
-              {leg.airline} {leg.flight_number} · {leg.dep_airport_iata}→
+              <a
+                href={`https://www.flightradar24.com/data/flights/${(leg.flight_number ?? "").replace(/\s+/g, "").toLowerCase()}`}
+                target="_blank"
+                rel="noreferrer"
+                className="font-mono text-accent hover:underline"
+                title="Track on Flightradar24"
+              >
+                {leg.airline} {leg.flight_number} ↗
+              </a>{" "}
+              · {leg.dep_airport_iata}→
               {leg.arr_airport_iata} · {leg.dep_time}–{leg.arr_time}
             </span>
             {canEdit && (

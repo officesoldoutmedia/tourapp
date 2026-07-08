@@ -342,7 +342,9 @@
     "suggestAnchored": "Ca să ajungi cu 15 min înainte de „{title}” ({time}):",
     "suggestForArrive": "Ca să ajungi cu 15 min buffer:",
     "leaveAt": "Pleacă la",
-    "suggestHint": "Setează ora de sosire sau adaugă itemi în program și îți sugerez ora de plecare."
+    "suggestHint": "Setează ora de sosire sau adaugă itemi în program și îți sugerez ora de plecare.",
+    "seaOperator": "Operator",
+    "seaVessel": "Vas / voiaj nr."
   },
   "hotels": {
     "title": "Hoteluri",

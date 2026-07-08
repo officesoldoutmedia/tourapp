@@ -342,7 +342,9 @@
     "suggestAnchored": "To arrive 15 min before “{title}” ({time}):",
     "suggestForArrive": "To arrive with a 15 min buffer:",
     "leaveAt": "Leave at",
-    "suggestHint": "Set an arrival time or add schedule items and I'll suggest when to leave."
+    "suggestHint": "Set an arrival time or add schedule items and I'll suggest when to leave.",
+    "seaOperator": "Operator",
+    "seaVessel": "Vessel / voyage no."
   },
   "hotels": {
     "title": "Hotels",
