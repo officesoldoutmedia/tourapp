@@ -11,6 +11,9 @@ import {
   type ScheduleItemData,
 } from "./day-client";
 import { EventsSection } from "./events-client";
+import { TravelSection, type TravelItemData } from "./travel-client";
+import { HotelsSection, type HotelData } from "./hotels-client";
+import { formatTimeInZone } from "@/lib/datetime";
 
 export default async function DayPage({
   params,
@@ -60,6 +63,113 @@ export default async function DayPage({
       .is("deleted_at", null)
       .order("created_at"),
   ]);
+
+  const [
+    { data: travelItems },
+    { data: hotels },
+    { data: personnel },
+    { data: prevDay },
+  ] = await Promise.all([
+    supabase
+      .from("travel_items")
+      .select(
+        "*, flight_legs(id, airline, flight_number, dep_airport_iata, arr_airport_iata, scheduled_dep, scheduled_arr), travel_passengers(personnel_id)",
+      )
+      .eq("day_id", day.id)
+      .is("deleted_at", null)
+      .order("depart_time", { ascending: true, nullsFirst: false })
+      .order("sort_order"),
+    supabase
+      .from("day_hotels")
+      .select(
+        "id, name, city, party, check_in_date, check_out_date, check_in_time, check_out_time, notes, stay_group_id, room_list_entries(id, personnel_id, guest_name, bag_tag, room_number, room_type, smoking, check_in, check_out, confirmation_number, deleted_at)",
+      )
+      .eq("day_id", day.id)
+      .is("deleted_at", null)
+      .order("sort_order")
+      .order("created_at"),
+    supabase
+      .from("tour_personnel")
+      .select("id, first_name, last_name, preferred_name")
+      .eq("tour_id", tourId)
+      .is("deleted_at", null)
+      .order("sort_order")
+      .order("last_name"),
+    supabase
+      .from("days")
+      .select("id")
+      .eq("tour_id", tourId)
+      .lt("date", date)
+      .is("deleted_at", null)
+      .order("date", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
+  const { data: prevDayHotels } = prevDay
+    ? await supabase
+        .from("day_hotels")
+        .select("id, name")
+        .eq("day_id", prevDay.id)
+        .is("deleted_at", null)
+        .order("sort_order")
+    : { data: [] as { id: string; name: string }[] };
+
+  const personnelOptions = (personnel ?? []).map((p) => ({
+    id: p.id,
+    name:
+      `${p.last_name ?? ""}, ${p.first_name ?? ""}${p.preferred_name ? ` (${p.preferred_name})` : ""}`
+        .replace(/^, /, "")
+        .trim(),
+  }));
+
+  const travelData: TravelItemData[] = (travelItems ?? []).map((item) => ({
+    ...(item as unknown as Omit<TravelItemData, "legs" | "passenger_ids">),
+    legs: (
+      (item.flight_legs ?? []) as {
+        id: string;
+        airline: string | null;
+        flight_number: string | null;
+        dep_airport_iata: string | null;
+        arr_airport_iata: string | null;
+        scheduled_dep: string | null;
+        scheduled_arr: string | null;
+      }[]
+    ).map((leg) => ({
+      id: leg.id,
+      airline: leg.airline,
+      flight_number: leg.flight_number,
+      dep_airport_iata: leg.dep_airport_iata,
+      arr_airport_iata: leg.arr_airport_iata,
+      dep_time: leg.scheduled_dep
+        ? formatTimeInZone(new Date(leg.scheduled_dep), tz)
+        : "—",
+      arr_time: leg.scheduled_arr
+        ? formatTimeInZone(new Date(leg.scheduled_arr), tz)
+        : "—",
+    })),
+    passenger_ids: (
+      (item.travel_passengers ?? []) as { personnel_id: string }[]
+    ).map((p) => p.personnel_id),
+  }));
+
+  const hotelData: HotelData[] = (hotels ?? []).map((hotel) => ({
+    id: hotel.id,
+    name: hotel.name,
+    city: hotel.city,
+    party: hotel.party,
+    check_in_date: hotel.check_in_date,
+    check_out_date: hotel.check_out_date,
+    check_in_time: hotel.check_in_time,
+    check_out_time: hotel.check_out_time,
+    notes: hotel.notes,
+    stay_group_id: hotel.stay_group_id,
+    rooms: (
+      (hotel.room_list_entries ?? []) as (HotelData["rooms"][number] & {
+        deleted_at: string | null;
+      })[]
+    ).filter((room) => room.deleted_at === null),
+  }));
 
   const canEdit = can({ tier, permission }, "edit_tour_content");
   const location = [day.city, day.state, day.country].filter(Boolean).join(", ");
@@ -112,6 +222,28 @@ export default async function DayPage({
         day={day as DayData}
         items={(items ?? []) as ScheduleItemData[]}
         templates={templates ?? []}
+        canEdit={canEdit}
+      />
+
+      <TravelSection
+        orgSlug={orgSlug}
+        tourId={tourId}
+        date={date}
+        dayId={day.id}
+        tz={tz}
+        items={travelData}
+        personnel={personnelOptions}
+        canEdit={canEdit}
+      />
+
+      <HotelsSection
+        orgSlug={orgSlug}
+        tourId={tourId}
+        date={date}
+        dayId={day.id}
+        hotels={hotelData}
+        prevDayHotels={prevDayHotels ?? []}
+        personnel={personnelOptions}
         canEdit={canEdit}
       />
     </main>
