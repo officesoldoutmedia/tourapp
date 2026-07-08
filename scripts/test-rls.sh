@@ -16,7 +16,8 @@ trap cleanup EXIT
 if [ ! -d "$PGDATA" ]; then
   initdb -D "$PGDATA" -U postgres --auth=trust -E UTF8 >/dev/null
 fi
-pg_ctl -D "$PGDATA" -o "-p $PORT -k /tmp" -l "$PGDATA/log" start >/dev/null
+pg_ctl -D "$PGDATA" status >/dev/null 2>&1 ||
+  pg_ctl -D "$PGDATA" -o "-p $PORT -k /tmp" -l "$PGDATA/log" start >/dev/null
 
 dropdb -h /tmp -p "$PORT" -U postgres --if-exists tourapp_test
 createdb -h /tmp -p "$PORT" -U postgres tourapp_test

@@ -199,9 +199,16 @@ create policy profiles_update_self on public.profiles
 -- organizations ─────────────────────────────────────────────────────
 alter table public.organizations enable row level security;
 
+-- deleted_at: rândurile șterse rămân vizibile DOAR pentru cei care pot
+-- edita (soft-delete prin UPDATE cere ca rândul NOU să treacă politica de
+-- SELECT — comportament documentat Postgres; plus permite restore/trash).
 create policy orgs_select_member on public.organizations
   for select to authenticated
-  using (private.is_org_member(id) and deleted_at is null);
+  using (
+    private.is_org_member(id)
+    and (deleted_at is null
+         or (private.has_min_permission(id, 'administrator') and private.is_pro()))
+  );
 
 create policy orgs_update_admin_pro on public.organizations
   for update to authenticated
@@ -248,12 +255,26 @@ alter table public.groups enable row level security;
 
 create policy groups_select_member on public.groups
   for select to authenticated
-  using (private.is_org_member(organization_id) and deleted_at is null);
+  using (
+    private.is_org_member(organization_id)
+    and (deleted_at is null
+         or (private.has_min_permission(organization_id, 'manager') and private.is_pro()))
+  );
 
-create policy groups_write_manager_pro on public.groups
-  for all to authenticated
+-- NB: politicile de scriere sunt SEPARATE pe insert/update/delete (nu `for
+-- all`) — un `for all` ar acorda și SELECT, ocolind filtrul deleted_at.
+create policy groups_insert_manager_pro on public.groups
+  for insert to authenticated
+  with check (private.has_min_permission(organization_id, 'manager') and private.is_pro());
+
+create policy groups_update_manager_pro on public.groups
+  for update to authenticated
   using (private.has_min_permission(organization_id, 'manager') and private.is_pro())
   with check (private.has_min_permission(organization_id, 'manager') and private.is_pro());
+
+create policy groups_delete_manager_pro on public.groups
+  for delete to authenticated
+  using (private.has_min_permission(organization_id, 'manager') and private.is_pro());
 
 -- group_members ─────────────────────────────────────────────────────
 alter table public.group_members enable row level security;
@@ -267,17 +288,20 @@ create policy group_members_select_member on public.group_members
     )
   );
 
-create policy group_members_write_manager_pro on public.group_members
-  for all to authenticated
-  using (
+create policy group_members_insert_manager_pro on public.group_members
+  for insert to authenticated
+  with check (
     exists (
       select 1 from public.groups g
       where g.id = group_id
         and private.has_min_permission(g.organization_id, 'manager')
         and private.is_pro()
     )
-  )
-  with check (
+  );
+
+create policy group_members_delete_manager_pro on public.group_members
+  for delete to authenticated
+  using (
     exists (
       select 1 from public.groups g
       where g.id = group_id
@@ -295,10 +319,13 @@ create policy visibility_select_manager on public.visibility_rules
   for select to authenticated
   using (private.has_min_permission(organization_id, 'manager'));
 
-create policy visibility_write_manager_pro on public.visibility_rules
-  for all to authenticated
-  using (private.has_min_permission(organization_id, 'manager') and private.is_pro())
+create policy visibility_insert_manager_pro on public.visibility_rules
+  for insert to authenticated
   with check (private.has_min_permission(organization_id, 'manager') and private.is_pro());
+
+create policy visibility_delete_manager_pro on public.visibility_rules
+  for delete to authenticated
+  using (private.has_min_permission(organization_id, 'manager') and private.is_pro());
 
 -- notifications ─────────────────────────────────────────────────────
 alter table public.notifications enable row level security;

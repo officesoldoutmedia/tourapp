@@ -25,10 +25,22 @@ create index org_invitations_org_idx on public.org_invitations (organization_id)
 alter table public.org_invitations enable row level security;
 
 -- Doar administratorii org-ului văd/administrează invitațiile. (§4.2)
-create policy invitations_admin_all on public.org_invitations
-  for all to authenticated
+create policy invitations_select_admin on public.org_invitations
+  for select to authenticated
+  using (private.has_min_permission(organization_id, 'administrator') and private.is_pro());
+
+create policy invitations_insert_admin on public.org_invitations
+  for insert to authenticated
+  with check (private.has_min_permission(organization_id, 'administrator') and private.is_pro());
+
+create policy invitations_update_admin on public.org_invitations
+  for update to authenticated
   using (private.has_min_permission(organization_id, 'administrator') and private.is_pro())
   with check (private.has_min_permission(organization_id, 'administrator') and private.is_pro());
+
+create policy invitations_delete_admin on public.org_invitations
+  for delete to authenticated
+  using (private.has_min_permission(organization_id, 'administrator') and private.is_pro());
 
 -- ───────────────────────────────────────────────────────────────────
 -- Lookup public după token (pagina /invite/[token] — userul poate să

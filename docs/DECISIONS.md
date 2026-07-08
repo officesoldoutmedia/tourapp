@@ -36,3 +36,15 @@ scenariile din `supabase/tests/*.test.sql` (simulare useri prin
 adaugă un fișier `*.test.sql` cu probele ei de RLS. Nu s-a creat proiect
 Supabase cloud (cost $10/lună — decizie de business, rămâne pentru Faza 8 /
 utilizator).
+
+## 2026-07-08 — Soft delete & politici RLS (2 corecții din testare)
+1. Politicile de scriere sunt SEPARATE (insert/update/delete), niciodată
+   `for all` — un `for all` acordă implicit și SELECT și ar ocoli filtrul
+   `deleted_at is null` din politica de citire.
+2. Postgres cere ca rândul NOU al unui UPDATE să treacă politicile de SELECT
+   (când statement-ul citește tabelul). Soft-delete prin `set deleted_at=now()`
+   s-ar bloca singur. Soluția: politica de SELECT devine
+   `deleted_at is null OR <user-ul poate edita>` — crew nu vede niciodată
+   rânduri șterse; editorii le văd (trash/restore — aliniat cu §2.2.3 "datele
+   de tur nu se pierd niciodată"). Query-urile de UI filtrează explicit
+   `deleted_at is null`.
