@@ -104,3 +104,21 @@ Faza 1; la nivelul Fazei 0 verificăm motorul: `visibility_rules` +
       status advance agregat pe sidebarul zilelor (restanța Fazei 2).
 - [ ] DoD manual pe stack Supabase live (extend stay prin UI, copy/paste
       room list în Excel) — la instalarea Docker/OrbStack sau proiect cloud.
+
+## Faza 4 — Stare
+
+- [x] Migrația 00009 (tour_passes, gl settings/allotments, requests, passes)
+      + RLS §4.3.2 — `faza4_rls.test.sql`: 7 probe PASS (un singur pass type
+      la submit; cutoff blochează submitterul dar nu managerul; enforced
+      allotment respinge; owner edit doar pending, fără auto-aprobare;
+      mobile_access fără acces).
+- [x] Grid manager: New Guest row cu Enter/Tab-din-Notes + smart defaults [C],
+      filtre Requestor/Status/Affiliation, master checkbox pe selecția
+      filtrată, bulk status, sortare pe coloane, totaluri pe selecția
+      filtrată, footer NUM ALLOWED + ENFORCED + Remaining roșu la negativ,
+      header cutoff + LOCKED, panou detaliu cu APPROVE.
+- [x] Form crew + lista requesturilor proprii; CRUD Tour Passes
+      (/t/[tourId]/passes); email de aprobare (bilete + passes) prin Resend,
+      mod log fără cheie.
+- [ ] DoD manual pe stack live: emailul real prin Resend (cere RESEND_API_KEY)
+      + fluxul cu 2 useri prin UI.
