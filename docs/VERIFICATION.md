@@ -71,3 +71,20 @@ Faza 1; la nivelul Fazei 0 verificăm motorul: `visibility_rules` +
       `supabase/tests/*.test.sql` — 14 probe, toate PASS (2026-07-08).
 - [ ] Verificare pe stack Supabase real (auth flows end-to-end prin UI) —
       la instalarea OrbStack/Docker sau la crearea proiectului cloud (Faza 8).
+
+## Faza 1 — Stare
+
+- [x] Migrații 00004 (tours/days/schedule/personnel/gear/templates) + 00005
+      (realtime publication, guarded) — aplicate curat pe Postgres 17.
+- [x] RLS: `supabase/tests/faza1_rls.test.sql` — 8 probe PASS (cascadă
+      tur→zi→item, item-level rules, grup, soft delete + trash + restore).
+- [x] `lib/datetime.ts` — 16 teste (+1 peste miezul nopții, DST 29 mar /
+      25 oct 2026, formatare în tz-ul zilei).
+- [x] UI: wizard tur zi-cu-zi cu tz lookup, sidebar zile pe luni, pagina
+      zilei (note 3 zone + schedule cu +1/confirmed/complete/publicity/
+      CONFIRMALL/templates), realtime hook. Build + lint + typecheck verzi.
+- [ ] DoD manual pe stack Supabase real (2 useri live) — după instalarea
+      Docker/OrbStack sau proiect cloud: tur de 10 zile prin wizard,
+      template aplicat, +1 corect, edit live vizibil la al doilea user.
+- [ ] Rămas din blueprint Faza 1: mini-calendar în sidebar (nice-to-have,
+      lista pe luni acoperă navigarea).
