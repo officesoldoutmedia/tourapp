@@ -60,3 +60,13 @@ server-side prin lib/googlePlaces.ts; stă în GOOGLE_MAPS_API_KEY din .env.loca
 gitignored). Teste live: Places găsește NIBIRU; Time Zone dă Europe/Bucharest;
 Distance Matrix Satu Mare→Cluj 189 km/3h (fix exemplul din DoD-ul Fazei 3).
 De făcut de utilizator (recomandat): buget + alertă în Billing → Budgets & alerts.
+
+## 2026-07-08 — Guest List: decizii [D]
+1. Emailurile de aprobare: toggle-ul org `guest_list_approval_emails` e tratat
+   ca ON dacă nu e setat (feature-ul merge out-of-the-box; org settings UI vine
+   în faza de settings).
+2. Totalurile din footer: pe selecția filtrată [C]; fără selecție → toate
+   rândurile filtrate. Remaining se calculează pe TOATE requesturile
+   ne-declined (nu doar cele filtrate).
+3. Tastatură pe rândul New Guest: Enter salvează din orice câmp; Tab din Notes
+   salvează și mută focusul pe Last Name [C]; Tab/Shift-Tab navighează nativ.

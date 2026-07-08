@@ -119,12 +119,20 @@ export default async function EventPage({
             ({(advances ?? []).length})
           </span>
         </span>
-        <Link
-          href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/advance`}
-          className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white"
-        >
-          {ta("title")} →
-        </Link>
+        <span className="flex gap-2">
+          <Link
+            href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/guest-list`}
+            className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
+          >
+            Guest List →
+          </Link>
+          <Link
+            href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/advance`}
+            className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white"
+          >
+            {ta("title")} →
+          </Link>
+        </span>
       </section>
 
       <EventSections
