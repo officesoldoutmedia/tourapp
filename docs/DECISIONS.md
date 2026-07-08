@@ -26,3 +26,13 @@ blueprint). Landing-ul de marketing (faza lansare) poate primi routing separat.
 Conform §3.2 nota [D]: implementăm UN nivel efectiv (enum org_permission), nu
 array de flags. Logica centralizată în lib/permissions.ts + private.* SQL face
 migrarea la flags o schimbare locală dacă trialul Eventric o infirmă.
+
+## 2026-07-08 — Testare RLS pe Postgres local cu stub auth (fără Docker)
+`scripts/test-rls.sh` pornește un Postgres 17 (brew) efemer, aplică
+`supabase/tests/00000_auth_stub.sql` (roluri anon/authenticated/service_role +
+schema auth + auth.uid() identic Supabase), rulează TOATE migrațiile, apoi
+scenariile din `supabase/tests/*.test.sql` (simulare useri prin
+`set_config('request.jwt.claims', …)` + `set role authenticated`). Fiecare fază
+adaugă un fișier `*.test.sql` cu probele ei de RLS. Nu s-a creat proiect
+Supabase cloud (cost $10/lună — decizie de business, rămâne pentru Faza 8 /
+utilizator).
