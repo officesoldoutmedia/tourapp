@@ -17,6 +17,7 @@ const geistMono = Geist_Mono({
 export const metadata: Metadata = {
   title: "TourApp",
   description: "Tour & event logistics",
+  other: { "color-scheme": "only light" },
 };
 
 export default async function RootLayout({

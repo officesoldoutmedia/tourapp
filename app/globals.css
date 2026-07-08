@@ -18,8 +18,10 @@
  * ilizibil pe dark mode de sistem. Dark mode-ul complet e cerință reală
  * (blueprint §9 [C]) și intră ca pas de design dedicat — vezi DECISIONS.md.
  */
+/* "only light" e și opt-out-ul oficial din Auto Dark Mode al Chrome-ului
+   (forțarea dark pe site-uri), care altfel inversează culorile peste CSS. */
 html {
-  color-scheme: light;
+  color-scheme: only light;
 }
 
 body {
