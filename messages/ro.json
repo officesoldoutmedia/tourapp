@@ -336,7 +336,13 @@
     "noItems": "Niciun travel item pe această zi.",
     "km": "km",
     "miles": "mi",
-    "pinPicker": "📍 din tur"
+    "pinPicker": "📍 din tur",
+    "routeLoading": "Calculez ruta…",
+    "openRoute": "Deschide ruta în Google Maps",
+    "suggestAnchored": "Ca să ajungi cu 15 min înainte de „{title}” ({time}):",
+    "suggestForArrive": "Ca să ajungi cu 15 min buffer:",
+    "leaveAt": "Pleacă la",
+    "suggestHint": "Setează ora de sosire sau adaugă itemi în program și îți sugerez ora de plecare."
   },
   "hotels": {
     "title": "Hoteluri",

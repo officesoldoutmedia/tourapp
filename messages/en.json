@@ -336,7 +336,13 @@
     "noItems": "No travel items on this day.",
     "km": "km",
     "miles": "mi",
-    "pinPicker": "📍 from tour"
+    "pinPicker": "📍 from tour",
+    "routeLoading": "Calculating route…",
+    "openRoute": "Open route in Google Maps",
+    "suggestAnchored": "To arrive 15 min before “{title}” ({time}):",
+    "suggestForArrive": "To arrive with a 15 min buffer:",
+    "leaveAt": "Leave at",
+    "suggestHint": "Set an arrival time or add schedule items and I'll suggest when to leave."
   },
   "hotels": {
     "title": "Hotels",

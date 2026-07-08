@@ -151,6 +151,9 @@ export function TimeRail({
             : 45;
           const lane = lanes.get(block.id) ?? 0;
           const laneWidth = 100 / laneCount;
+          const blockHeight = Math.max(duration * (HOUR_PX / 60) - 2, 26);
+          // sub 40px nu încap două rânduri → totul pe un singur rând
+          const compact = blockHeight < 40;
           const isTravel = block.kind !== "schedule" && block.kind !== "publicity";
           const Icon =
             block.kind === "publicity"
@@ -158,33 +161,43 @@ export function TimeRail({
               : isTravel
                 ? TRAVEL_ICON[block.kind as keyof typeof TRAVEL_ICON]
                 : null;
+          const timeLabel = (
+            <>
+              {formatTimeInZone(new Date(block.startAt), tz)}
+              {block.endAt && `–${formatTimeInZone(new Date(block.endAt), tz)}`}
+              {block.confirmed && <span className="ml-1 text-success">✓</span>}
+            </>
+          );
           return (
             <div
               key={block.id}
-              className={`absolute overflow-hidden rounded-md border border-hairline bg-surface px-2 py-1 shadow-xs ${
+              className={`absolute flex flex-col justify-center overflow-hidden rounded-md border border-hairline bg-surface px-2 shadow-xs ${
                 isTravel ? "border-l-3 border-l-party-5" : "border-l-3 border-l-accent"
               }`}
               style={{
                 top: y(start) + 8,
-                height: Math.max(duration * (HOUR_PX / 60) - 2, 24),
+                height: blockHeight,
                 left: `calc(${RAIL_W + 8}px + ${lane * laneWidth}% - ${lane * laneWidth * ((RAIL_W + 16) / 100)}px)`,
                 width: `calc(${laneWidth}% - ${laneWidth * ((RAIL_W + 16) / 100)}px - 8px)`,
               }}
             >
-              <p className="flex items-center gap-1.5 truncate text-sm font-medium leading-tight">
+              <p className="flex min-w-0 items-center gap-1.5 text-sm font-medium leading-tight">
                 {Icon && <Icon size={13} className="shrink-0 text-secondary" />}
                 {block.party && (
-                  <span className="rounded-full bg-accent-subtle px-1.5 text-[10px] font-bold text-accent">
+                  <span className="shrink-0 rounded-full bg-accent-subtle px-1.5 text-[10px] font-bold text-accent">
                     {block.party}
                   </span>
                 )}
                 <span className="truncate">{block.title}</span>
+                {compact && (
+                  <span className="ml-auto shrink-0 pl-2 font-mono text-[11px] font-normal text-tertiary">
+                    {timeLabel}
+                  </span>
+                )}
               </p>
-              <p className="font-mono text-[11px] text-tertiary">
-                {formatTimeInZone(new Date(block.startAt), tz)}
-                {block.endAt && `–${formatTimeInZone(new Date(block.endAt), tz)}`}
-                {block.confirmed && <span className="ml-1 text-success">✓</span>}
-              </p>
+              {!compact && (
+                <p className="font-mono text-[11px] text-tertiary">{timeLabel}</p>
+              )}
             </div>
           );
         })}

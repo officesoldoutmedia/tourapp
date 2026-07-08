@@ -308,6 +308,13 @@ export default async function DayPage({
       ? await getWeather(dayLat, dayLng, date, tz).catch(() => null)
       : null;
 
+  const firstTimed = (items ?? [])
+    .filter((i) => i.start_at)
+    .sort((a, b) => (a.start_at as string).localeCompare(b.start_at as string))[0];
+  const firstSchedule = firstTimed
+    ? { time: formatTimeInZone(new Date(firstTimed.start_at as string), tz), title: firstTimed.title }
+    : null;
+
   const mapPins: MapPinLink[] = [
     ...(events ?? []).flatMap((e) => {
       const v = e.venues as unknown as {
@@ -409,6 +416,7 @@ export default async function DayPage({
           items={travelData}
           personnel={personnelOptions}
           pins={pins}
+          firstSchedule={firstSchedule}
           canEdit={canEdit}
         />
       </div>

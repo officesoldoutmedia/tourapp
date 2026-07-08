@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, useTransition } from "react";
+import { useEffect, useState, useTransition } from "react";
+import { formatDuration } from "@/lib/travel";
 import { useTranslations } from "next-intl";
 import {
   deleteFlightLeg,
@@ -74,6 +75,7 @@ export function TravelSection({
   personnel,
   pins,
   canEdit,
+  firstSchedule,
 }: {
   orgSlug: string;
   tourId: string;
@@ -84,6 +86,7 @@ export function TravelSection({
   personnel: PersonnelOption[];
   pins: TravelPin[];
   canEdit: boolean;
+  firstSchedule?: { time: string; title: string } | null;
 }) {
   const t = useTranslations("travel");
   const [editing, setEditing] = useState<TravelItemData | null>(null);
@@ -218,6 +221,7 @@ export function TravelSection({
           initial={editing}
           dayId={dayId}
           pins={pins}
+          firstSchedule={firstSchedule ?? null}
           pending={pending}
           onCancel={() => {
             setAdding(false);
@@ -234,6 +238,7 @@ function TravelForm({
   initial,
   dayId,
   pins,
+  firstSchedule,
   pending,
   onSave,
   onCancel,
@@ -241,6 +246,7 @@ function TravelForm({
   initial: TravelItemData | null;
   dayId: string;
   pins: TravelPin[];
+  firstSchedule: { time: string; title: string } | null;
   pending: boolean;
   onSave: (input: TravelItemInput) => void;
   onCancel: () => void;
@@ -261,6 +267,64 @@ function TravelForm({
   const [trainNumber, setTrainNumber] = useState(initial?.train_number ?? "");
   const [ticketStatus, setTicketStatus] = useState(initial?.ticket_status ?? "");
   const [confirmation, setConfirmation] = useState(initial?.confirmation_number ?? "");
+
+  // ── Rută live [C §6.7 extins]: origin+dest → km/durată + sugestie plecare ──
+  // rezultatul poartă cheia (origin/dest) pentru care a fost calculat —
+  // se invalidează singur la tastare, fără setState sincron în effect
+  const [routeResult, setRouteResult] = useState<{
+    origin: string;
+    dest: string;
+    distanceKm: number;
+    durationMin: number;
+  } | null>(null);
+  const [routeLoading, setRouteLoading] = useState(false);
+  useEffect(() => {
+    if (type !== "ground" || origin.trim().length < 3 || dest.trim().length < 3) return;
+    const timer = setTimeout(async () => {
+      setRouteLoading(true);
+      try {
+        const res = await fetch("/api/travel/route-info", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ origin, dest }),
+        });
+        const data = await res.json();
+        if (data.ok) {
+          setRouteResult({ origin, dest, distanceKm: data.distanceKm, durationMin: data.durationMin });
+        }
+      } finally {
+        setRouteLoading(false);
+      }
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [type, origin, dest]);
+  const route =
+    routeResult && routeResult.origin === origin && routeResult.dest === dest
+      ? routeResult
+      : null;
+
+  const toMin = (hhmm: string) => {
+    const [h, m] = hhmm.split(":").map(Number);
+    return h * 60 + m;
+  };
+  const toHhmm = (min: number) => {
+    const m = ((min % 1440) + 1440) % 1440;
+    return `${String(Math.floor(m / 60)).padStart(2, "0")}:${String(m % 60).padStart(2, "0")}`;
+  };
+  // ținta de sosire: ora de arrive introdusă SAU primul item din program
+  // minus 15 min buffer; plecarea sugerată se rotunjește în jos la 5 min.
+  const BUFFER_MIN = 15;
+  let suggestion: { departMin: number; arriveMin: number; anchor: string } | null = null;
+  if (route) {
+    if (arrive) {
+      const departMin = Math.floor((toMin(arrive) - route.durationMin - BUFFER_MIN) / 5) * 5;
+      suggestion = { departMin, arriveMin: departMin + route.durationMin, anchor: "" };
+    } else if (firstSchedule) {
+      const targetArrive = toMin(firstSchedule.time) - BUFFER_MIN;
+      const departMin = Math.floor((targetArrive - route.durationMin) / 5) * 5;
+      suggestion = { departMin, arriveMin: departMin + route.durationMin, anchor: firstSchedule.title };
+    }
+  }
 
   function save(autoCalc: boolean) {
     onSave({
@@ -373,6 +437,50 @@ function TravelForm({
           className="w-16 rounded border border-hairline px-2 py-1 text-sm"
         />
       </div>
+
+      {type === "ground" && (routeLoading || route) && (
+        <div className="space-y-1.5 rounded-md border border-accent-border bg-accent-subtle/40 px-3 py-2 text-sm">
+          {routeLoading && !route ? (
+            <p className="text-tertiary">{t("routeLoading")}</p>
+          ) : route ? (
+            <>
+              <p className="flex flex-wrap items-center gap-x-3 gap-y-1">
+                <span className="font-mono font-medium">{route.distanceKm} km</span>
+                <span className="font-mono">{formatDuration(route.durationMin)}</span>
+                <a
+                  href={`https://www.google.com/maps/dir/?api=1&origin=${encodeURIComponent(origin)}&destination=${encodeURIComponent(dest)}`}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-accent hover:underline"
+                >
+                  {t("openRoute")} ↗
+                </a>
+              </p>
+              {suggestion && suggestion.departMin >= 0 && (
+                <p className="flex flex-wrap items-center gap-2">
+                  <span className="text-secondary">
+                    {suggestion.anchor
+                      ? t("suggestAnchored", { title: suggestion.anchor, time: firstSchedule!.time })
+                      : t("suggestForArrive")}
+                  </span>
+                  <button
+                    onClick={() => {
+                      setDepart(toHhmm(suggestion!.departMin));
+                      setArrive(toHhmm(suggestion!.arriveMin));
+                    }}
+                    className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 font-mono text-xs font-medium text-white"
+                  >
+                    {t("leaveAt")} {toHhmm(suggestion.departMin)} → {toHhmm(suggestion.arriveMin)}
+                  </button>
+                </p>
+              )}
+              {!suggestion && (
+                <p className="text-xs text-tertiary">{t("suggestHint")}</p>
+              )}
+            </>
+          ) : null}
+        </div>
+      )}
 
       {type === "rail" && (
         <div className="flex flex-wrap gap-2">
