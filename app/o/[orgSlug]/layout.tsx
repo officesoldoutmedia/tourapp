@@ -1,6 +1,8 @@
 import Link from "next/link";
 import { requireOrg } from "@/lib/org";
 import { Contact, Bell, Settings } from "lucide-react";
+import { cookies } from "next/headers";
+import { ThemeToggle } from "@/components/ThemeToggle";
 
 export default async function OrgLayout({
   children,
@@ -11,6 +13,8 @@ export default async function OrgLayout({
 }) {
   const { orgSlug } = await params;
   const { org, user, supabase, permission } = await requireOrg(orgSlug);
+
+  const theme = (await cookies()).get("theme")?.value === "dark" ? "dark" as const : "light" as const;
 
   const { count: unread } = await supabase
     .from("notifications")
@@ -38,6 +42,7 @@ export default async function OrgLayout({
           {["administrator", "accounting", "manager"].includes(permission) && (
             <Link href={`/o/${org.slug}/settings`} title="Settings" className="text-secondary transition-colors hover:text-primary"><Settings size={18} strokeWidth={1.5} /></Link>
           )}
+          <ThemeToggle initial={theme} />
         </span>
       </header>
       <div className="flex-1">{children}</div>

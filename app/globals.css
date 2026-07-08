@@ -58,8 +58,16 @@
   --text-disabled: #48525b;
   --accent: #4f8df7;
   --accent-hover: #68a0fa;
+  --accent-active: #3a7be0;
   --accent-subtle: #16263f;
   --accent-border: #274b7e;
+
+  --success: #3fbf7f;
+  --success-subtle: #0e2a1d;
+  --warning: #d98e33;
+  --warning-subtle: #2e2113;
+  --danger: #e5695c;
+  --danger-subtle: #331512;
 }
 
 @theme inline {
@@ -106,9 +114,12 @@
   --shadow-focus: 0 0 0 3px var(--accent-subtle), 0 0 0 1px var(--accent);
 }
 
-/* Light-only deocamdată + opt-out din Chrome Auto Dark Mode (§2.5). */
+/* color-scheme urmează tema; "only" = opt-out din Chrome Auto Dark Mode. */
 html {
   color-scheme: only light;
+}
+html[data-theme="dark"] {
+  color-scheme: only dark;
 }
 
 body {

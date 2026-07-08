@@ -139,7 +139,7 @@ export function TravelSection({
                 className="min-w-0 flex-1 truncate text-left text-sm font-medium hover:underline"
               >
                 {item.party && (
-                  <span className="mr-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  <span className="mr-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-canvas">
                     {item.party}
                   </span>
                 )}

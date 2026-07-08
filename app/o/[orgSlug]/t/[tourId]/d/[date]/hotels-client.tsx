@@ -211,7 +211,7 @@ function HotelCard({
       <div className="flex flex-wrap items-center gap-2 px-3 py-2">
         <span className="min-w-0 flex-1 text-sm font-medium">
           {hotel.party && (
-            <span className="mr-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">
+            <span className="mr-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-canvas">
               {hotel.party}
             </span>
           )}

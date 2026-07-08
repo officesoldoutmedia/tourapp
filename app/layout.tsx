@@ -3,6 +3,7 @@ import { Inter, JetBrains_Mono } from "next/font/google";
 import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
+import { cookies } from "next/headers";
 import "./globals.css";
 
 // §3.1: display = General Sans (Fontshare, self-hosted), body = Inter,
@@ -38,10 +39,13 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   const locale = await getLocale();
+  const theme = (await cookies()).get("theme")?.value === "dark" ? "dark" : "light";
 
   return (
     <html
       lang={locale}
+      data-theme={theme}
+      suppressHydrationWarning
       className={`${generalSans.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
