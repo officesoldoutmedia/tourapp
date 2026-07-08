@@ -76,3 +76,11 @@ Overage = split% × max(0, AmountToPot − Guarantee) pentru vs_split/door_deal;
 override manual posibil (coloana overage). Total expenses rămâne input manual
 pe settlement (suma pre-split din tab e afișată ca hint) — de validat cu
 fixtures reale de la Stefan (§10 Faza 7 DoD) și în trialul Eventric.
+
+## 2026-07-08 — Light-only temporar; dark mode = pas de design dedicat
+Template-ul create-next-app comuta fundalul pe negru la prefers-color-scheme:
+dark, dar componentele MVP folosesc clase de temă deschisă → text ilizibil pe
+dark mode de sistem (raportat de Stefan la primul test). Am forțat
+`color-scheme: light`. Dark mode-ul COMPLET e cerință [C §9] ("crew-ul
+lucrează noaptea — e funcțional, nu estetic") și se face ca pas de design
+dedicat (tokens + variante dark pe toate componentele), nu acum.

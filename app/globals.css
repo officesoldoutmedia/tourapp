@@ -12,15 +12,18 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/*
+ * Deocamdată aplicația e LIGHT-ONLY: componentele folosesc clase de temă
+ * deschisă, iar override-ul automat pe prefers-color-scheme făcea textul
+ * ilizibil pe dark mode de sistem. Dark mode-ul complet e cerință reală
+ * (blueprint §9 [C]) și intră ca pas de design dedicat — vezi DECISIONS.md.
+ */
+html {
+  color-scheme: light;
 }
 
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
 }
