@@ -521,5 +521,24 @@
     "expense": "Expense",
     "totalIncomeExpense": "TOTAL INCOME / EXPENSE",
     "grandTotal": "GRAND TOTAL"
+  },
+  "settings": {
+    "title": "Setări organizație",
+    "users": "Users & permisiuni",
+    "groups": "Grupuri (visibility)",
+    "songs": "Song Library",
+    "glEmails": "Emailuri automate de aprobare guest list",
+    "glEmailsHint": "La Approved se trimite email către adresa din Email Notify [C]",
+    "invite": "Invită user",
+    "inviteSent": "Invitație creată — trimite linkul:",
+    "email": "Email",
+    "permission": "Permisiune",
+    "remove": "Scoate",
+    "pendingInvites": "Invitații în așteptare",
+    "members": "Membri",
+    "addGroup": "Adaugă grup",
+    "groupName": "Numele grupului",
+    "noGroups": "Niciun grup. Grupurile se folosesc la visibility.",
+    "inGroup": "Membri în grup"
   }
 }

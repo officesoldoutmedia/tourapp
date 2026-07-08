@@ -521,5 +521,24 @@
     "expense": "Expense",
     "totalIncomeExpense": "TOTAL INCOME / EXPENSE",
     "grandTotal": "GRAND TOTAL"
+  },
+  "settings": {
+    "title": "Organization settings",
+    "users": "Users & permissions",
+    "groups": "Groups (visibility)",
+    "songs": "Song Library",
+    "glEmails": "Automated guest list approval emails",
+    "glEmailsHint": "On Approved, an email is sent to the Email Notify address [C]",
+    "invite": "Invite user",
+    "inviteSent": "Invitation created — send this link:",
+    "email": "Email",
+    "permission": "Permission",
+    "remove": "Remove",
+    "pendingInvites": "Pending invitations",
+    "members": "Members",
+    "addGroup": "Add group",
+    "groupName": "Group name",
+    "noGroups": "No groups. Groups are used for visibility.",
+    "inGroup": "Group members"
   }
 }
