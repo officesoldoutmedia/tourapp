@@ -89,11 +89,11 @@ export default async function AdvancePage({
       <header>
         <Link
           href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}`}
-          className="text-xs text-neutral-500 hover:underline"
+          className="text-xs text-secondary hover:underline"
         >
           ← {event.title ?? (event.venues as unknown as { name: string } | null)?.name}
         </Link>
-        <h1 className="text-xl font-semibold">Advance</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight">Advance</h1>
       </header>
 
       <AdvanceEditor

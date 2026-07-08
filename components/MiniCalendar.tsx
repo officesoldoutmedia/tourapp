@@ -48,15 +48,15 @@ export function MiniCalendar({
   }, [locale]);
 
   return (
-    <div className="border-t border-neutral-200 p-2 text-xs">
+    <div className="border-t border-hairline p-2 text-xs">
       <div className="mb-1 flex items-center justify-between px-1">
-        <button onClick={() => shift(-1)} className="rounded px-1.5 hover:bg-neutral-100">‹</button>
+        <button onClick={() => shift(-1)} className="rounded px-1.5 hover:bg-subtle">‹</button>
         <span className="font-semibold capitalize">{monthLabel}</span>
-        <button onClick={() => shift(1)} className="rounded px-1.5 hover:bg-neutral-100">›</button>
+        <button onClick={() => shift(1)} className="rounded px-1.5 hover:bg-subtle">›</button>
       </div>
       <div className="grid grid-cols-7 gap-0.5 text-center">
         {weekdays.map((w, i) => (
-          <span key={i} className="text-[10px] text-neutral-400">{w}</span>
+          <span key={i} className="text-[10px] text-tertiary">{w}</span>
         ))}
         {Array.from({ length: startPad }).map((_, i) => (
           <span key={`pad-${i}`} />
@@ -72,8 +72,8 @@ export function MiniCalendar({
               onClick={() => router.push(`${baseHref}/${iso}`)}
               className={`rounded py-0.5 ${
                 isTourDay
-                  ? "bg-red-50 font-semibold text-red-700 hover:bg-red-100"
-                  : "text-neutral-300"
+                  ? "bg-accent-subtle font-semibold text-accent hover:bg-accent-border/40"
+                  : "text-disabled"
               }`}
             >
               {dayNum}

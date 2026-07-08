@@ -110,11 +110,11 @@ export default async function UsersSettingsPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl space-y-6 p-6">
-      <h1 className="text-xl font-semibold">{t("users")}</h1>
+      <h1 className="font-display text-xl font-semibold tracking-tight">{t("users")}</h1>
 
       <section className="space-y-2">
-        <h2 className="text-sm font-medium text-neutral-500">{t("members")}</h2>
-        <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+        <h2 className="text-sm font-medium text-secondary">{t("members")}</h2>
+        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
           {(members ?? []).map((member) => {
             const profile = profileOf.get(member.user_id);
             const name =
@@ -126,9 +126,9 @@ export default async function UsersSettingsPage({
                 <span className="min-w-0 flex-1">
                   <b>{name}</b>
                   {profile?.user_tier === "pro" && (
-                    <span className="ml-2 rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-bold text-amber-800">PRO</span>
+                    <span className="ml-2 rounded-full bg-warning-subtle px-2 py-0.5 text-[10px] font-bold text-warning">PRO</span>
                   )}
-                  <span className="ml-2 text-xs text-neutral-400">{profile?.email}</span>
+                  <span className="ml-2 text-xs text-tertiary">{profile?.email}</span>
                 </span>
                 <form action={setPermission} className="flex items-center gap-1">
                   <input type="hidden" name="id" value={member.id} />
@@ -136,20 +136,20 @@ export default async function UsersSettingsPage({
                     name="permission"
                     defaultValue={member.permission}
                     disabled={member.user_id === user.id}
-                    className="rounded border border-neutral-300 px-2 py-1 text-xs"
+                    className="rounded border border-hairline px-2 py-1 text-xs"
                   >
                     {PERMISSIONS.map((p) => (
                       <option key={p} value={p}>{tp(p)}</option>
                     ))}
                   </select>
                   {member.user_id !== user.id && (
-                    <button className="rounded bg-neutral-900 px-2 py-1 text-xs text-white">✓</button>
+                    <button className="rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs text-white">✓</button>
                   )}
                 </form>
                 {member.user_id !== user.id && (
                   <form action={removeMember}>
                     <input type="hidden" name="id" value={member.id} />
-                    <button className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50">
+                    <button className="rounded px-2 py-1 text-xs text-danger hover:bg-danger-subtle">
                       {t("remove")}
                     </button>
                   </form>
@@ -162,13 +162,13 @@ export default async function UsersSettingsPage({
 
       {(invites ?? []).length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-neutral-500">{t("pendingInvites")}</h2>
-          <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+          <h2 className="text-sm font-medium text-secondary">{t("pendingInvites")}</h2>
+          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
             {(invites ?? []).map((inv) => (
               <li key={inv.id} className="px-4 py-2 text-sm">
                 <b>{inv.email}</b>
-                <span className="ml-2 text-xs text-neutral-500">{tp(inv.permission)}</span>
-                <code className="mt-1 block truncate rounded bg-neutral-50 px-2 py-1 text-xs text-neutral-600">
+                <span className="ml-2 text-xs text-secondary">{tp(inv.permission)}</span>
+                <code className="mt-1 block truncate rounded bg-subtle px-2 py-1 text-xs text-secondary">
                   {base}/invite/{inv.token}
                 </code>
               </li>
@@ -177,18 +177,18 @@ export default async function UsersSettingsPage({
         </section>
       )}
 
-      <form action={invite} className="flex flex-wrap gap-2 rounded-lg border border-neutral-200 p-3">
-        <input name="email" type="email" required placeholder={t("email")} className="min-w-48 flex-1 rounded border border-neutral-300 px-3 py-2 text-sm" />
-        <select name="permission" defaultValue="mobile_access" className="rounded border border-neutral-300 px-2 py-2 text-sm">
+      <form action={invite} className="flex flex-wrap gap-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
+        <input name="email" type="email" required placeholder={t("email")} className="min-w-48 flex-1 rounded border border-hairline px-3 py-2 text-sm" />
+        <select name="permission" defaultValue="mobile_access" className="rounded border border-hairline px-2 py-2 text-sm">
           {PERMISSIONS.map((p) => (
             <option key={p} value={p}>{tp(p)}</option>
           ))}
         </select>
-        <button className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
+        <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
           + {t("invite")}
         </button>
       </form>
-      {invited && <p className="text-xs text-emerald-700">{t("inviteSent")}</p>}
+      {invited && <p className="text-xs text-success">{t("inviteSent")}</p>}
     </main>
   );
 }

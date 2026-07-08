@@ -96,11 +96,11 @@ export default async function EventPage({
       <header className="space-y-1">
         <Link
           href={`/o/${orgSlug}/t/${tourId}/d/${date}`}
-          className="text-xs text-neutral-500 hover:underline"
+          className="text-xs text-secondary hover:underline"
         >
           ← {date}
         </Link>
-        <h1 className="text-xl font-semibold">{event.title ?? venue?.name ?? "—"}</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight">{event.title ?? venue?.name ?? "—"}</h1>
       </header>
 
       {venue && (
@@ -112,10 +112,10 @@ export default async function EventPage({
         />
       )}
 
-      <section className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-3">
+      <section className="flex items-center justify-between rounded-lg border border-hairline bg-surface shadow-xs px-4 py-3">
         <span className="text-sm font-medium">
           {statusIcon} {t("advances")}{" "}
-          <span className="text-xs text-neutral-500">
+          <span className="text-xs text-secondary">
             ({(advances ?? []).length})
           </span>
         </span>
@@ -123,26 +123,26 @@ export default async function EventPage({
           {can({ tier, permission }, "view_accounting") && (
             <Link
               href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/accounting`}
-              className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
+              className="rounded border border-hairline px-3 py-1 text-xs font-medium"
             >
               Accounting →
             </Link>
           )}
           <Link
             href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/set-list`}
-            className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
+            className="rounded border border-hairline px-3 py-1 text-xs font-medium"
           >
             Set List →
           </Link>
           <Link
             href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/guest-list`}
-            className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
+            className="rounded border border-hairline px-3 py-1 text-xs font-medium"
           >
             Guest List →
           </Link>
           <Link
             href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/advance`}
-            className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white"
+            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
           >
             {ta("title")} →
           </Link>

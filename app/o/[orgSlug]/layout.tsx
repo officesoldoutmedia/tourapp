@@ -19,8 +19,8 @@ export default async function OrgLayout({
 
   return (
     <div className="flex min-h-screen flex-col">
-      <header className="flex items-center gap-4 border-b border-neutral-200 px-4 py-2">
-        <Link href="/app" className="text-sm text-neutral-500 hover:underline">
+      <header className="sticky top-0 z-20 flex h-14 items-center gap-4 border-b border-hairline bg-surface px-4 shadow-xs">
+        <Link href="/app" className="text-sm text-secondary hover:underline">
           ⌂
         </Link>
         <Link href={`/o/${org.slug}`} className="text-sm font-semibold">
@@ -31,7 +31,7 @@ export default async function OrgLayout({
           <Link href={`/o/${org.slug}/notifications`} title="Notifications" className="relative hover:opacity-70">
             🔔
             {(unread ?? 0) > 0 && (
-              <span className="absolute -right-2 -top-1 rounded-full bg-red-600 px-1 text-[10px] font-bold text-white">
+              <span className="absolute -right-2 -top-1 rounded-full bg-danger px-1 text-[10px] font-bold text-white">
                 {unread}
               </span>
             )}

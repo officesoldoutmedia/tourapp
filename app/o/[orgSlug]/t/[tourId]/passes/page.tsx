@@ -50,23 +50,23 @@ export default async function TourPassesPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl space-y-6 p-6">
-      <h1 className="text-xl font-semibold">{t("title")}</h1>
+      <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
 
       {(passes ?? []).length === 0 ? (
-        <p className="text-sm text-neutral-500">{t("empty")}</p>
+        <p className="text-sm text-secondary">{t("empty")}</p>
       ) : (
-        <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
           {(passes ?? []).map((pass) => (
             <li key={pass.id} className="flex items-center justify-between px-4 py-2">
               <span>
                 <b>{pass.name}</b>
                 {pass.description && (
-                  <span className="ml-2 text-sm text-neutral-500">{pass.description}</span>
+                  <span className="ml-2 text-sm text-secondary">{pass.description}</span>
                 )}
               </span>
               <form action={removePass}>
                 <input type="hidden" name="id" value={pass.id} />
-                <button className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50">
+                <button className="rounded px-2 py-1 text-xs text-danger hover:bg-danger-subtle">
                   {tc("delete")}
                 </button>
               </form>
@@ -76,9 +76,9 @@ export default async function TourPassesPage({
       )}
 
       <form action={addPass} className="flex flex-wrap gap-2">
-        <input name="name" required placeholder={t("name")} className="w-40 rounded border border-neutral-300 px-3 py-2 text-sm" />
-        <input name="description" placeholder={t("description")} className="min-w-48 flex-1 rounded border border-neutral-300 px-3 py-2 text-sm" />
-        <button className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
+        <input name="name" required placeholder={t("name")} className="w-40 rounded border border-hairline px-3 py-2 text-sm" />
+        <input name="description" placeholder={t("description")} className="min-w-48 flex-1 rounded border border-hairline px-3 py-2 text-sm" />
+        <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
           + {t("add")}
         </button>
       </form>

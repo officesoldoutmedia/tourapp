@@ -239,17 +239,17 @@ export default async function DayPage({
     <main className="mx-auto w-full max-w-3xl space-y-8 p-6">
       <header className="space-y-1">
         <div className="flex items-baseline justify-between gap-4">
-          <h1 className="text-xl font-semibold">{location || "—"}</h1>
-          <span className="rounded-full bg-neutral-100 px-3 py-1 text-xs font-semibold">
+          <h1 className="font-display text-xl font-semibold tracking-tight">{location || "—"}</h1>
+          <span className="rounded-full bg-inset px-3 py-1 text-xs font-semibold">
             {td(day.day_type)}
           </span>
         </div>
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-secondary">
           {formatDayHeader(day.date, tz, locale)}
         </p>
         <DayActionsBar orgSlug={orgSlug} dayId={day.id} canEdit={canEdit} />
         {isDstTransitionDay(day.date, tz) && (
-          <p className="rounded-md border border-amber-300 bg-amber-50 px-3 py-1.5 text-xs text-amber-900">
+          <p className="rounded-md border border-warning bg-warning-subtle px-3 py-1.5 text-xs text-warning">
             {t("dstNotice")}
           </p>
         )}

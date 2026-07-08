@@ -76,31 +76,31 @@ export default async function ContactsPage({
   }
 
   const companyName = new Map((companies ?? []).map((c) => [c.id, c.name]));
-  const inputCls = "rounded border border-neutral-300 px-2 py-1 text-sm";
+  const inputCls = "rounded border border-hairline px-2 py-1 text-sm";
 
   return (
     <main className="mx-auto w-full max-w-3xl space-y-8 p-6">
-      <h1 className="text-xl font-semibold">{t("title")}</h1>
+      <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-medium">{t("companies")}</h2>
+        <h2 className="font-display text-lg font-semibold tracking-tight">{t("companies")}</h2>
         {(companies ?? []).length === 0 ? (
-          <p className="text-sm text-neutral-500">{t("emptyCompanies")}</p>
+          <p className="text-sm text-secondary">{t("emptyCompanies")}</p>
         ) : (
-          <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
             {(companies ?? []).map((company) => (
               <li key={company.id} className="flex items-center gap-2 px-4 py-2 text-sm">
                 <span className="min-w-0 flex-1">
                   <b>{company.name}</b>
-                  {company.kind && <span className="ml-2 text-xs text-neutral-500">{company.kind}</span>}
+                  {company.kind && <span className="ml-2 text-xs text-secondary">{company.kind}</span>}
                 </span>
-                {company.phone && <a href={`tel:${company.phone}`} className="text-xs text-neutral-500 hover:underline">{company.phone}</a>}
-                {company.email && <a href={`mailto:${company.email}`} className="text-xs text-neutral-500 hover:underline">{company.email}</a>}
+                {company.phone && <a href={`tel:${company.phone}`} className="text-xs text-secondary hover:underline">{company.phone}</a>}
+                {company.email && <a href={`mailto:${company.email}`} className="text-xs text-secondary hover:underline">{company.email}</a>}
                 {canEdit && (
                   <form action={remove}>
                     <input type="hidden" name="table" value="companies" />
                     <input type="hidden" name="id" value={company.id} />
-                    <button className="rounded px-2 py-0.5 text-xs text-red-600 hover:bg-red-50">{tc("delete")}</button>
+                    <button className="rounded px-2 py-0.5 text-xs text-danger hover:bg-danger-subtle">{tc("delete")}</button>
                   </form>
                 )}
               </li>
@@ -113,35 +113,35 @@ export default async function ContactsPage({
             <input name="kind" placeholder={t("kind")} className={`${inputCls} w-32`} />
             <input name="phone" placeholder="Tel" className={`${inputCls} w-28`} />
             <input name="email" placeholder="Email" className={`${inputCls} w-40`} />
-            <button className="rounded bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white">+ {t("addCompany")}</button>
+            <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1.5 text-sm font-medium text-white">+ {t("addCompany")}</button>
           </form>
         )}
       </section>
 
       <section className="space-y-3">
-        <h2 className="text-lg font-medium">{t("contactsList")}</h2>
+        <h2 className="font-display text-lg font-semibold tracking-tight">{t("contactsList")}</h2>
         {(contacts ?? []).length === 0 ? (
-          <p className="text-sm text-neutral-500">{t("emptyContacts")}</p>
+          <p className="text-sm text-secondary">{t("emptyContacts")}</p>
         ) : (
-          <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
             {(contacts ?? []).map((contact) => (
               <li key={contact.id} className="flex items-center gap-2 px-4 py-2 text-sm">
                 <span className="min-w-0 flex-1">
                   <b>{contact.last_name}{contact.first_name && `, ${contact.first_name}`}</b>
-                  {contact.role && <span className="ml-2 text-xs text-neutral-500">{contact.role}</span>}
+                  {contact.role && <span className="ml-2 text-xs text-secondary">{contact.role}</span>}
                   {contact.company_id && (
-                    <span className="ml-2 text-xs text-neutral-400">
+                    <span className="ml-2 text-xs text-tertiary">
                       @ {companyName.get(contact.company_id) ?? t("none")}
                     </span>
                   )}
                 </span>
-                {contact.phone && <a href={`tel:${contact.phone}`} className="text-xs text-neutral-500 hover:underline">{contact.phone}</a>}
-                {contact.email && <a href={`mailto:${contact.email}`} className="text-xs text-neutral-500 hover:underline">{contact.email}</a>}
+                {contact.phone && <a href={`tel:${contact.phone}`} className="text-xs text-secondary hover:underline">{contact.phone}</a>}
+                {contact.email && <a href={`mailto:${contact.email}`} className="text-xs text-secondary hover:underline">{contact.email}</a>}
                 {canEdit && (
                   <form action={remove}>
                     <input type="hidden" name="table" value="contacts" />
                     <input type="hidden" name="id" value={contact.id} />
-                    <button className="rounded px-2 py-0.5 text-xs text-red-600 hover:bg-red-50">{tc("delete")}</button>
+                    <button className="rounded px-2 py-0.5 text-xs text-danger hover:bg-danger-subtle">{tc("delete")}</button>
                   </form>
                 )}
               </li>
@@ -161,7 +161,7 @@ export default async function ContactsPage({
             </select>
             <input name="phone" placeholder="Tel" className={`${inputCls} w-28`} />
             <input name="email" placeholder="Email" className={`${inputCls} w-40`} />
-            <button className="rounded bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white">+ {t("addContact")}</button>
+            <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1.5 text-sm font-medium text-white">+ {t("addContact")}</button>
           </form>
         )}
       </section>

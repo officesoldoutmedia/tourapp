@@ -102,11 +102,11 @@ export function TravelSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">{t("title")}</h2>
+        <h2 className="font-display text-lg font-semibold tracking-tight">{t("title")}</h2>
         {canEdit && !adding && !editing && (
           <button
             onClick={() => setAdding(true)}
-            className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white"
+            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
           >
             + {t("add")}
           </button>
@@ -114,22 +114,22 @@ export function TravelSection({
       </div>
 
       {items.length === 0 && !adding && (
-        <p className="text-sm text-neutral-400">{t("noItems")}</p>
+        <p className="text-sm text-tertiary">{t("noItems")}</p>
       )}
 
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 empty:hidden">
+      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
         {items.map((item) => (
           <li key={item.id} className="px-3 py-2">
             <div className="flex items-center gap-2">
               <span>{TYPE_ICON[item.travel_type]}</span>
-              <span className="w-28 shrink-0 font-mono text-xs text-neutral-600">
+              <span className="w-28 shrink-0 font-mono text-xs text-secondary">
                 {clock(item.depart_time)}
-                {item.depart_day_offset > 0 && <sup className="text-red-600">+1</sup>}
+                {item.depart_day_offset > 0 && <sup className="text-danger">+1</sup>}
                 {item.arrive_time && (
                   <>
                     –{clock(item.arrive_time)}
                     {item.arrive_day_offset > 0 && (
-                      <sup className="text-red-600">+1</sup>
+                      <sup className="text-danger">+1</sup>
                     )}
                   </>
                 )}
@@ -139,14 +139,14 @@ export function TravelSection({
                 className="min-w-0 flex-1 truncate text-left text-sm font-medium hover:underline"
               >
                 {item.party && (
-                  <span className="mr-1 rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] font-bold text-white">
+                  <span className="mr-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">
                     {item.party}
                   </span>
                 )}
                 {item.title ?? "—"}
               </button>
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${item.is_confirmed ? "bg-emerald-100 text-emerald-800" : "bg-neutral-100 text-neutral-500"}`}
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${item.is_confirmed ? "bg-success-subtle text-success" : "bg-inset text-secondary"}`}
               >
                 {item.is_confirmed ? t("confirmed") : t("unconfirmed")}
               </span>
@@ -159,20 +159,20 @@ export function TravelSection({
                         toggleTravelConfirmed(orgSlug, tourId, date, item.id, !item.is_confirmed),
                       )
                     }
-                    className="rounded px-1.5 py-0.5 text-xs hover:bg-neutral-100"
+                    className="rounded px-1.5 py-0.5 text-xs hover:bg-subtle"
                   >
                     ✓
                   </button>
                   <button
                     onClick={() => setEditing(item)}
-                    className="rounded px-1.5 py-0.5 text-xs hover:bg-neutral-100"
+                    className="rounded px-1.5 py-0.5 text-xs hover:bg-subtle"
                   >
                     ✎
                   </button>
                   <button
                     disabled={pending}
                     onClick={() => run(() => deleteTravelItem(orgSlug, tourId, date, item.id))}
-                    className="rounded px-1.5 py-0.5 text-xs text-red-600 hover:bg-red-50"
+                    className="rounded px-1.5 py-0.5 text-xs text-danger hover:bg-danger-subtle"
                   >
                     🗑
                   </button>
@@ -181,7 +181,7 @@ export function TravelSection({
             </div>
 
             {expanded === item.id && (
-              <div className="mt-2 space-y-2 border-t border-neutral-100 pt-2 text-xs text-neutral-600">
+              <div className="mt-2 space-y-2 border-t border-hairline pt-2 text-xs text-secondary">
                 {item.detail && <p>{item.detail}</p>}
                 {item.travel_type === "air" && (
                   <FlightLegs
@@ -287,14 +287,14 @@ function TravelForm({
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-neutral-200 p-3">
+    <div className="space-y-3 rounded-lg border border-hairline bg-surface shadow-xs p-3">
       {/* tabs GROUND|AIR|RAIL|SEA [C-S] */}
       <div className="flex gap-1">
         {(Object.keys(TYPE_ICON) as TravelType[]).map((tt) => (
           <button
             key={tt}
             onClick={() => setType(tt)}
-            className={`rounded px-3 py-1 text-xs font-semibold uppercase ${type === tt ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-600"}`}
+            className={`rounded px-3 py-1 text-xs font-semibold uppercase ${type === tt ? "bg-accent hover:bg-accent-hover text-white" : "bg-inset text-secondary"}`}
           >
             {t(tt)}
           </button>
@@ -307,14 +307,14 @@ function TravelForm({
             value={origin}
             onChange={(e) => setOrigin(e.target.value)}
             placeholder={t("origin")}
-            className="min-w-0 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+            className="min-w-0 flex-1 rounded border border-hairline px-2 py-1 text-sm"
           />
           {pins.length > 0 && (
             <select
               value=""
               title={t("pinPicker")}
               onChange={(e) => e.target.value && setOrigin(e.target.value)}
-              className="w-9 rounded border border-neutral-300 text-sm"
+              className="w-9 rounded border border-hairline text-sm"
             >
               <option value="">📍</option>
               {pins.map((pin) => (
@@ -330,14 +330,14 @@ function TravelForm({
             value={dest}
             onChange={(e) => setDest(e.target.value)}
             placeholder={t("destination")}
-            className="min-w-0 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+            className="min-w-0 flex-1 rounded border border-hairline px-2 py-1 text-sm"
           />
           {pins.length > 0 && (
             <select
               value=""
               title={t("pinPicker")}
               onChange={(e) => e.target.value && setDest(e.target.value)}
-              className="w-9 rounded border border-neutral-300 text-sm"
+              className="w-9 rounded border border-hairline text-sm"
             >
               <option value="">📍</option>
               {pins.map((pin) => (
@@ -354,7 +354,7 @@ function TravelForm({
             type="time"
             value={depart}
             onChange={(e) => setDepart(e.target.value)}
-            className="rounded border border-neutral-300 px-2 py-1 text-sm"
+            className="rounded border border-hairline px-2 py-1 text-sm"
           />
         </label>
         <label className="flex items-center gap-1 text-xs">
@@ -363,38 +363,38 @@ function TravelForm({
             type="time"
             value={arrive}
             onChange={(e) => setArrive(e.target.value)}
-            className="rounded border border-neutral-300 px-2 py-1 text-sm"
+            className="rounded border border-hairline px-2 py-1 text-sm"
           />
         </label>
         <input
           value={party}
           onChange={(e) => setParty(e.target.value)}
           placeholder={t("party")}
-          className="w-16 rounded border border-neutral-300 px-2 py-1 text-sm"
+          className="w-16 rounded border border-hairline px-2 py-1 text-sm"
         />
       </div>
 
       {type === "rail" && (
         <div className="flex flex-wrap gap-2">
-          <input value={railLine} onChange={(e) => setRailLine(e.target.value)} placeholder={t("railLine")} className="w-28 rounded border border-neutral-300 px-2 py-1 text-sm" />
-          <input value={trainNumber} onChange={(e) => setTrainNumber(e.target.value)} placeholder={t("trainNumber")} className="w-24 rounded border border-neutral-300 px-2 py-1 text-sm" />
-          <input value={ticketStatus} onChange={(e) => setTicketStatus(e.target.value)} placeholder={t("ticketStatus")} className="w-28 rounded border border-neutral-300 px-2 py-1 text-sm" />
-          <input value={confirmation} onChange={(e) => setConfirmation(e.target.value)} placeholder={t("confirmation")} className="w-28 rounded border border-neutral-300 px-2 py-1 text-sm" />
+          <input value={railLine} onChange={(e) => setRailLine(e.target.value)} placeholder={t("railLine")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
+          <input value={trainNumber} onChange={(e) => setTrainNumber(e.target.value)} placeholder={t("trainNumber")} className="w-24 rounded border border-hairline px-2 py-1 text-sm" />
+          <input value={ticketStatus} onChange={(e) => setTicketStatus(e.target.value)} placeholder={t("ticketStatus")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
+          <input value={confirmation} onChange={(e) => setConfirmation(e.target.value)} placeholder={t("confirmation")} className="w-28 rounded border border-hairline px-2 py-1 text-sm" />
         </div>
       )}
 
       {/* AUTOTITLE|CUSTOMTITLE toggle [C-S] */}
       <div className="flex flex-wrap items-center gap-2">
-        <span className="flex overflow-hidden rounded-full border border-red-600 text-xs font-semibold">
+        <span className="flex rounded-full bg-inset p-0.5 text-xs font-semibold">
           <button
             onClick={() => setAutoTitle(true)}
-            className={`px-3 py-1 ${autoTitle ? "bg-red-600 text-white" : "text-red-600"}`}
+            className={`rounded-full px-3 py-1 transition-colors ${autoTitle ? "bg-surface text-primary shadow-xs" : "text-tertiary hover:text-secondary"}`}
           >
             {t("autoTitle")}
           </button>
           <button
             onClick={() => setAutoTitle(false)}
-            className={`px-3 py-1 ${!autoTitle ? "bg-red-600 text-white" : "text-red-600"}`}
+            className={`rounded-full px-3 py-1 transition-colors ${!autoTitle ? "bg-surface text-primary shadow-xs" : "text-tertiary hover:text-secondary"}`}
           >
             {t("customTitle")}
           </button>
@@ -404,7 +404,7 @@ function TravelForm({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t("customTitle")}
-            className="min-w-40 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+            className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-sm"
           />
         )}
       </div>
@@ -414,7 +414,7 @@ function TravelForm({
         onChange={(e) => setDetail(e.target.value)}
         placeholder={t("detail")}
         rows={2}
-        className="w-full rounded border border-neutral-300 px-2 py-1 text-sm"
+        className="w-full rounded border border-hairline px-2 py-1 text-sm"
       />
 
       <div className="flex gap-2">
@@ -422,7 +422,7 @@ function TravelForm({
           <button
             disabled={pending || !origin || !dest}
             onClick={() => save(true)}
-            className="rounded bg-emerald-700 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+            className="rounded bg-success px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
           >
             {t("calc")}
           </button>
@@ -430,11 +430,11 @@ function TravelForm({
         <button
           disabled={pending}
           onClick={() => save(false)}
-          className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+          className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
         >
           {tc("save")}
         </button>
-        <button onClick={onCancel} className="rounded border border-neutral-300 px-3 py-1 text-xs">
+        <button onClick={onCancel} className="rounded border border-hairline px-3 py-1 text-xs">
           {tc("cancel")}
         </button>
       </div>
@@ -485,7 +485,7 @@ function FlightLegs({
               <button
                 disabled={pending}
                 onClick={() => run(() => deleteFlightLeg(orgSlug, tourId, date, leg.id))}
-                className="text-red-600"
+                className="text-danger"
               >
                 ×
               </button>
@@ -508,11 +508,11 @@ function FlightLegs({
               value={draft[key]}
               onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
               placeholder={ph}
-              className={`${w} rounded border border-neutral-300 px-1.5 py-0.5`}
+              className={`${w} rounded border border-hairline px-1.5 py-0.5`}
             />
           ))}
-          <input type="time" value={draft.depTime} onChange={(e) => setDraft({ ...draft, depTime: e.target.value })} className="rounded border border-neutral-300 px-1.5 py-0.5" />
-          <input type="time" value={draft.arrTime} onChange={(e) => setDraft({ ...draft, arrTime: e.target.value })} className="rounded border border-neutral-300 px-1.5 py-0.5" />
+          <input type="time" value={draft.depTime} onChange={(e) => setDraft({ ...draft, depTime: e.target.value })} className="rounded border border-hairline px-1.5 py-0.5" />
+          <input type="time" value={draft.arrTime} onChange={(e) => setDraft({ ...draft, arrTime: e.target.value })} className="rounded border border-hairline px-1.5 py-0.5" />
           <button
             disabled={pending || !draft.flightNumber}
             onClick={() =>
@@ -526,7 +526,7 @@ function FlightLegs({
                 return r;
               })
             }
-            className="rounded bg-neutral-900 px-2 py-0.5 text-white disabled:opacity-40"
+            className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-white disabled:opacity-40"
           >
             + {t("addLeg")}
           </button>
@@ -579,7 +579,7 @@ function PassengerPicker({
           <button
             disabled={pending}
             onClick={() => onSave([...selected])}
-            className="rounded bg-neutral-900 px-2 py-0.5 text-white"
+            className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-white"
           >
             ✓
           </button>

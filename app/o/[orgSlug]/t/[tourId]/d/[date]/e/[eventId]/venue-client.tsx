@@ -51,17 +51,17 @@ export function VenueSection({
   }
 
   return (
-    <section className="space-y-2 rounded-lg border border-neutral-200 px-4 py-3">
+    <section className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs px-4 py-3">
       <div className="flex flex-wrap items-center gap-2">
         <span className="mr-auto text-sm font-medium">
           {t("venue")}: {venue.name}
           <span
             className={`ml-2 rounded-full px-2 py-0.5 text-[10px] font-semibold ${
               isGlobal
-                ? "bg-blue-100 text-blue-800"
+                ? "bg-accent-subtle text-accent"
                 : venue.source === "google"
-                  ? "bg-emerald-100 text-emerald-800"
-                  : "bg-neutral-100 text-neutral-600"
+                  ? "bg-success-subtle text-success"
+                  : "bg-inset text-secondary"
             }`}
           >
             {isGlobal ? t("sourceCatalog") : venue.copied_from ? t("localCopy") : t("sourceOrg")}
@@ -71,7 +71,7 @@ export function VenueSection({
           <>
             <button
               onClick={() => setEditing(true)}
-              className="rounded border border-neutral-300 px-2 py-1 text-xs font-medium"
+              className="rounded border border-hairline px-2 py-1 text-xs font-medium"
             >
               ✎ {t("editVenue")}
             </button>
@@ -79,7 +79,7 @@ export function VenueSection({
               disabled={pending}
               title={t("unlinkHint")}
               onClick={() => run(() => unlinkEventVenue(orgSlug, eventId))}
-              className="rounded border border-neutral-300 px-2 py-1 text-xs font-medium"
+              className="rounded border border-hairline px-2 py-1 text-xs font-medium"
             >
               {t("unlinkVenue")}
             </button>
@@ -87,24 +87,24 @@ export function VenueSection({
         )}
       </div>
 
-      <p className="text-xs text-neutral-500">
+      <p className="text-xs text-secondary">
         {[venue.address_line1, venue.city, venue.country].filter(Boolean).join(", ") || "—"}
         {venue.capacity != null && ` · ${t("capacity")}: ${venue.capacity}`}
       </p>
 
       {editing && (
-        <div className="space-y-2 border-t border-neutral-100 pt-2">
+        <div className="space-y-2 border-t border-hairline pt-2">
           {isGlobal && (
-            <p className="rounded bg-blue-50 px-2 py-1 text-xs text-blue-900">
+            <p className="rounded bg-accent-subtle px-2 py-1 text-xs text-accent">
               {t("cowHint")}
             </p>
           )}
           <div className="flex flex-wrap gap-2">
-            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t("venueName")} className="min-w-40 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm" />
-            <input value={form.address_line1} onChange={(e) => setForm({ ...form, address_line1: e.target.value })} placeholder="Adresă / Address" className="min-w-40 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm" />
-            <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Oraș / City" className="w-32 rounded border border-neutral-300 px-2 py-1 text-sm" />
-            <input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} placeholder="Țară / Country" className="w-32 rounded border border-neutral-300 px-2 py-1 text-sm" />
-            <input type="number" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: e.target.value })} placeholder={t("capacity")} className="w-24 rounded border border-neutral-300 px-2 py-1 text-sm" />
+            <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t("venueName")} className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-sm" />
+            <input value={form.address_line1} onChange={(e) => setForm({ ...form, address_line1: e.target.value })} placeholder="Adresă / Address" className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-sm" />
+            <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Oraș / City" className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
+            <input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} placeholder="Țară / Country" className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
+            <input type="number" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: e.target.value })} placeholder={t("capacity")} className="w-24 rounded border border-hairline px-2 py-1 text-sm" />
           </div>
           <div className="flex gap-2">
             <button
@@ -120,11 +120,11 @@ export function VenueSection({
                   }),
                 )
               }
-              className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+              className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
             >
               {tc("save")}
             </button>
-            <button onClick={() => setEditing(false)} className="rounded border border-neutral-300 px-3 py-1 text-xs">
+            <button onClick={() => setEditing(false)} className="rounded border border-hairline px-3 py-1 text-xs">
               {tc("cancel")}
             </button>
           </div>

@@ -61,35 +61,35 @@ export default async function NotificationsPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl space-y-6 p-6">
-      <h1 className="text-xl font-semibold">{t("title")}</h1>
+      <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
 
       {canSend && (
-        <form action={compose} className="space-y-2 rounded-lg border border-neutral-200 p-3">
+        <form action={compose} className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
           <p className="text-sm font-medium">{t("compose")} — {t("toAll")}</p>
-          <input name="title" placeholder={t("subject")} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm" />
-          <textarea name="body" rows={2} placeholder={t("body")} className="w-full rounded border border-neutral-300 px-3 py-2 text-sm" />
-          <button className="rounded bg-neutral-900 px-4 py-2 text-sm font-medium text-white">
+          <input name="title" placeholder={t("subject")} className="w-full rounded border border-hairline px-3 py-2 text-sm" />
+          <textarea name="body" rows={2} placeholder={t("body")} className="w-full rounded border border-hairline px-3 py-2 text-sm" />
+          <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
             {t("send")}
           </button>
         </form>
       )}
 
       {(notifications ?? []).length === 0 ? (
-        <p className="text-sm text-neutral-500">{t("empty")}</p>
+        <p className="text-sm text-secondary">{t("empty")}</p>
       ) : (
-        <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
           {(notifications ?? []).map((n) => (
             <li key={n.id} className={`flex items-start gap-3 px-4 py-3 ${n.read_at ? "opacity-60" : ""}`}>
               <span className="mt-1 text-xs">{n.read_at ? "○" : "●"}</span>
               <span className="min-w-0 flex-1">
                 {n.title && <b className="block text-sm">{n.title}</b>}
-                {n.body && <span className="block whitespace-pre-wrap text-sm text-neutral-600">{n.body}</span>}
-                <span className="text-xs text-neutral-400">{n.created_at.slice(0, 16).replace("T", " ")}</span>
+                {n.body && <span className="block whitespace-pre-wrap text-sm text-secondary">{n.body}</span>}
+                <span className="text-xs text-tertiary">{n.created_at.slice(0, 16).replace("T", " ")}</span>
               </span>
               {!n.read_at && (
                 <form action={markRead}>
                   <input type="hidden" name="id" value={n.id} />
-                  <button className="rounded border border-neutral-300 px-2 py-1 text-xs">
+                  <button className="rounded border border-hairline px-2 py-1 text-xs">
                     {t("markRead")}
                   </button>
                 </form>

@@ -76,22 +76,22 @@ export default async function SetListPage({
         <div className="mr-auto">
           <Link
             href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}`}
-            className="text-xs text-neutral-500 hover:underline"
+            className="text-xs text-secondary hover:underline"
           >
             ← {event.title ?? (event.venues as unknown as { name: string } | null)?.name}
           </Link>
-          <h1 className="text-xl font-semibold">{t("title")}</h1>
+          <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
         </div>
         <a
           href={`/api/pdf/setlist/${eventId}`}
           target="_blank"
-          className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
+          className="rounded border border-hairline px-3 py-1 text-xs font-medium"
         >
           🖨 {t("pdf")}
         </a>
         <Link
           href={`/o/${orgSlug}/settings/songs`}
-          className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
+          className="rounded border border-hairline px-3 py-1 text-xs font-medium"
         >
           {t("editSongList")}
         </Link>
@@ -108,7 +108,7 @@ export default async function SetListPage({
       />
 
       {/* totaluri [C-S] */}
-      <p className="border-t border-neutral-200 pt-2 text-sm font-medium text-neutral-600">
+      <p className="border-t border-hairline pt-2 text-sm font-medium text-secondary">
         {t("totals", {
           songs: totals.songs,
           breaks: totals.breaks,

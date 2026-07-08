@@ -51,16 +51,16 @@ export default async function SongsPage({
     revalidatePath(`/o/${orgSlug}/settings/songs`);
   }
 
-  const inputCls = "rounded border border-neutral-300 px-2 py-1 text-sm";
+  const inputCls = "rounded border border-hairline px-2 py-1 text-sm";
 
   return (
     <main className="mx-auto w-full max-w-3xl space-y-6 p-6">
-      <h1 className="text-xl font-semibold">{t("title")}</h1>
+      <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
 
       {(songs ?? []).length === 0 ? (
-        <p className="text-sm text-neutral-500">{t("empty")}</p>
+        <p className="text-sm text-secondary">{t("empty")}</p>
       ) : (
-        <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
           {(songs ?? []).map((song) => (
             <li key={song.id} className="px-4 py-2">
               {/* editare inline: modificarea se propagă în toate set lists [C] */}
@@ -71,21 +71,21 @@ export default async function SongsPage({
                 <input name="bpm" defaultValue={song.bpm ?? ""} placeholder={t("bpm")} className={`${inputCls} w-16`} />
                 <input name="key" defaultValue={song.song_key ?? ""} placeholder={t("key")} className={`${inputCls} w-16`} />
                 <input name="techNotes" defaultValue={song.tech_notes ?? ""} placeholder={t("techNotes")} className={`${inputCls} min-w-32 flex-1`} />
-                <button className="rounded bg-neutral-900 px-2 py-1 text-xs font-medium text-white">{tc("save")}</button>
-                <button formAction={removeSong} className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50">🗑</button>
+                <button className="rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs font-medium text-white">{tc("save")}</button>
+                <button formAction={removeSong} className="rounded px-2 py-1 text-xs text-danger hover:bg-danger-subtle">🗑</button>
               </form>
             </li>
           ))}
         </ul>
       )}
 
-      <form action={saveSong} className="flex flex-wrap gap-2 rounded-lg border border-neutral-200 p-3">
+      <form action={saveSong} className="flex flex-wrap gap-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
         <input name="title" required placeholder={t("songTitle")} className={`${inputCls} min-w-40 flex-1`} />
         <input name="length" placeholder={t("length")} className={`${inputCls} w-20`} />
         <input name="bpm" placeholder={t("bpm")} className={`${inputCls} w-16`} />
         <input name="key" placeholder={t("key")} className={`${inputCls} w-16`} />
         <input name="techNotes" placeholder={t("techNotes")} className={`${inputCls} min-w-32 flex-1`} />
-        <button className="rounded bg-neutral-900 px-3 py-1.5 text-sm font-medium text-white">
+        <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1.5 text-sm font-medium text-white">
           + {t("add")}
         </button>
       </form>

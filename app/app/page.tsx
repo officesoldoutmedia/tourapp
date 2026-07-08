@@ -26,19 +26,19 @@ export default async function AppPage() {
   return (
     <main className="mx-auto w-full max-w-2xl space-y-10 p-6">
       <section className="space-y-4">
-        <h1 className="text-2xl font-semibold">{t("yourOrganizations")}</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">{t("yourOrganizations")}</h1>
         {orgs.length === 0 ? (
-          <p className="text-sm text-neutral-500">{t("empty")}</p>
+          <p className="text-sm text-secondary">{t("empty")}</p>
         ) : (
-          <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200">
+          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
             {orgs.map((org) => (
               <li key={org.id}>
                 <Link
                   href={`/o/${org.slug}`}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-neutral-50"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-subtle"
                 >
                   <span className="font-medium">{org.name}</span>
-                  <span className="text-xs text-neutral-500">
+                  <span className="text-xs text-secondary">
                     {tp(org.permission)}
                   </span>
                 </Link>
@@ -49,7 +49,7 @@ export default async function AppPage() {
       </section>
 
       <section className="space-y-4">
-        <h2 className="text-lg font-medium">
+        <h2 className="font-display text-lg font-semibold tracking-tight">
           {orgs.length === 0 ? t("createFirst") : t("create")}
         </h2>
         <form action={createOrganization} className="space-y-4">
@@ -58,7 +58,7 @@ export default async function AppPage() {
             <input
               name="name"
               required
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
             />
           </label>
           <label className="block space-y-1">
@@ -66,7 +66,7 @@ export default async function AppPage() {
             <select
               name="orgType"
               defaultValue="music"
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+              className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
             >
               <option value="music">{t("orgTypeMusic")}</option>
               <option value="other">{t("orgTypeOther")}</option>
@@ -74,7 +74,7 @@ export default async function AppPage() {
           </label>
           <button
             type="submit"
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+            className="rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
           >
             {t("create")}
           </button>

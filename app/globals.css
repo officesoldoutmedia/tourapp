@@ -1,31 +1,162 @@
 @import "tailwindcss";
 
+/* ═══════════════════════════════════════════════════════════════════
+   TOURAPP DESIGN SYSTEM — tokens (TOURAPP_DESIGN_SYSTEM.md §2, §4)
+   Regula: nimic hardcodat în componente; totul vine de aici.
+   ═══════════════════════════════════════════════════════════════════ */
+
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* §2.1 Neutrale — reci, ușor albăstrui */
+  --bg-canvas: #fbfcfd;
+  --bg-surface: #ffffff;
+  --bg-subtle: #f4f6f8;
+  --bg-inset: #eef1f4;
+
+  --border-hairline: #e6eaee;
+  --border-strong: #d4dae0;
+
+  --text-primary: #0b1215;
+  --text-secondary: #4a555e;
+  --text-tertiary: #8a959e;
+  --text-disabled: #b8c0c7;
+
+  /* §2.2 Accent — albastru-electric, rar și intenționat */
+  --accent: #1f6feb;
+  --accent-hover: #1a5fd0;
+  --accent-active: #164fb0;
+  --accent-subtle: #e8f0fe;
+  --accent-border: #b9d2fb;
+
+  /* §2.3 Semantice de stare */
+  --success: #1a7f52;
+  --success-subtle: #e4f5ec;
+  --warning: #b25e09;
+  --warning-subtle: #fbefe0;
+  --danger: #c4372b;
+  --danger-subtle: #fbeae8;
+
+  /* §2.4 Party colors */
+  --party-1: #1f6feb;
+  --party-2: #7a4dd1;
+  --party-3: #1a7f52;
+  --party-4: #b25e09;
+  --party-5: #0e7c86;
+  --party-6: #b33b78;
+}
+
+/* §2.5 Dark — tokenii există de la început; UI-ul se activează ulterior */
+[data-theme="dark"] {
+  --bg-canvas: #0b0f12;
+  --bg-surface: #12181d;
+  --bg-subtle: #1a222a;
+  --bg-inset: #0e141a;
+  --border-hairline: #232c34;
+  --border-strong: #323d47;
+  --text-primary: #eef2f5;
+  --text-secondary: #a7b2bc;
+  --text-tertiary: #6b7680;
+  --text-disabled: #48525b;
+  --accent: #4f8df7;
+  --accent-hover: #68a0fa;
+  --accent-subtle: #16263f;
+  --accent-border: #274b7e;
 }
 
 @theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+  /* culori → utilitare bg- / text- / border- */
+  --color-canvas: var(--bg-canvas);
+  --color-surface: var(--bg-surface);
+  --color-subtle: var(--bg-subtle);
+  --color-inset: var(--bg-inset);
+  --color-hairline: var(--border-hairline);
+  --color-strong: var(--border-strong);
+  --color-primary: var(--text-primary);
+  --color-secondary: var(--text-secondary);
+  --color-tertiary: var(--text-tertiary);
+  --color-disabled: var(--text-disabled);
+  --color-accent: var(--accent);
+  --color-accent-hover: var(--accent-hover);
+  --color-accent-active: var(--accent-active);
+  --color-accent-subtle: var(--accent-subtle);
+  --color-accent-border: var(--accent-border);
+  --color-success: var(--success);
+  --color-success-subtle: var(--success-subtle);
+  --color-warning: var(--warning);
+  --color-warning-subtle: var(--warning-subtle);
+  --color-danger: var(--danger);
+  --color-danger-subtle: var(--danger-subtle);
+  --color-party-1: var(--party-1);
+  --color-party-2: var(--party-2);
+  --color-party-3: var(--party-3);
+  --color-party-4: var(--party-4);
+  --color-party-5: var(--party-5);
+  --color-party-6: var(--party-6);
+
+  /* §3 tipografie */
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-general-sans), var(--font-inter), sans-serif;
+  --font-mono: var(--font-jetbrains), ui-monospace, monospace;
+
+  /* §4.3 shadows — elevație prin lumină */
+  --shadow-2xs: 0 1px 2px rgba(11, 18, 21, 0.04);
+  --shadow-xs: 0 1px 2px rgba(11, 18, 21, 0.04);
+  --shadow-sm: 0 1px 3px rgba(11, 18, 21, 0.06), 0 1px 2px rgba(11, 18, 21, 0.04);
+  --shadow-md: 0 4px 12px rgba(11, 18, 21, 0.08), 0 2px 4px rgba(11, 18, 21, 0.04);
+  --shadow-lg: 0 12px 32px rgba(11, 18, 21, 0.12), 0 4px 8px rgba(11, 18, 21, 0.06);
+  --shadow-focus: 0 0 0 3px var(--accent-subtle), 0 0 0 1px var(--accent);
 }
 
-/*
- * Deocamdată aplicația e LIGHT-ONLY: componentele folosesc clase de temă
- * deschisă, iar override-ul automat pe prefers-color-scheme făcea textul
- * ilizibil pe dark mode de sistem. Dark mode-ul complet e cerință reală
- * (blueprint §9 [C]) și intră ca pas de design dedicat — vezi DECISIONS.md.
- */
-/* "only light" e și opt-out-ul oficial din Auto Dark Mode al Chrome-ului
-   (forțarea dark pe site-uri), care altfel inversează culorile peste CSS. */
+/* Light-only deocamdată + opt-out din Chrome Auto Dark Mode (§2.5). */
 html {
   color-scheme: only light;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background: var(--bg-canvas);
+  color: var(--text-primary);
+  font-family: var(--font-sans);
+  font-size: 14px; /* §3.2 — bază 14, densitate Linear */
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Cifrele sunt conținutul (§3.1): tot ce e mono → tabular */
+.font-mono {
+  font-variant-numeric: tabular-nums;
+  font-size: 0.93em;
+}
+
+/* Focus vizibil pe tot ce e interactiv (§5, checklist) */
+:where(button, a, [role="button"]):focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: 6px;
+}
+:where(input, select, textarea):focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: var(--shadow-focus);
+}
+
+/* Controale de formular — §5.3 */
+:where(input, select, textarea) {
+  background: var(--bg-surface);
+  transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+}
+::placeholder {
+  color: var(--text-tertiary);
+}
+
+/* §7 Motion — discret; reduced-motion → instant */
+:where(button, a, input, select) {
+  transition: background-color 120ms ease-out, color 120ms ease-out,
+    border-color 120ms ease-out;
+}
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
 }

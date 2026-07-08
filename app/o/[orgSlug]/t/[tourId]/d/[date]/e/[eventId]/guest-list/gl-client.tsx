@@ -132,8 +132,8 @@ export function GuestListGrid({
   return (
     <div className="space-y-3">
       {/* Header: cutoff + locked [C-S] */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-neutral-200 px-3 py-2 text-xs">
-        <label className="flex items-center gap-2 font-semibold uppercase tracking-wide text-neutral-500">
+      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-hairline bg-surface shadow-xs px-3 py-2 text-xs">
+        <label className="flex items-center gap-2 font-semibold uppercase tracking-wide text-secondary">
           {t("cutoff")}
           <input
             type="datetime-local"
@@ -144,7 +144,7 @@ export function GuestListGrid({
               const value = e.target.value ? new Date(e.target.value).toISOString() : null;
               run(() => updateGlSettings(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, { cutoffAt: value }));
             }}
-            className="rounded border border-neutral-300 px-2 py-1"
+            className="rounded border border-hairline px-2 py-1"
           />
         </label>
         <button
@@ -156,18 +156,18 @@ export function GuestListGrid({
               }),
             )
           }
-          className={`rounded-full px-3 py-1 font-bold ${settings.is_locked ? "bg-red-600 text-white" : "border border-neutral-300 text-neutral-600"}`}
+          className={`rounded-full px-3 py-1 font-bold ${settings.is_locked ? "bg-danger text-white" : "border border-hairline text-secondary"}`}
         >
           {settings.is_locked ? `🔒 ${t("locked")}` : `🔓 ${t("unlocked")}`}
         </button>
 
         {/* filtre [C] */}
         <span className="ml-auto flex flex-wrap items-center gap-2">
-          <select value={filters.requestor} onChange={(e) => setFilters({ ...filters, requestor: e.target.value })} className="rounded border border-neutral-300 px-2 py-1">
+          <select value={filters.requestor} onChange={(e) => setFilters({ ...filters, requestor: e.target.value })} className="rounded border border-hairline px-2 py-1">
             <option value="">{t("requestor")}: {t("filterAll")}</option>
             {requestors.map((name) => (<option key={name} value={name}>{name}</option>))}
           </select>
-          <select value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value })} className="rounded border border-neutral-300 px-2 py-1">
+          <select value={filters.status} onChange={(e) => setFilters({ ...filters, status: e.target.value })} className="rounded border border-hairline px-2 py-1">
             <option value="">{t("status")}: {t("filterAll")}</option>
             {(["pending", "approved", "declined"] as const).map((s) => (
               <option key={s} value={s}>{t(s)}</option>
@@ -177,7 +177,7 @@ export function GuestListGrid({
             value={filters.affiliation}
             onChange={(e) => setFilters({ ...filters, affiliation: e.target.value })}
             placeholder={t("affiliation")}
-            className="w-28 rounded border border-neutral-300 px-2 py-1"
+            className="w-28 rounded border border-hairline px-2 py-1"
           />
         </span>
       </div>
@@ -199,7 +199,7 @@ export function GuestListGrid({
                 return r;
               });
             }}
-            className="rounded border border-neutral-300 px-2 py-1"
+            className="rounded border border-hairline px-2 py-1"
           >
             <option value="">{t("bulkStatus")}…</option>
             {(["approved", "declined", "pending"] as const).map((s) => (
@@ -215,7 +215,7 @@ export function GuestListGrid({
                 return r;
               })
             }
-            className="rounded px-2 py-1 text-red-600 hover:bg-red-50"
+            className="rounded px-2 py-1 text-danger hover:bg-danger-subtle"
           >
             🗑 {t("delete")}
           </button>
@@ -223,9 +223,9 @@ export function GuestListGrid({
       )}
 
       <div className="flex gap-4">
-        <div className="min-w-0 flex-1 overflow-x-auto rounded-lg border border-neutral-200">
+        <div className="min-w-0 flex-1 overflow-x-auto rounded-lg border border-hairline bg-surface shadow-xs">
           <table className="w-full text-xs">
-            <thead className="bg-neutral-50 text-left uppercase text-neutral-500">
+            <thead className="bg-subtle text-left uppercase text-secondary">
               <tr>
                 <th className="px-2 py-1.5">
                   <input
@@ -269,7 +269,7 @@ export function GuestListGrid({
                 <th className="px-2 py-1.5">{t("notes")}</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-neutral-100">
+            <tbody className="divide-y divide-hairline">
               {canSubmit && (
                 <NewGuestRow ctx={ctx} passTypes={passTypes} pending={pending} run={run} />
               )}
@@ -292,13 +292,13 @@ export function GuestListGrid({
                 />
               ))}
               {filtered.length === 0 && (
-                <tr><td colSpan={12 + passTypes.length} className="px-3 py-4 text-center text-neutral-400">{t("noRequests")}</td></tr>
+                <tr><td colSpan={12 + passTypes.length} className="px-3 py-4 text-center text-tertiary">{t("noRequests")}</td></tr>
               )}
             </tbody>
-            <tfoot className="bg-neutral-50 font-medium">
+            <tfoot className="bg-subtle font-medium">
               {/* totaluri pe selecția filtrată [C] */}
               <tr>
-                <td className="px-2 py-1.5 text-neutral-400" colSpan={2}>{t("selectedTotals")}</td>
+                <td className="px-2 py-1.5 text-tertiary" colSpan={2}>{t("selectedTotals")}</td>
                 <td />
                 <td className="px-2 py-1.5">{totalTickets}</td>
                 {passTypes.map((pass) => (
@@ -308,7 +308,7 @@ export function GuestListGrid({
               </tr>
               {/* allotments: NUM ALLOWED + ENFORCED + Remaining roșu [C] */}
               <tr className="text-[11px]">
-                <td className="px-2 py-1.5 text-neutral-400" colSpan={3}>
+                <td className="px-2 py-1.5 text-tertiary" colSpan={3}>
                   {t("numAllowed")} / {t("enforced")} / {t("remaining")}
                 </td>
                 <AllotmentCell
@@ -350,10 +350,10 @@ export function GuestListGrid({
 
         {/* Panou detaliu cu APPROVE [C-S] */}
         {detail && (
-          <aside className="w-64 shrink-0 space-y-2 rounded-lg border border-neutral-200 p-3 text-xs">
+          <aside className="w-64 shrink-0 space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3 text-xs">
             <div className="flex items-center justify-between">
               <span className="font-semibold">{t("detail")}</span>
-              <button onClick={() => setDetailId(null)} className="rounded px-1.5 hover:bg-neutral-100">✕</button>
+              <button onClick={() => setDetailId(null)} className="rounded px-1.5 hover:bg-subtle">✕</button>
             </div>
             <p className="text-sm font-medium">
               {detail.last_name}, {detail.first_name}
@@ -381,19 +381,19 @@ export function GuestListGrid({
                         }),
                       )
                     }
-                    className="w-16 rounded border border-neutral-300 px-1.5 py-0.5"
+                    className="w-16 rounded border border-hairline px-1.5 py-0.5"
                   />
                 ))}
               </div>
             )}
-            {detail.notes && <p className="whitespace-pre-wrap text-neutral-500">{detail.notes}</p>}
+            {detail.notes && <p className="whitespace-pre-wrap text-secondary">{detail.notes}</p>}
             {canManage && detail.status !== "approved" && (
               <button
                 disabled={pending}
                 onClick={() =>
                   run(() => setGuestStatus(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, [detail.id], "approved"))
                 }
-                className="w-full rounded bg-emerald-700 px-3 py-1.5 font-bold text-white"
+                className="w-full rounded bg-success px-3 py-1.5 font-bold text-white"
               >
                 ✓ {t("approve")}
               </button>
@@ -404,7 +404,7 @@ export function GuestListGrid({
                 onClick={() =>
                   run(() => setGuestStatus(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, [detail.id], "declined"))
                 }
-                className="w-full rounded border border-red-300 px-3 py-1 text-red-700"
+                className="w-full rounded border border-danger px-3 py-1 text-danger"
               >
                 {t("decline")}
               </button>
@@ -503,10 +503,10 @@ function NewGuestRow({
     }
   }
 
-  const cell = "w-full min-w-12 rounded border border-neutral-300 px-1.5 py-0.5";
+  const cell = "w-full min-w-12 rounded border border-hairline px-1.5 py-0.5";
 
   return (
-    <tr className="bg-amber-50/60" title={t("newGuestHint")}>
+    <tr className="bg-warning-subtle/50" title={t("newGuestHint")}>
       <td className="px-2 py-1">＋</td>
       <td className="px-2 py-1">
         <input ref={lastNameRef} value={draft.lastName} onChange={(e) => setDraft({ ...draft, lastName: e.target.value })} onKeyDown={onEnter} placeholder={t("last")} className={cell} />
@@ -530,12 +530,12 @@ function NewGuestRow({
           />
         </td>
       ))}
-      <td className="px-2 py-1 text-neutral-400">{t("pending")}</td>
+      <td className="px-2 py-1 text-tertiary">{t("pending")}</td>
       <td className="px-2 py-1">
         <input value={draft.affiliation} onChange={(e) => setDraft({ ...draft, affiliation: e.target.value })} onKeyDown={onEnter} className={cell} />
       </td>
-      <td className="px-2 py-1 text-neutral-400">—</td>
-      <td className="px-2 py-1 text-neutral-400">—</td>
+      <td className="px-2 py-1 text-tertiary">—</td>
+      <td className="px-2 py-1 text-tertiary">—</td>
       <td className="px-2 py-1">
         <select value={draft.pickup} onChange={(e) => setDraft({ ...draft, pickup: e.target.value })} className={cell}>
           <option value="" />
@@ -546,7 +546,7 @@ function NewGuestRow({
         {/* Space comută [C] — comportament nativ de buton */}
         <button
           onClick={() => setDraft({ ...draft, priority: !draft.priority })}
-          className={`rounded px-2 py-0.5 ${draft.priority ? "bg-amber-400 font-bold" : "border border-neutral-300"}`}
+          className={`rounded px-2 py-0.5 ${draft.priority ? "bg-warning-subtle border border-warning font-bold" : "border border-hairline"}`}
         >
           {draft.priority ? "Yes" : "No"}
         </button>
@@ -596,12 +596,12 @@ function GuestRowView({
     );
   }
 
-  const cell = "w-full min-w-12 rounded border border-transparent bg-transparent px-1.5 py-0.5 hover:border-neutral-200 focus:border-neutral-400";
+  const cell = "w-full min-w-12 rounded border border-transparent bg-transparent px-1.5 py-0.5 hover:border-hairline focus:border-strong";
   const statusColor =
-    row.status === "approved" ? "text-emerald-700" : row.status === "declined" ? "text-red-600" : "text-neutral-500";
+    row.status === "approved" ? "text-success" : row.status === "declined" ? "text-danger" : "text-secondary";
 
   return (
-    <tr className={selected ? "bg-blue-50/50" : undefined}>
+    <tr className={selected ? "bg-accent-subtle/50" : undefined}>
       <td className="px-2 py-1">
         <input type="checkbox" checked={selected} onChange={(e) => onSelect(e.target.checked)} />
       </td>
@@ -639,7 +639,7 @@ function GuestRowView({
                 setGuestStatus(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, [row.id], e.target.value as "pending" | "approved" | "declined"),
               )
             }
-            className={`rounded border border-neutral-200 px-1 py-0.5 font-medium ${statusColor}`}
+            className={`rounded border border-hairline px-1 py-0.5 font-medium ${statusColor}`}
           >
             {(["pending", "approved", "declined"] as const).map((s) => (
               <option key={s} value={s}>{t(s)}</option>
@@ -652,11 +652,11 @@ function GuestRowView({
       <td className="px-2 py-1">
         <input defaultValue={row.affiliation ?? ""} onBlur={(e) => e.target.value !== (row.affiliation ?? "") && patch({ affiliation: e.target.value })} className={cell} readOnly={!canManage} />
       </td>
-      <td className="px-2 py-1 text-neutral-500">{row.requestor_name}</td>
-      <td className="px-2 py-1 text-neutral-500">{row.requested_at.slice(0, 10)}</td>
+      <td className="px-2 py-1 text-secondary">{row.requestor_name}</td>
+      <td className="px-2 py-1 text-secondary">{row.requested_at.slice(0, 10)}</td>
       <td className="px-2 py-1">
         {canManage ? (
-          <select value={row.pickup ?? ""} onChange={(e) => patch({ pickup: e.target.value })} className="rounded border border-neutral-200 px-1 py-0.5">
+          <select value={row.pickup ?? ""} onChange={(e) => patch({ pickup: e.target.value })} className="rounded border border-hairline px-1 py-0.5">
             <option value="" />
             {PICKUPS.map((p) => (<option key={p} value={p}>{t(`pickup_${p}`)}</option>))}
           </select>
@@ -668,12 +668,12 @@ function GuestRowView({
         <button
           disabled={!canManage || pending}
           onClick={() => patch({ priority: !row.priority })}
-          className={`rounded px-2 py-0.5 ${row.priority ? "bg-amber-400 font-bold" : "border border-neutral-200 text-neutral-400"}`}
+          className={`rounded px-2 py-0.5 ${row.priority ? "bg-warning-subtle border border-warning font-bold" : "border border-hairline text-tertiary"}`}
         >
           {row.priority ? "Yes" : "No"}
         </button>
       </td>
-      <td className="max-w-40 truncate px-2 py-1 text-neutral-500" title={row.notes ?? ""}>
+      <td className="max-w-40 truncate px-2 py-1 text-secondary" title={row.notes ?? ""}>
         {row.notes}
       </td>
     </tr>
@@ -701,7 +701,7 @@ function AllotmentCell({
             const v = e.target.value === "" ? null : Number(e.target.value);
             if (v !== allowed) onChange(v, enforced);
           }}
-          className="w-14 rounded border border-neutral-300 px-1 py-0.5"
+          className="w-14 rounded border border-hairline px-1 py-0.5"
         />
         <input
           type="checkbox"
@@ -712,7 +712,7 @@ function AllotmentCell({
         />
         {remaining != null && (
           // Remaining ROȘU la negativ [C]
-          <b className={remaining < 0 ? "text-red-600" : "text-neutral-600"}>{remaining}</b>
+          <b className={remaining < 0 ? "text-danger" : "text-secondary"}>{remaining}</b>
         )}
       </span>
     </td>
@@ -762,29 +762,29 @@ export function CrewGlForm({
   }
 
   const statusColor = (s: GuestRow["status"]) =>
-    s === "approved" ? "text-emerald-700" : s === "declined" ? "text-red-600" : "text-neutral-500";
+    s === "approved" ? "text-success" : s === "declined" ? "text-danger" : "text-secondary";
 
   return (
     <div className="space-y-4">
       {canSubmit && (
-        <div className="space-y-2 rounded-lg border border-neutral-200 p-3">
+        <div className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
           <p className="text-sm font-medium">{t("submitRequest")}</p>
           <div className="flex flex-wrap gap-2">
-            <input value={draft.lastName} onChange={(e) => setDraft({ ...draft, lastName: e.target.value })} placeholder={t("last")} className="w-32 rounded border border-neutral-300 px-2 py-1 text-sm" />
-            <input value={draft.firstName} onChange={(e) => setDraft({ ...draft, firstName: e.target.value })} placeholder={t("first")} className="w-32 rounded border border-neutral-300 px-2 py-1 text-sm" />
-            <input value={draft.affiliation} onChange={(e) => setDraft({ ...draft, affiliation: e.target.value })} placeholder={t("affiliation")} className="w-32 rounded border border-neutral-300 px-2 py-1 text-sm" />
-            <input type="number" min={0} value={draft.numTickets} onChange={(e) => setDraft({ ...draft, numTickets: Number(e.target.value) || 0 })} className="w-16 rounded border border-neutral-300 px-2 py-1 text-sm" />
+            <input value={draft.lastName} onChange={(e) => setDraft({ ...draft, lastName: e.target.value })} placeholder={t("last")} className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
+            <input value={draft.firstName} onChange={(e) => setDraft({ ...draft, firstName: e.target.value })} placeholder={t("first")} className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
+            <input value={draft.affiliation} onChange={(e) => setDraft({ ...draft, affiliation: e.target.value })} placeholder={t("affiliation")} className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
+            <input type="number" min={0} value={draft.numTickets} onChange={(e) => setDraft({ ...draft, numTickets: Number(e.target.value) || 0 })} className="w-16 rounded border border-hairline px-2 py-1 text-sm" />
             {passTypes.length > 0 && (
-              <select value={draft.passId} onChange={(e) => setDraft({ ...draft, passId: e.target.value })} className="rounded border border-neutral-300 px-2 py-1 text-sm">
+              <select value={draft.passId} onChange={(e) => setDraft({ ...draft, passId: e.target.value })} className="rounded border border-hairline px-2 py-1 text-sm">
                 <option value="">—</option>
                 {passTypes.map((p) => (<option key={p.id} value={p.id}>{p.name}</option>))}
               </select>
             )}
-            <input value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} placeholder={t("notes")} className="min-w-32 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm" />
+            <input value={draft.notes} onChange={(e) => setDraft({ ...draft, notes: e.target.value })} placeholder={t("notes")} className="min-w-32 flex-1 rounded border border-hairline px-2 py-1 text-sm" />
             <button
               disabled={pending || !draft.lastName.trim()}
               onClick={submit}
-              className="rounded bg-neutral-900 px-3 py-1 text-sm font-medium text-white disabled:opacity-40"
+              className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-sm font-medium text-white disabled:opacity-40"
             >
               {t("submitRequest")}
             </button>
@@ -795,14 +795,14 @@ export function CrewGlForm({
       <div className="space-y-1">
         <p className="text-sm font-medium">{t("myRequests")}</p>
         {rows.length === 0 ? (
-          <p className="text-sm text-neutral-400">{t("noRequests")}</p>
+          <p className="text-sm text-tertiary">{t("noRequests")}</p>
         ) : (
-          <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 text-sm">
+          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs text-sm">
             {rows.map((row) => (
               <li key={row.id} className="flex items-center justify-between px-3 py-2">
                 <span>
                   {row.last_name}, {row.first_name}
-                  <span className="ml-2 text-xs text-neutral-500">
+                  <span className="ml-2 text-xs text-secondary">
                     {row.num_tickets > 0 && `${row.num_tickets} tix`}
                     {Object.entries(row.passes).map(([passId, qty]) =>
                       ` · ${qty}× ${passTypes.find((p) => p.id === passId)?.name ?? ""}`,

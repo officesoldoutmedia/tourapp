@@ -30,10 +30,10 @@ export default async function InvitePage({
   return (
     <main className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 text-center">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">{t("title")}</h1>
 
         {!invitation || invitation.accepted ? (
-          <p className="text-sm text-neutral-500">{t("invalid")}</p>
+          <p className="text-sm text-secondary">{t("invalid")}</p>
         ) : (
           <>
             <p className="text-sm">
@@ -52,19 +52,19 @@ export default async function InvitePage({
               >
                 <button
                   type="submit"
-                  className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+                  className="rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
                 >
                   {t("accept")}
                 </button>
               </form>
             ) : (
               <div className="space-y-3">
-                <p className="text-sm text-neutral-500">
+                <p className="text-sm text-secondary">
                   {t("needAccount", { email: invitation.email })}
                 </p>
                 <Link
                   href={`/login?next=${encodeURIComponent(`/invite/${token}`)}`}
-                  className="inline-block rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+                  className="inline-block rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
                 >
                   {t("accept")}
                 </Link>

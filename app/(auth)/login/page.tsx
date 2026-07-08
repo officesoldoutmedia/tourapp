@@ -59,10 +59,10 @@ function LoginForm() {
   return (
     <main className="flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-sm space-y-6">
-        <h1 className="text-2xl font-semibold">{tc("appName")}</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">{tc("appName")}</h1>
 
         {message ? (
-          <p className="rounded-md border border-emerald-300 bg-emerald-50 p-3 text-sm text-emerald-900">
+          <p className="rounded-md border border-success bg-success-subtle p-3 text-sm text-success">
             {message}
           </p>
         ) : (
@@ -75,7 +75,7 @@ function LoginForm() {
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
               />
             </label>
             <label className="block space-y-1">
@@ -85,38 +85,38 @@ function LoginForm() {
                 autoComplete="current-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+                className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
               />
             </label>
 
-            {error && <p className="text-sm text-red-600">{error}</p>}
+            {error && <p className="text-sm text-danger">{error}</p>}
 
             <button
               type="submit"
               disabled={pending}
-              className="w-full rounded-md bg-neutral-900 px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+              className="w-full rounded-md bg-accent hover:bg-accent-hover px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
             >
               {t("logIn")}
             </button>
 
-            <div className="flex items-center gap-3 text-xs text-neutral-400">
-              <span className="h-px flex-1 bg-neutral-200" />
+            <div className="flex items-center gap-3 text-xs text-tertiary">
+              <span className="h-px flex-1 bg-hairline" />
               {t("orSeparator")}
-              <span className="h-px flex-1 bg-neutral-200" />
+              <span className="h-px flex-1 bg-hairline" />
             </div>
 
             <button
               type="button"
               onClick={sendMagicLink}
               disabled={pending || !email}
-              className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm font-medium disabled:opacity-50"
+              className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm font-medium disabled:opacity-50"
             >
               {t("magicLink")}
             </button>
           </form>
         )}
 
-        <p className="text-sm text-neutral-500">
+        <p className="text-sm text-secondary">
           {t("noAccount")}{" "}
           <Link href="/signup" className="font-medium underline">
             {t("signUp")}

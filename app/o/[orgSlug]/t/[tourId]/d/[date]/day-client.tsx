@@ -58,7 +58,7 @@ export function NotesSection({
     <section className="grid gap-4 md:grid-cols-3">
       {fields.map(([field, label, value]) => (
         <label key={field} className="block space-y-1">
-          <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+          <span className="text-xs font-semibold uppercase tracking-wide text-secondary">
             {label}
           </span>
           <textarea
@@ -70,7 +70,7 @@ export function NotesSection({
                 void updateDayNotes(orgSlug, tourId, day.date, field, e.target.value);
               }
             }}
-            className="w-full rounded-md border border-neutral-200 px-3 py-2 text-sm read-only:bg-neutral-50"
+            className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm read-only:bg-subtle"
           />
         </label>
       ))}
@@ -115,13 +115,13 @@ export function ScheduleSection({
   return (
     <section className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="mr-auto text-lg font-medium">{td("schedule")}</h2>
+        <h2 className="mr-auto font-display text-lg font-semibold tracking-tight">{td("schedule")}</h2>
         {canEdit && (
           <>
             <select
               value={templateId}
               onChange={(e) => setTemplateId(e.target.value)}
-              className="rounded border border-neutral-300 px-2 py-1 text-xs"
+              className="rounded border border-hairline px-2 py-1 text-xs"
             >
               <option value="">{t("applyTemplate")}…</option>
               {templates.map((tpl) => (
@@ -138,7 +138,7 @@ export function ScheduleSection({
                     applyScheduleTemplate(orgSlug, tourId, day.date, day.id, templateId),
                   )
                 }
-                className="rounded border border-neutral-300 px-2 py-1 text-xs font-medium"
+                className="rounded border border-hairline px-2 py-1 text-xs font-medium"
               >
                 {t("applyTemplate")}
               </button>
@@ -148,13 +148,13 @@ export function ScheduleSection({
               onClick={() =>
                 run(() => confirmAllSchedule(orgSlug, tourId, day.date, day.id))
               }
-              className="rounded border border-neutral-300 px-2 py-1 text-xs font-medium disabled:opacity-40"
+              className="rounded border border-hairline px-2 py-1 text-xs font-medium disabled:opacity-40"
             >
               {t("confirmAll")}
             </button>
             <button
               onClick={() => setAdding(true)}
-              className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white"
+              className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
             >
               + {t("add")}
             </button>
@@ -163,10 +163,10 @@ export function ScheduleSection({
       </div>
 
       {items.length === 0 && !adding && (
-        <p className="text-sm text-neutral-400">{t("noItems")}</p>
+        <p className="text-sm text-tertiary">{t("noItems")}</p>
       )}
 
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 empty:hidden">
+      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
         {items.map((item) =>
           editing?.id === item.id ? (
             <li key={item.id} className="p-3">
@@ -182,7 +182,7 @@ export function ScheduleSection({
             </li>
           ) : (
             <li key={item.id} className="flex items-center gap-3 px-3 py-2">
-              <span className="w-24 shrink-0 font-mono text-xs text-neutral-600">
+              <span className="w-24 shrink-0 font-mono text-xs text-secondary">
                 {item.start_at ? formatTimeInZone(new Date(item.start_at), day.timezone) : "—"}
                 {item.end_at && (
                   <>
@@ -193,26 +193,26 @@ export function ScheduleSection({
                         new Date(item.end_at),
                         day.timezone,
                       ) && (
-                        <sup className="ml-0.5 font-semibold text-red-600">+1</sup>
+                        <sup className="ml-0.5 font-semibold text-danger">+1</sup>
                       )}
                   </>
                 )}
               </span>
               <span className="min-w-0 flex-1">
                 <span
-                  className={`text-sm font-medium ${item.is_complete ? "text-neutral-400 line-through" : ""}`}
+                  className={`text-sm font-medium ${item.is_complete ? "text-tertiary line-through" : ""}`}
                 >
                   {item.item_type === "publicity" && <span title={t("publicity")}>🎤 </span>}
                   {item.title}
                 </span>
                 {item.details && (
-                  <span className="block truncate text-xs text-neutral-500">
+                  <span className="block truncate text-xs text-secondary">
                     {item.details}
                   </span>
                 )}
               </span>
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${item.is_confirmed ? "bg-emerald-100 text-emerald-800" : "bg-neutral-100 text-neutral-500"}`}
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${item.is_confirmed ? "bg-success-subtle text-success" : "bg-inset text-secondary"}`}
               >
                 {item.is_confirmed ? t("confirmed") : t("unconfirmed")}
               </span>
@@ -226,7 +226,7 @@ export function ScheduleSection({
                         toggleScheduleFlag(orgSlug, tourId, day.date, item.id, "is_confirmed", !item.is_confirmed),
                       )
                     }
-                    className="rounded px-1.5 py-0.5 text-xs hover:bg-neutral-100"
+                    className="rounded px-1.5 py-0.5 text-xs hover:bg-subtle"
                   >
                     ✓
                   </button>
@@ -238,14 +238,14 @@ export function ScheduleSection({
                         toggleScheduleFlag(orgSlug, tourId, day.date, item.id, "is_complete", !item.is_complete),
                       )
                     }
-                    className="rounded px-1.5 py-0.5 text-xs hover:bg-neutral-100"
+                    className="rounded px-1.5 py-0.5 text-xs hover:bg-subtle"
                   >
                     ☑
                   </button>
                   <button
                     title={t("edit")}
                     onClick={() => setEditing(item)}
-                    className="rounded px-1.5 py-0.5 text-xs hover:bg-neutral-100"
+                    className="rounded px-1.5 py-0.5 text-xs hover:bg-subtle"
                   >
                     ✎
                   </button>
@@ -255,7 +255,7 @@ export function ScheduleSection({
                     onClick={() =>
                       run(() => deleteScheduleItem(orgSlug, tourId, day.date, item.id))
                     }
-                    className="rounded px-1.5 py-0.5 text-xs text-red-600 hover:bg-red-50"
+                    className="rounded px-1.5 py-0.5 text-xs text-danger hover:bg-danger-subtle"
                   >
                     🗑
                   </button>
@@ -267,7 +267,7 @@ export function ScheduleSection({
       </ul>
 
       {adding && (
-        <div className="rounded-lg border border-neutral-200 p-3">
+        <div className="rounded-lg border border-hairline bg-surface shadow-xs p-3">
           <ItemForm
             initial={null}
             day={day}
@@ -284,7 +284,7 @@ export function ScheduleSection({
             value={templateName}
             onChange={(e) => setTemplateName(e.target.value)}
             placeholder={t("templateName")}
-            className="rounded border border-neutral-300 px-2 py-1 text-xs"
+            className="rounded border border-hairline px-2 py-1 text-xs"
           />
           <button
             disabled={pending || !templateName.trim()}
@@ -295,7 +295,7 @@ export function ScheduleSection({
                 return r;
               })
             }
-            className="rounded border border-neutral-300 px-2 py-1 text-xs font-medium disabled:opacity-40"
+            className="rounded border border-hairline px-2 py-1 text-xs font-medium disabled:opacity-40"
           >
             {t("saveAsTemplate")}
           </button>
@@ -343,12 +343,12 @@ function ItemForm({
           value={title}
           onChange={(e) => setTitle(e.target.value)}
           placeholder={t("title")}
-          className="min-w-40 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+          className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-sm"
         />
         <select
           value={itemType}
           onChange={(e) => setItemType(e.target.value as "schedule" | "publicity")}
-          className="rounded border border-neutral-300 px-2 py-1 text-sm"
+          className="rounded border border-hairline px-2 py-1 text-sm"
         >
           <option value="schedule">{t("scheduleType")}</option>
           <option value="publicity">{t("publicity")}</option>
@@ -357,16 +357,16 @@ function ItemForm({
           type="time"
           value={start}
           onChange={(e) => setStart(e.target.value)}
-          className="rounded border border-neutral-300 px-2 py-1 text-sm"
+          className="rounded border border-hairline px-2 py-1 text-sm"
         />
         <input
           type="time"
           value={end}
           onChange={(e) => setEnd(e.target.value)}
-          className="rounded border border-neutral-300 px-2 py-1 text-sm"
+          className="rounded border border-hairline px-2 py-1 text-sm"
         />
         {plusOne && (
-          <span className="self-center text-xs font-semibold text-red-600">
+          <span className="self-center text-xs font-semibold text-danger">
             {t("plusOne")}
           </span>
         )}
@@ -376,7 +376,7 @@ function ItemForm({
         onChange={(e) => setDetails(e.target.value)}
         placeholder={t("details")}
         rows={2}
-        className="w-full rounded border border-neutral-300 px-2 py-1 text-sm"
+        className="w-full rounded border border-hairline px-2 py-1 text-sm"
       />
       <div className="flex gap-2">
         <button
@@ -394,13 +394,13 @@ function ItemForm({
               tz: day.timezone,
             })
           }
-          className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+          className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
         >
           {tc("save")}
         </button>
         <button
           onClick={onCancel}
-          className="rounded border border-neutral-300 px-3 py-1 text-xs"
+          className="rounded border border-hairline px-3 py-1 text-xs"
         >
           {tc("cancel")}
         </button>

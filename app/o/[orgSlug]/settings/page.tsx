@@ -35,36 +35,36 @@ export default async function OrgSettingsPage({
 
   return (
     <main className="mx-auto w-full max-w-2xl space-y-6 p-6">
-      <h1 className="text-xl font-semibold">{t("title")}</h1>
+      <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
 
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
         {canManageUsers && (
           <li>
-            <Link href={`/o/${orgSlug}/settings/users`} className="block px-4 py-3 hover:bg-neutral-50">
+            <Link href={`/o/${orgSlug}/settings/users`} className="block px-4 py-3 hover:bg-subtle">
               👤 {t("users")}
             </Link>
           </li>
         )}
         <li>
-          <Link href={`/o/${orgSlug}/settings/groups`} className="block px-4 py-3 hover:bg-neutral-50">
+          <Link href={`/o/${orgSlug}/settings/groups`} className="block px-4 py-3 hover:bg-subtle">
             👥 {t("groups")}
           </Link>
         </li>
         <li>
-          <Link href={`/o/${orgSlug}/settings/songs`} className="block px-4 py-3 hover:bg-neutral-50">
+          <Link href={`/o/${orgSlug}/settings/songs`} className="block px-4 py-3 hover:bg-subtle">
             🎵 {t("songs")}
           </Link>
         </li>
       </ul>
 
       {canManageUsers && (
-        <form action={toggleGlEmails} className="flex items-center justify-between rounded-lg border border-neutral-200 px-4 py-3">
+        <form action={toggleGlEmails} className="flex items-center justify-between rounded-lg border border-hairline bg-surface shadow-xs px-4 py-3">
           <span>
             <span className="block text-sm font-medium">{t("glEmails")}</span>
-            <span className="text-xs text-neutral-500">{t("glEmailsHint")}</span>
+            <span className="text-xs text-secondary">{t("glEmailsHint")}</span>
           </span>
           <button
-            className={`rounded-full px-4 py-1 text-xs font-bold ${glEmailsOn ? "bg-emerald-600 text-white" : "border border-neutral-300 text-neutral-500"}`}
+            className={`rounded-full px-4 py-1 text-xs font-bold ${glEmailsOn ? "bg-success text-white" : "border border-hairline text-secondary"}`}
           >
             {glEmailsOn ? "ON" : "OFF"}
           </button>

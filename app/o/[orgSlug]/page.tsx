@@ -26,11 +26,11 @@ export default async function OrgDashboard({
   return (
     <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
       <div className="flex items-center justify-between">
-        <h1 className="text-2xl font-semibold">{t("title")}</h1>
+        <h1 className="font-display text-2xl font-semibold tracking-tight">{t("title")}</h1>
         {canManage && (
           <Link
             href={`/o/${org.slug}/tours/new`}
-            className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white"
+            className="rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
           >
             {t("newTour")}
           </Link>
@@ -38,17 +38,17 @@ export default async function OrgDashboard({
       </div>
 
       {active.length === 0 ? (
-        <p className="text-sm text-neutral-500">{t("empty")}</p>
+        <p className="text-sm text-secondary">{t("empty")}</p>
       ) : (
-        <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200">
+        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
           {active.map((tour) => (
             <li key={tour.id}>
               <Link
                 href={`/o/${org.slug}/t/${tour.id}`}
-                className="flex items-center justify-between px-4 py-3 hover:bg-neutral-50"
+                className="flex items-center justify-between px-4 py-3 hover:bg-subtle"
               >
                 <span className="font-medium">{tour.name}</span>
-                <span className="text-xs text-neutral-500">
+                <span className="text-xs text-secondary">
                   {tour.start_date} → {tour.end_date}
                 </span>
               </Link>
@@ -59,15 +59,15 @@ export default async function OrgDashboard({
 
       {archived.length > 0 && (
         <section className="space-y-2">
-          <h2 className="text-sm font-medium text-neutral-500">
+          <h2 className="text-sm font-medium text-secondary">
             {t("archived")}
           </h2>
-          <ul className="divide-y divide-neutral-200 rounded-lg border border-neutral-200 opacity-60">
+          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs opacity-60">
             {archived.map((tour) => (
               <li key={tour.id}>
                 <Link
                   href={`/o/${org.slug}/t/${tour.id}`}
-                  className="flex items-center justify-between px-4 py-3 hover:bg-neutral-50"
+                  className="flex items-center justify-between px-4 py-3 hover:bg-subtle"
                 >
                   <span>{tour.name}</span>
                 </Link>

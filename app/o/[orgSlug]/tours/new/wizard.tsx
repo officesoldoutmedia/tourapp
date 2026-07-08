@@ -95,7 +95,7 @@ export function TourWizard({
 
   return (
     <main className="mx-auto w-full max-w-4xl space-y-8 p-6">
-      <h1 className="text-2xl font-semibold">{t("newTour")}</h1>
+      <h1 className="font-display text-2xl font-semibold tracking-tight">{t("newTour")}</h1>
 
       <div className="grid gap-4 sm:grid-cols-3">
         <label className="block space-y-1 sm:col-span-1">
@@ -103,7 +103,7 @@ export function TourWizard({
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
           />
         </label>
         <label className="block space-y-1">
@@ -115,7 +115,7 @@ export function TourWizard({
               setFrom(e.target.value);
               generateDays(e.target.value, to);
             }}
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
           />
         </label>
         <label className="block space-y-1">
@@ -127,17 +127,17 @@ export function TourWizard({
               setTo(e.target.value);
               generateDays(from, e.target.value);
             }}
-            className="w-full rounded-md border border-neutral-300 px-3 py-2 text-sm"
+            className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
           />
         </label>
       </div>
 
       {days.length > 0 && (
         <section className="space-y-3">
-          <h2 className="text-lg font-medium">{t("wizardDays")}</h2>
-          <div className="overflow-x-auto rounded-lg border border-neutral-200">
+          <h2 className="font-display text-lg font-semibold tracking-tight">{t("wizardDays")}</h2>
+          <div className="overflow-x-auto rounded-lg border border-hairline bg-surface shadow-xs">
             <table className="w-full text-sm">
-              <thead className="bg-neutral-50 text-left text-xs uppercase text-neutral-500">
+              <thead className="bg-subtle text-left text-xs uppercase text-secondary">
                 <tr>
                   <th className="px-3 py-2">Data</th>
                   <th className="px-3 py-2">{t("dayTypeLabel")}</th>
@@ -146,7 +146,7 @@ export function TourWizard({
                   <th className="px-3 py-2">{t("timezone")}</th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-neutral-100">
+              <tbody className="divide-y divide-hairline">
                 {days.map((day, idx) => (
                   <tr key={day.date}>
                     <td className="whitespace-nowrap px-3 py-1.5 font-mono text-xs">
@@ -158,7 +158,7 @@ export function TourWizard({
                         onChange={(e) =>
                           updateDay(idx, { day_type: e.target.value })
                         }
-                        className="rounded border border-neutral-300 px-2 py-1"
+                        className="rounded border border-hairline px-2 py-1"
                       >
                         {DAY_TYPES.map((dt) => (
                           <option key={dt} value={dt}>
@@ -171,7 +171,7 @@ export function TourWizard({
                       <input
                         value={day.city}
                         onChange={(e) => updateDay(idx, { city: e.target.value })}
-                        className="w-32 rounded border border-neutral-300 px-2 py-1"
+                        className="w-32 rounded border border-hairline px-2 py-1"
                       />
                     </td>
                     <td className="px-3 py-1.5">
@@ -180,7 +180,7 @@ export function TourWizard({
                         onChange={(e) =>
                           updateDay(idx, { country: e.target.value })
                         }
-                        className="w-32 rounded border border-neutral-300 px-2 py-1"
+                        className="w-32 rounded border border-hairline px-2 py-1"
                       />
                     </td>
                     <td className="px-3 py-1.5">
@@ -189,7 +189,7 @@ export function TourWizard({
                         onChange={(e) =>
                           updateDay(idx, { timezone: e.target.value })
                         }
-                        className="w-48 rounded border border-neutral-300 px-2 py-1"
+                        className="w-48 rounded border border-hairline px-2 py-1"
                       >
                         {timezones.map((tz) => (
                           <option key={tz} value={tz}>
@@ -210,7 +210,7 @@ export function TourWizard({
               <select
                 value={templateId}
                 onChange={(e) => setTemplateId(e.target.value)}
-                className="rounded-md border border-neutral-300 px-3 py-2 text-sm"
+                className="rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
               >
                 <option value="">{t("noTemplate")}</option>
                 {templates.map((tpl) => (
@@ -224,12 +224,12 @@ export function TourWizard({
         </section>
       )}
 
-      {error && <p className="text-sm text-red-600">{error}</p>}
+      {error && <p className="text-sm text-danger">{error}</p>}
 
       <button
         onClick={submit}
         disabled={pending || !name.trim() || days.length === 0}
-        className="rounded-md bg-neutral-900 px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+        className="rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
       >
         {t("createTour")}
       </button>

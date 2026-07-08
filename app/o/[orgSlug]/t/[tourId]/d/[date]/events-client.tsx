@@ -55,11 +55,11 @@ export function EventsSection({
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-medium">{t("title")}</h2>
+        <h2 className="font-display text-lg font-semibold tracking-tight">{t("title")}</h2>
         {canEdit && !adding && (
           <button
             onClick={() => setAdding(true)}
-            className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white"
+            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
           >
             + {t("addEvent")}
           </button>
@@ -67,27 +67,27 @@ export function EventsSection({
       </div>
 
       {events.length === 0 && !adding && (
-        <p className="text-sm text-neutral-400">{t("noEvents")}</p>
+        <p className="text-sm text-tertiary">{t("noEvents")}</p>
       )}
 
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 empty:hidden">
+      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
         {events.map((event) => (
           <li key={event.id}>
             <Link
               href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${event.id}`}
-              className="flex items-center justify-between px-3 py-2 hover:bg-neutral-50"
+              className="flex items-center justify-between px-3 py-2 hover:bg-subtle"
             >
               <span className="text-sm font-medium">
                 {event.title ?? event.venue_name ?? "—"}
               </span>
-              <span className="text-xs text-neutral-500">{event.venue_name}</span>
+              <span className="text-xs text-secondary">{event.venue_name}</span>
             </Link>
           </li>
         ))}
       </ul>
 
       {adding && (
-        <div className="space-y-3 rounded-lg border border-neutral-200 p-3">
+        <div className="space-y-3 rounded-lg border border-hairline bg-surface shadow-xs p-3">
           {!manual ? (
             <>
               <input
@@ -95,9 +95,9 @@ export function EventsSection({
                 value={query}
                 onChange={(e) => search(e.target.value)}
                 placeholder={t("searchVenue")}
-                className="w-full rounded border border-neutral-300 px-3 py-2 text-sm"
+                className="w-full rounded border border-hairline px-3 py-2 text-sm"
               />
-              <ul className="divide-y divide-neutral-100 empty:hidden">
+              <ul className="divide-y divide-hairline empty:hidden">
                 {hits.map((hit) => (
                   <li key={hit.id}>
                     <button
@@ -109,21 +109,21 @@ export function EventsSection({
                             : { dayId, venueId: hit.id },
                         )
                       }
-                      className="flex w-full items-center justify-between px-2 py-1.5 text-left text-sm hover:bg-neutral-50"
+                      className="flex w-full items-center justify-between px-2 py-1.5 text-left text-sm hover:bg-subtle"
                     >
                       <span>
                         {hit.name}
-                        <span className="ml-2 text-xs text-neutral-500">
+                        <span className="ml-2 text-xs text-secondary">
                           {[hit.city, hit.country].filter(Boolean).join(", ")}
                         </span>
                       </span>
                       <span
                         className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
                           hit.source === "google"
-                            ? "bg-emerald-100 text-emerald-800"
+                            ? "bg-success-subtle text-success"
                             : hit.source === "catalog"
-                              ? "bg-blue-100 text-blue-800"
-                              : "bg-neutral-100 text-neutral-600"
+                              ? "bg-accent-subtle text-accent"
+                              : "bg-inset text-secondary"
                         }`}
                       >
                         {hit.source === "google"
@@ -141,7 +141,7 @@ export function EventsSection({
                   setManual(true);
                   setNewVenue((v) => ({ ...v, name: query }));
                 }}
-                className="text-xs font-medium text-neutral-600 underline"
+                className="text-xs font-medium text-secondary underline"
               >
                 {t("createManually")}
               </button>
@@ -152,24 +152,24 @@ export function EventsSection({
                 value={newVenue.name}
                 onChange={(e) => setNewVenue({ ...newVenue, name: e.target.value })}
                 placeholder={t("venueName")}
-                className="min-w-40 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+                className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-sm"
               />
               <input
                 value={newVenue.city}
                 onChange={(e) => setNewVenue({ ...newVenue, city: e.target.value })}
                 placeholder="Oraș / City"
-                className="w-32 rounded border border-neutral-300 px-2 py-1 text-sm"
+                className="w-32 rounded border border-hairline px-2 py-1 text-sm"
               />
               <input
                 value={newVenue.country}
                 onChange={(e) => setNewVenue({ ...newVenue, country: e.target.value })}
                 placeholder="Țară / Country"
-                className="w-32 rounded border border-neutral-300 px-2 py-1 text-sm"
+                className="w-32 rounded border border-hairline px-2 py-1 text-sm"
               />
               <button
                 disabled={pending || !newVenue.name.trim()}
                 onClick={() => attach({ dayId, newVenue })}
-                className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+                className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
               >
                 {tc("save")}
               </button>
@@ -181,29 +181,29 @@ export function EventsSection({
               setManual(false);
               setDuplicates(null);
             }}
-            className="text-xs text-neutral-500 underline"
+            className="text-xs text-secondary underline"
           >
             {tc("cancel")}
           </button>
 
           {/* Dialog "Multiple Records Found" [C §6.5.1.5] */}
           {duplicates && (
-            <div className="space-y-2 rounded-md border border-amber-300 bg-amber-50 p-3">
+            <div className="space-y-2 rounded-md border border-warning bg-warning-subtle p-3">
               <p className="text-sm font-semibold">{t("duplicatesFound")}</p>
-              <p className="text-xs text-neutral-600">{t("duplicatesHint")}</p>
+              <p className="text-xs text-secondary">{t("duplicatesHint")}</p>
               <ul className="space-y-1">
                 {duplicates.map((dupe) => (
                   <li key={dupe.id} className="flex items-center justify-between text-sm">
                     <span>
                       {dupe.name}{" "}
-                      <span className="text-xs text-neutral-500">
+                      <span className="text-xs text-secondary">
                         {[dupe.city, dupe.country].filter(Boolean).join(", ")}
                       </span>
                     </span>
                     <button
                       disabled={pending}
                       onClick={() => attach({ dayId, venueId: dupe.id })}
-                      className="rounded border border-neutral-400 px-2 py-0.5 text-xs font-medium"
+                      className="rounded border border-strong px-2 py-0.5 text-xs font-medium"
                     >
                       {t("useExisting")}
                     </button>
@@ -213,7 +213,7 @@ export function EventsSection({
               <button
                 disabled={pending}
                 onClick={() => attach({ dayId, newVenue, ignoreDuplicates: true })}
-                className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white"
+                className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
               >
                 {t("createNew")}
               </button>

@@ -51,11 +51,11 @@ export function TasksSection({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-medium">{t("title")}</h2>
+      <h2 className="font-display text-lg font-semibold tracking-tight">{t("title")}</h2>
 
-      {tasks.length === 0 && <p className="text-sm text-neutral-400">{t("empty")}</p>}
+      {tasks.length === 0 && <p className="text-sm text-tertiary">{t("empty")}</p>}
 
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 empty:hidden">
+      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
         {tasks.map((task) => {
           const overdue =
             !task.is_complete && task.due_at !== null && Date.parse(task.due_at) < now;
@@ -69,21 +69,21 @@ export function TasksSection({
                   run(() => toggleTaskComplete(orgSlug, tourId, date, task.id, e.target.checked))
                 }
               />
-              <span className={`min-w-0 flex-1 ${task.is_complete ? "text-neutral-400 line-through" : ""}`}>
+              <span className={`min-w-0 flex-1 ${task.is_complete ? "text-tertiary line-through" : ""}`}>
                 {task.title}
               </span>
               {task.due_at && (
-                <span className="text-xs text-neutral-500">{task.due_at.slice(0, 10)}</span>
+                <span className="text-xs text-secondary">{task.due_at.slice(0, 10)}</span>
               )}
               {overdue && (
                 // [C] overdue = text roșu
-                <span className="text-xs font-bold text-red-600">{t("overdue")}</span>
+                <span className="text-xs font-bold text-danger">{t("overdue")}</span>
               )}
               {canEdit && (
                 <button
                   disabled={pending}
                   onClick={() => run(() => deleteTask(orgSlug, tourId, date, task.id))}
-                  className="rounded px-1.5 py-0.5 text-xs text-red-600 hover:bg-red-50"
+                  className="rounded px-1.5 py-0.5 text-xs text-danger hover:bg-danger-subtle"
                 >
                   🗑
                 </button>
@@ -99,14 +99,14 @@ export function TasksSection({
             value={title}
             onChange={(e) => setTitle(e.target.value)}
             placeholder={t("taskTitle")}
-            className="min-w-40 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+            className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-sm"
           />
           <input
             type="date"
             value={due}
             onChange={(e) => setDue(e.target.value)}
             title={t("due")}
-            className="rounded border border-neutral-300 px-2 py-1 text-sm"
+            className="rounded border border-hairline px-2 py-1 text-sm"
           />
           <button
             disabled={pending || !title.trim()}
@@ -124,7 +124,7 @@ export function TasksSection({
                 return r;
               })
             }
-            className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
           >
             + {t("add")}
           </button>
@@ -203,30 +203,30 @@ export function AttachmentsSection({
 
   return (
     <section className="space-y-3">
-      <h2 className="text-lg font-medium">{t("title")}</h2>
+      <h2 className="font-display text-lg font-semibold tracking-tight">{t("title")}</h2>
 
       {attachments.length === 0 && (
-        <p className="text-sm text-neutral-400">{t("empty")}</p>
+        <p className="text-sm text-tertiary">{t("empty")}</p>
       )}
 
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 empty:hidden">
+      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
         {attachments.map((att) => (
           <li key={att.id} className="flex items-center gap-2 px-3 py-2 text-sm">
             <span className="min-w-0 flex-1 truncate">📎 {att.file_name}</span>
             {att.tags.map((tag) => (
-              <span key={tag} className="rounded-full bg-neutral-100 px-2 py-0.5 text-[10px] text-neutral-600">
+              <span key={tag} className="rounded-full bg-inset px-2 py-0.5 text-[10px] text-secondary">
                 {tag}
               </span>
             ))}
             {att.size_bytes != null && (
-              <span className="text-xs text-neutral-400">
+              <span className="text-xs text-tertiary">
                 {(att.size_bytes / 1024 / 1024).toFixed(1)} MB
               </span>
             )}
             <button
               disabled={pending}
               onClick={() => download(att.id)}
-              className="rounded border border-neutral-300 px-2 py-0.5 text-xs"
+              className="rounded border border-hairline px-2 py-0.5 text-xs"
             >
               ⬇ {t("download")}
             </button>
@@ -238,7 +238,7 @@ export function AttachmentsSection({
                     await deleteAttachment(orgSlug, tourId, date, att.id);
                   })
                 }
-                className="rounded px-1.5 py-0.5 text-xs text-red-600 hover:bg-red-50"
+                className="rounded px-1.5 py-0.5 text-xs text-danger hover:bg-danger-subtle"
               >
                 🗑
               </button>
@@ -249,7 +249,7 @@ export function AttachmentsSection({
 
       {canEdit && (
         <div className="flex flex-wrap items-center gap-2">
-          <label className="cursor-pointer rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white">
+          <label className="cursor-pointer rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white">
             {uploading ? t("uploading") : `⬆ ${t("upload")}`}
             <input
               type="file"
@@ -266,9 +266,9 @@ export function AttachmentsSection({
             value={tags}
             onChange={(e) => setTags(e.target.value)}
             placeholder={t("tags")}
-            className="w-48 rounded border border-neutral-300 px-2 py-1 text-xs"
+            className="w-48 rounded border border-hairline px-2 py-1 text-xs"
           />
-          {error && <span className="text-xs text-red-600">{error}</span>}
+          {error && <span className="text-xs text-danger">{error}</span>}
         </div>
       )}
     </section>
@@ -295,7 +295,7 @@ export function DayActionsBar({
       <a
         href={`/api/pdf/daysheet/${dayId}?rooms=1`}
         target="_blank"
-        className="rounded border border-neutral-300 px-3 py-1 font-medium"
+        className="rounded border border-hairline px-3 py-1 font-medium"
       >
         🖨 {t("pdf")}
       </a>
@@ -308,7 +308,7 @@ export function DayActionsBar({
               if (r.url) setUrl(r.url);
             })
           }
-          className="rounded border border-neutral-300 px-3 py-1 font-medium disabled:opacity-40"
+          className="rounded border border-hairline px-3 py-1 font-medium disabled:opacity-40"
         >
           🔗 {t("share")}
         </button>
@@ -320,7 +320,7 @@ export function DayActionsBar({
             setCopied(true);
             setTimeout(() => setCopied(false), 2000);
           }}
-          className="max-w-72 truncate rounded bg-neutral-100 px-3 py-1 font-mono"
+          className="max-w-72 truncate rounded bg-inset px-3 py-1 font-mono"
           title={url}
         >
           {copied ? t("copied") : url}

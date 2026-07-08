@@ -87,7 +87,7 @@ export function SetListEditor({
                   }),
                 );
             }}
-            className="rounded border border-neutral-300 px-2 py-1 text-xs"
+            className="rounded border border-hairline px-2 py-1 text-xs"
             title={t("songsNotInList")}
           >
             <option value="">+ {t("addSong")}…</option>
@@ -102,7 +102,7 @@ export function SetListEditor({
             value={breakLabel}
             onChange={(e) => setBreakLabel(e.target.value)}
             placeholder={t("breakLabel")}
-            className="w-36 rounded border border-neutral-300 px-2 py-1 text-xs"
+            className="w-36 rounded border border-hairline px-2 py-1 text-xs"
           />
           <button
             disabled={pending || !breakLabel.trim()}
@@ -116,14 +116,14 @@ export function SetListEditor({
                 return r;
               })
             }
-            className="rounded border border-neutral-300 px-2 py-1 text-xs font-medium disabled:opacity-40"
+            className="rounded border border-hairline px-2 py-1 text-xs font-medium disabled:opacity-40"
           >
             + {t("addBreak")}
           </button>
           <button
             onClick={copyList}
             disabled={items.length === 0}
-            className="ml-auto rounded border border-neutral-300 px-2 py-1 text-xs font-medium disabled:opacity-40"
+            className="ml-auto rounded border border-hairline px-2 py-1 text-xs font-medium disabled:opacity-40"
           >
             {copied ? t("copied") : `📋 ${t("copy")}`}
           </button>
@@ -131,14 +131,14 @@ export function SetListEditor({
       )}
 
       {items.length === 0 ? (
-        <p className="text-sm text-neutral-400">{t("empty")}</p>
+        <p className="text-sm text-tertiary">{t("empty")}</p>
       ) : (
-        <ol className="divide-y divide-neutral-100 rounded-lg border border-neutral-200">
+        <ol className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
           {items.map((item, idx) => (
             <li key={item.id} className="px-3 py-2">
               <div className="flex items-center gap-2">
                 {item.item_type === "break" ? (
-                  <span className="flex-1 rounded bg-neutral-100 px-2 py-1 text-center text-xs font-semibold uppercase text-neutral-500">
+                  <span className="flex-1 rounded bg-inset px-2 py-1 text-center text-xs font-semibold uppercase text-secondary">
                     — {item.title} —
                   </span>
                 ) : (
@@ -146,11 +146,11 @@ export function SetListEditor({
                     onClick={() => setExpanded(expanded === item.id ? null : item.id)}
                     className="min-w-0 flex-1 text-left text-sm hover:underline"
                   >
-                    <span className="mr-2 font-mono text-xs text-neutral-400">
+                    <span className="mr-2 font-mono text-xs text-tertiary">
                       {items.slice(0, idx + 1).filter((i) => i.item_type === "song").length}.
                     </span>
                     <span className="font-medium">{item.title}</span>
-                    <span className="ml-2 text-xs text-neutral-500">
+                    <span className="ml-2 text-xs text-secondary">
                       {item.length_seconds != null && formatMmSs(item.length_seconds)}
                       {item.bpm != null && ` · ${item.bpm} BPM`}
                       {item.song_key && ` · ${item.song_key}`}
@@ -160,15 +160,15 @@ export function SetListEditor({
                 )}
                 {canEdit && (
                   <span className="flex shrink-0 gap-1">
-                    <button disabled={pending || idx === 0} onClick={() => run(() => moveSetItem(orgSlug, tourId, date, eventId, item.id, -1))} className="rounded px-1 text-xs hover:bg-neutral-100 disabled:opacity-30">↑</button>
-                    <button disabled={pending || idx === items.length - 1} onClick={() => run(() => moveSetItem(orgSlug, tourId, date, eventId, item.id, 1))} className="rounded px-1 text-xs hover:bg-neutral-100 disabled:opacity-30">↓</button>
-                    <button disabled={pending} onClick={() => run(() => removeSetItem(orgSlug, tourId, date, eventId, item.id))} className="rounded px-1 text-xs text-red-600 hover:bg-red-50">🗑</button>
+                    <button disabled={pending || idx === 0} onClick={() => run(() => moveSetItem(orgSlug, tourId, date, eventId, item.id, -1))} className="rounded px-1 text-xs hover:bg-subtle disabled:opacity-30">↑</button>
+                    <button disabled={pending || idx === items.length - 1} onClick={() => run(() => moveSetItem(orgSlug, tourId, date, eventId, item.id, 1))} className="rounded px-1 text-xs hover:bg-subtle disabled:opacity-30">↓</button>
+                    <button disabled={pending} onClick={() => run(() => removeSetItem(orgSlug, tourId, date, eventId, item.id))} className="rounded px-1 text-xs text-danger hover:bg-danger-subtle">🗑</button>
                   </span>
                 )}
               </div>
 
               {expanded === item.id && item.item_type === "song" && (
-                <div className="mt-2 flex flex-wrap gap-2 border-t border-neutral-100 pt-2">
+                <div className="mt-2 flex flex-wrap gap-2 border-t border-hairline pt-2">
                   <input
                     defaultValue={item.set_specific_notes ?? ""}
                     readOnly={!canEdit}
@@ -181,7 +181,7 @@ export function SetListEditor({
                           }),
                         );
                     }}
-                    className="min-w-40 flex-1 rounded border border-neutral-200 px-2 py-1 text-xs"
+                    className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-xs"
                   />
                   <input
                     defaultValue={item.guest_performers ?? ""}
@@ -195,7 +195,7 @@ export function SetListEditor({
                           }),
                         );
                     }}
-                    className="min-w-40 flex-1 rounded border border-neutral-200 px-2 py-1 text-xs"
+                    className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-xs"
                   />
                 </div>
               )}

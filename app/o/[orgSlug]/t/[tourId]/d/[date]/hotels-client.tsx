@@ -78,11 +78,11 @@ export function HotelsSection({
   return (
     <section className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
-        <h2 className="mr-auto text-lg font-medium">{t("title")}</h2>
+        <h2 className="mr-auto font-display text-lg font-semibold tracking-tight">{t("title")}</h2>
         {canEdit && prevDayHotels.length > 0 && (
           <button
             onClick={() => setExtending(!extending)}
-            className="rounded border border-neutral-300 px-3 py-1 text-xs font-medium"
+            className="rounded border border-hairline px-3 py-1 text-xs font-medium"
           >
             {t("extendStay")}
           </button>
@@ -90,7 +90,7 @@ export function HotelsSection({
         {canEdit && !adding && (
           <button
             onClick={() => setAdding(true)}
-            className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white"
+            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
           >
             + {t("add")}
           </button>
@@ -98,14 +98,14 @@ export function HotelsSection({
       </div>
 
       {extending && (
-        <div className="space-y-1 rounded-lg border border-neutral-200 p-3 text-sm">
-          <p className="text-xs font-semibold text-neutral-500">{t("extendFrom")}</p>
+        <div className="space-y-1 rounded-lg border border-hairline bg-surface shadow-xs p-3 text-sm">
+          <p className="text-xs font-semibold text-secondary">{t("extendFrom")}</p>
           {prevDayHotels.map((hotel) => (
             <button
               key={hotel.id}
               disabled={pending}
               onClick={() => run(() => extendStay(orgSlug, tourId, date, hotel.id, dayId))}
-              className="block w-full rounded px-2 py-1 text-left hover:bg-neutral-50"
+              className="block w-full rounded px-2 py-1 text-left hover:bg-subtle"
             >
               🏨 {hotel.name}
             </button>
@@ -114,7 +114,7 @@ export function HotelsSection({
       )}
 
       {hotels.length === 0 && !adding && (
-        <p className="text-sm text-neutral-400">{t("noHotels")}</p>
+        <p className="text-sm text-tertiary">{t("noHotels")}</p>
       )}
 
       <div className="space-y-3">
@@ -207,23 +207,23 @@ function HotelCard({
   }
 
   return (
-    <div className="rounded-lg border border-neutral-200">
+    <div className="rounded-lg border border-hairline bg-surface shadow-xs">
       <div className="flex flex-wrap items-center gap-2 px-3 py-2">
         <span className="min-w-0 flex-1 text-sm font-medium">
           {hotel.party && (
-            <span className="mr-1 rounded bg-neutral-800 px-1.5 py-0.5 text-[10px] font-bold text-white">
+            <span className="mr-1 rounded bg-primary px-1.5 py-0.5 text-[10px] font-bold text-white">
               {hotel.party}
             </span>
           )}
           🏨 {hotel.name}
-          {hotel.city && <span className="ml-1 text-xs text-neutral-500">{hotel.city}</span>}
+          {hotel.city && <span className="ml-1 text-xs text-secondary">{hotel.city}</span>}
           {hotel.stay_group_id && (
-            <span className="ml-2 rounded-full bg-blue-100 px-2 py-0.5 text-[10px] font-semibold text-blue-800">
+            <span className="ml-2 rounded-full bg-accent-subtle px-2 py-0.5 text-[10px] font-semibold text-accent">
               {t("linked")}
             </span>
           )}
         </span>
-        <span className="text-xs text-neutral-500">
+        <span className="text-xs text-secondary">
           {t("checkIn")} {hotel.check_in_date ?? "—"}
           {hotel.check_in_time && ` ${hotel.check_in_time.slice(0, 5)}`} · {t("checkOut")}{" "}
           {hotel.check_out_date ?? "—"}
@@ -231,19 +231,19 @@ function HotelCard({
         </span>
         <button
           onClick={() => setShowRooms(!showRooms)}
-          className="rounded border border-neutral-300 px-2 py-0.5 text-xs"
+          className="rounded border border-hairline px-2 py-0.5 text-xs"
         >
           {t("roomList")} ({hotel.rooms.length})
         </button>
         {canEdit && (
           <span className="flex gap-1">
-            <button disabled={pending || isFirst} onClick={() => run(() => moveHotel(orgSlug, tourId, date, dayId, hotel.id, -1))} className="rounded px-1 text-xs hover:bg-neutral-100 disabled:opacity-30">↑</button>
-            <button disabled={pending || isLast} onClick={() => run(() => moveHotel(orgSlug, tourId, date, dayId, hotel.id, 1))} className="rounded px-1 text-xs hover:bg-neutral-100 disabled:opacity-30">↓</button>
+            <button disabled={pending || isFirst} onClick={() => run(() => moveHotel(orgSlug, tourId, date, dayId, hotel.id, -1))} className="rounded px-1 text-xs hover:bg-subtle disabled:opacity-30">↑</button>
+            <button disabled={pending || isLast} onClick={() => run(() => moveHotel(orgSlug, tourId, date, dayId, hotel.id, 1))} className="rounded px-1 text-xs hover:bg-subtle disabled:opacity-30">↓</button>
             {hotel.stay_group_id && (
               <button
                 disabled={pending}
                 onClick={() => run(() => unlinkHotel(orgSlug, tourId, date, hotel.id))}
-                className="rounded border border-neutral-300 px-2 py-0.5 text-xs"
+                className="rounded border border-hairline px-2 py-0.5 text-xs"
               >
                 {t("unlink")}
               </button>
@@ -251,7 +251,7 @@ function HotelCard({
             <button
               disabled={pending}
               onClick={() => run(() => deleteHotel(orgSlug, tourId, date, hotel.id))}
-              className="rounded px-1.5 py-0.5 text-xs text-red-600 hover:bg-red-50"
+              className="rounded px-1.5 py-0.5 text-xs text-danger hover:bg-danger-subtle"
             >
               🗑
             </button>
@@ -260,7 +260,7 @@ function HotelCard({
       </div>
 
       {showRooms && (
-        <div className="space-y-2 border-t border-neutral-100 p-3">
+        <div className="space-y-2 border-t border-hairline p-3">
           <RoomListGrid
             orgSlug={orgSlug}
             tourId={tourId}
@@ -271,14 +271,14 @@ function HotelCard({
             pending={pending}
             run={run}
           />
-          <div className="flex items-center gap-3 text-xs text-neutral-500">
+          <div className="flex items-center gap-3 text-xs text-secondary">
             <span>
               {t("totalGuests")}: <b>{hotel.rooms.length}</b> · {t("totalRooms")}:{" "}
               <b>{new Set(hotel.rooms.map((r) => r.room_number).filter(Boolean)).size}</b>
             </span>
             <button
               onClick={copyRoomList}
-              className="rounded border border-neutral-300 px-2 py-0.5 font-medium"
+              className="rounded border border-hairline px-2 py-0.5 font-medium"
             >
               {copied ? t("copied") : t("copyRoomList")}
             </button>
@@ -329,7 +329,7 @@ function RoomListGrid({
   return (
     <div className="overflow-x-auto">
       <table className="w-full text-xs">
-        <thead className="text-left uppercase text-neutral-500">
+        <thead className="text-left uppercase text-secondary">
           <tr>
             <th className="px-1 py-1">{t("bagTag")}</th>
             <th className="px-1 py-1">Nume</th>
@@ -342,7 +342,7 @@ function RoomListGrid({
             <th />
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-100">
+        <tbody className="divide-y divide-hairline">
           {hotel.rooms.map((room) => (
             <tr key={room.id}>
               <td className="px-1 py-1">{room.bag_tag}</td>
@@ -360,7 +360,7 @@ function RoomListGrid({
                   <button
                     disabled={pending}
                     onClick={() => run(() => deleteRoomEntry(orgSlug, tourId, date, room.id))}
-                    className="text-red-600"
+                    className="text-danger"
                   >
                     ×
                   </button>
@@ -371,13 +371,13 @@ function RoomListGrid({
           {canEdit && (
             <tr>
               <td className="px-1 py-1">
-                <input value={draft.bagTag} onChange={(e) => setDraft({ ...draft, bagTag: e.target.value })} className="w-12 rounded border border-neutral-300 px-1 py-0.5" />
+                <input value={draft.bagTag} onChange={(e) => setDraft({ ...draft, bagTag: e.target.value })} className="w-12 rounded border border-hairline px-1 py-0.5" />
               </td>
               <td className="px-1 py-1">
                 <select
                   value={draft.personnelId ?? ""}
                   onChange={(e) => setDraft({ ...draft, personnelId: e.target.value || null })}
-                  className="w-32 rounded border border-neutral-300 px-1 py-0.5"
+                  className="w-32 rounded border border-hairline px-1 py-0.5"
                 >
                   <option value="">{t("guestName")}…</option>
                   {personnel.map((p) => (
@@ -389,16 +389,16 @@ function RoomListGrid({
                     value={draft.guestName}
                     onChange={(e) => setDraft({ ...draft, guestName: e.target.value })}
                     placeholder={t("guestName")}
-                    className="mt-0.5 w-32 rounded border border-neutral-300 px-1 py-0.5"
+                    className="mt-0.5 w-32 rounded border border-hairline px-1 py-0.5"
                   />
                 )}
               </td>
-              <td className="px-1 py-1"><input value={draft.roomNumber} onChange={(e) => setDraft({ ...draft, roomNumber: e.target.value })} className="w-14 rounded border border-neutral-300 px-1 py-0.5" /></td>
-              <td className="px-1 py-1"><input value={draft.roomType} onChange={(e) => setDraft({ ...draft, roomType: e.target.value })} className="w-16 rounded border border-neutral-300 px-1 py-0.5" /></td>
+              <td className="px-1 py-1"><input value={draft.roomNumber} onChange={(e) => setDraft({ ...draft, roomNumber: e.target.value })} className="w-14 rounded border border-hairline px-1 py-0.5" /></td>
+              <td className="px-1 py-1"><input value={draft.roomType} onChange={(e) => setDraft({ ...draft, roomType: e.target.value })} className="w-16 rounded border border-hairline px-1 py-0.5" /></td>
               <td className="px-1 py-1"><input type="checkbox" checked={draft.smoking} onChange={(e) => setDraft({ ...draft, smoking: e.target.checked })} /></td>
-              <td className="px-1 py-1"><input type="date" value={draft.checkIn} onChange={(e) => setDraft({ ...draft, checkIn: e.target.value })} className="rounded border border-neutral-300 px-1 py-0.5" /></td>
-              <td className="px-1 py-1"><input type="date" value={draft.checkOut} onChange={(e) => setDraft({ ...draft, checkOut: e.target.value })} className="rounded border border-neutral-300 px-1 py-0.5" /></td>
-              <td className="px-1 py-1"><input value={draft.confirmationNumber} onChange={(e) => setDraft({ ...draft, confirmationNumber: e.target.value })} className="w-20 rounded border border-neutral-300 px-1 py-0.5" /></td>
+              <td className="px-1 py-1"><input type="date" value={draft.checkIn} onChange={(e) => setDraft({ ...draft, checkIn: e.target.value })} className="rounded border border-hairline px-1 py-0.5" /></td>
+              <td className="px-1 py-1"><input type="date" value={draft.checkOut} onChange={(e) => setDraft({ ...draft, checkOut: e.target.value })} className="rounded border border-hairline px-1 py-0.5" /></td>
+              <td className="px-1 py-1"><input value={draft.confirmationNumber} onChange={(e) => setDraft({ ...draft, confirmationNumber: e.target.value })} className="w-20 rounded border border-hairline px-1 py-0.5" /></td>
               <td className="px-1 py-1">
                 <button
                   disabled={pending || (!draft.personnelId && !draft.guestName)}
@@ -409,7 +409,7 @@ function RoomListGrid({
                       return r;
                     })
                   }
-                  className="rounded bg-neutral-900 px-2 py-0.5 text-white disabled:opacity-40"
+                  className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-white disabled:opacity-40"
                 >
                   +
                 </button>
@@ -472,38 +472,38 @@ function AddHotelForm({
   }
 
   return (
-    <div className="space-y-2 rounded-lg border border-neutral-200 p-3">
+    <div className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
       <div className="flex flex-wrap gap-2">
         <input
           autoFocus
           value={query}
           onChange={(e) => search(e.target.value)}
           placeholder={t("searchHotel")}
-          className="min-w-48 flex-1 rounded border border-neutral-300 px-3 py-1.5 text-sm"
+          className="min-w-48 flex-1 rounded border border-hairline px-3 py-1.5 text-sm"
         />
         <label className="flex items-center gap-1 text-xs">
           {t("checkIn")}
-          <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} className="rounded border border-neutral-300 px-2 py-1 text-sm" />
+          <input type="date" value={checkIn} onChange={(e) => setCheckIn(e.target.value)} className="rounded border border-hairline px-2 py-1 text-sm" />
         </label>
         <label className="flex items-center gap-1 text-xs">
           {t("checkOut")}
-          <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} className="rounded border border-neutral-300 px-2 py-1 text-sm" />
+          <input type="date" value={checkOut} onChange={(e) => setCheckOut(e.target.value)} className="rounded border border-hairline px-2 py-1 text-sm" />
         </label>
       </div>
-      <ul className="divide-y divide-neutral-100 empty:hidden">
+      <ul className="divide-y divide-hairline empty:hidden">
         {hits.map((hit, i) => (
           <li key={i}>
             <button
               disabled={pending}
               onClick={() => add(hit)}
-              className="flex w-full items-center justify-between px-2 py-1.5 text-left text-sm hover:bg-neutral-50"
+              className="flex w-full items-center justify-between px-2 py-1.5 text-left text-sm hover:bg-subtle"
             >
               <span>
                 {hit.name}
-                {hit.city && <span className="ml-2 text-xs text-neutral-500">{hit.city}</span>}
+                {hit.city && <span className="ml-2 text-xs text-secondary">{hit.city}</span>}
               </span>
               <span
-                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${hit.source === "google" ? "bg-emerald-100 text-emerald-800" : "bg-neutral-100 text-neutral-600"}`}
+                className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${hit.source === "google" ? "bg-success-subtle text-success" : "bg-inset text-secondary"}`}
               >
                 {hit.source === "google" ? "Google" : t("sourceTour")}
               </span>
@@ -515,11 +515,11 @@ function AddHotelForm({
         <button
           disabled={pending || query.trim().length < 2}
           onClick={() => add()}
-          className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+          className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
         >
           {t("createManually")}
         </button>
-        <button onClick={onCancel} className="rounded border border-neutral-300 px-3 py-1 text-xs">
+        <button onClick={onCancel} className="rounded border border-hairline px-3 py-1 text-xs">
           {tc("cancel")}
         </button>
       </div>

@@ -115,15 +115,15 @@ export default async function GuestListPage({
       <header>
         <Link
           href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}`}
-          className="text-xs text-neutral-500 hover:underline"
+          className="text-xs text-secondary hover:underline"
         >
           ← {event.title ?? (event.venues as unknown as { name: string } | null)?.name}
         </Link>
-        <h1 className="text-xl font-semibold">{t("title")}</h1>
+        <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
       </header>
 
       {!glViewAll && !glSubmit ? (
-        <p className="text-sm text-neutral-500">{t("noAccess")}</p>
+        <p className="text-sm text-secondary">{t("noAccess")}</p>
       ) : glViewAll ? (
         <GuestListGrid
           ctx={ctx}

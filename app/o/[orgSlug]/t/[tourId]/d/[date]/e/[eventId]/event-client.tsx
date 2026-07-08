@@ -78,12 +78,12 @@ export function EventSections({
 
   return (
     <section className="space-y-4">
-      <nav className="flex flex-wrap gap-1 border-b border-neutral-200 text-sm">
+      <nav className="flex flex-wrap gap-1 border-b border-hairline text-sm">
         {[...FIELD_SECTIONS, "local_crew", "labor_call"].map((s) => (
           <button
             key={s}
             onClick={() => setTab(s)}
-            className={`rounded-t px-3 py-1.5 font-medium ${tab === s ? "border border-b-0 border-neutral-200 bg-white" : "text-neutral-500 hover:text-neutral-800"}`}
+            className={`rounded-t px-3 py-1.5 font-medium ${tab === s ? "border border-b-0 border-hairline bg-white" : "text-secondary hover:text-primary"}`}
           >
             {tsec(s)}
           </button>
@@ -99,7 +99,7 @@ export function EventSections({
                 if (e.target.value)
                   run(() => addFieldToEvent(orgSlug, data.eventId, e.target.value));
               }}
-              className="rounded border border-neutral-300 px-2 py-1 text-xs"
+              className="rounded border border-hairline px-2 py-1 text-xs"
             >
               <option value="">+ {t("addField")}…</option>
               {available.map((def) => (
@@ -118,10 +118,10 @@ export function EventSections({
               return (
                 <div
                   key={def.key}
-                  className={`space-y-1 rounded-md border p-2 ${isHidden ? "border-dashed border-neutral-300 opacity-60" : "border-neutral-200"}`}
+                  className={`space-y-1 rounded-md border p-2 ${isHidden ? "border-dashed border-hairline opacity-60" : "border-hairline"}`}
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+                    <span className="text-xs font-semibold uppercase tracking-wide text-secondary">
                       {label(def)}
                     </span>
                     <span className="flex gap-1">
@@ -132,7 +132,7 @@ export function EventSections({
                           onClick={() =>
                             run(() => toggleHiddenField(orgSlug, def.key, !isHidden))
                           }
-                          className="rounded px-1 text-xs hover:bg-neutral-100"
+                          className="rounded px-1 text-xs hover:bg-subtle"
                         >
                           👁
                         </button>
@@ -144,7 +144,7 @@ export function EventSections({
                           onClick={() =>
                             run(() => removeFieldFromEvent(orgSlug, data.eventId, def.key))
                           }
-                          className="rounded px-1 text-xs text-red-600 hover:bg-red-50"
+                          className="rounded px-1 text-xs text-danger hover:bg-danger-subtle"
                         >
                           ×
                         </button>
@@ -162,7 +162,7 @@ export function EventSections({
                         );
                       }
                     }}
-                    className="w-full rounded border border-neutral-200 px-2 py-1 text-sm read-only:bg-neutral-50"
+                    className="w-full rounded border border-hairline px-2 py-1 text-sm read-only:bg-subtle"
                   />
                 </div>
               );
@@ -183,7 +183,7 @@ export function EventSections({
             ] as const
           ).map(([key, lbl]) => (
             <label key={key} className="block space-y-1">
-              <span className="text-xs font-semibold uppercase tracking-wide text-neutral-500">
+              <span className="text-xs font-semibold uppercase tracking-wide text-secondary">
                 {lbl}
               </span>
               <textarea
@@ -197,7 +197,7 @@ export function EventSections({
                     );
                   }
                 }}
-                className="w-full rounded border border-neutral-200 px-2 py-1 text-sm read-only:bg-neutral-50"
+                className="w-full rounded border border-hairline px-2 py-1 text-sm read-only:bg-subtle"
               />
             </label>
           ))}
@@ -247,7 +247,7 @@ function LaborCallGrid({
   return (
     <div className="space-y-2 overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="text-left text-xs uppercase text-neutral-500">
+        <thead className="text-left text-xs uppercase text-secondary">
           <tr>
             <th className="px-2 py-1">{t("laborTime")}</th>
             <th className="px-2 py-1">{t("laborCall_col")}</th>
@@ -258,24 +258,24 @@ function LaborCallGrid({
             <th />
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-100">
+        <tbody className="divide-y divide-hairline">
           {rows.map((row) => (
             <tr key={row.id}>
               <td className="px-2 py-1 font-mono text-xs">
                 {row.call_time?.slice(0, 5) ?? "—"}
-                {row.day_offset > 0 && <sup className="text-red-600">+1</sup>}
+                {row.day_offset > 0 && <sup className="text-danger">+1</sup>}
               </td>
               <td className="px-2 py-1">{row.call_count}</td>
               <td className="px-2 py-1">{row.worker_type}</td>
               <td className="px-2 py-1">{row.add_count}</td>
               <td className="px-2 py-1">{row.cut_count}</td>
-              <td className="px-2 py-1 text-xs text-neutral-500">{row.notes}</td>
+              <td className="px-2 py-1 text-xs text-secondary">{row.notes}</td>
               <td className="px-2 py-1">
                 {canEdit && (
                   <button
                     disabled={pending}
                     onClick={() => run(() => deleteLaborCall(orgSlug, row.id))}
-                    className="text-xs text-red-600"
+                    className="text-xs text-danger"
                   >
                     🗑
                   </button>
@@ -291,14 +291,14 @@ function LaborCallGrid({
                     type="time"
                     value={draft.call_time ?? ""}
                     onChange={(e) => setDraft({ ...draft, call_time: e.target.value })}
-                    className="rounded border border-neutral-300 px-1 py-0.5 text-xs"
+                    className="rounded border border-hairline px-1 py-0.5 text-xs"
                   />
                   <select
                     value={draft.day_offset}
                     onChange={(e) =>
                       setDraft({ ...draft, day_offset: Number(e.target.value) })
                     }
-                    className="rounded border border-neutral-300 px-1 py-0.5 text-xs"
+                    className="rounded border border-hairline px-1 py-0.5 text-xs"
                   >
                     <option value={0}>{t("laborDayOf")}</option>
                     <option value={1}>{t("laborDayAfter")}</option>
@@ -311,7 +311,7 @@ function LaborCallGrid({
                     <input
                       value={draft[key] ?? ""}
                       onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
-                      className="w-full min-w-14 rounded border border-neutral-300 px-1 py-0.5 text-xs"
+                      className="w-full min-w-14 rounded border border-hairline px-1 py-0.5 text-xs"
                     />
                   </td>
                 ),
@@ -335,7 +335,7 @@ function LaborCallGrid({
                       return r;
                     })
                   }
-                  className="rounded bg-neutral-900 px-2 py-0.5 text-xs text-white disabled:opacity-40"
+                  className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-xs text-white disabled:opacity-40"
                 >
                   +
                 </button>

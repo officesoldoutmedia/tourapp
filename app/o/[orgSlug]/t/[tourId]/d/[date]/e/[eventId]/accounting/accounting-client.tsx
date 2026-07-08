@@ -135,7 +135,7 @@ export function AccountingClient({
   }
 
   const inputCls =
-    "w-28 rounded border border-neutral-300 px-2 py-1 text-right text-sm read-only:bg-neutral-50";
+    "w-28 rounded border border-hairline px-2 py-1 text-right text-sm read-only:bg-subtle";
   const computedCls = "w-28 px-2 py-1 text-right text-sm font-bold";
 
   return (
@@ -146,7 +146,7 @@ export function AccountingClient({
             <button
               key={tb}
               onClick={() => setTab(tb)}
-              className={`rounded px-3 py-1.5 font-medium ${tab === tb ? "bg-neutral-900 text-white" : "bg-neutral-100 text-neutral-600"}`}
+              className={`rounded px-3 py-1.5 font-medium ${tab === tb ? "bg-accent hover:bg-accent-hover text-white" : "bg-inset text-secondary"}`}
             >
               {t(`tab_${tb}`)}
             </button>
@@ -163,7 +163,7 @@ export function AccountingClient({
                 }),
               )
             }
-            className="rounded border border-neutral-300 px-2 py-1"
+            className="rounded border border-hairline px-2 py-1"
           >
             {["EUR", "RON", "USD", "GBP"].map((c) => (
               <option key={c}>{c}</option>
@@ -177,7 +177,7 @@ export function AccountingClient({
                 if (e.target.value)
                   run(() => copyFromEvent(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, e.target.value));
               }}
-              className="rounded border border-neutral-300 px-2 py-1"
+              className="rounded border border-hairline px-2 py-1"
             >
               <option value="">{t("copyFrom")}…</option>
               {otherEvents.map((ev) => (
@@ -187,14 +187,14 @@ export function AccountingClient({
           )}
           <a
             href={`/api/csv/settlement/${ctx.eventId}`}
-            className="rounded border border-neutral-300 px-2 py-1 font-medium"
+            className="rounded border border-hairline px-2 py-1 font-medium"
           >
             CSV
           </a>
           <a
             href={`/api/pdf/settlement/${ctx.eventId}`}
             target="_blank"
-            className="rounded border border-neutral-300 px-2 py-1 font-medium"
+            className="rounded border border-hairline px-2 py-1 font-medium"
           >
             PDF
           </a>
@@ -250,9 +250,9 @@ export function AccountingClient({
             return (
               <div
                 key={field}
-                className={`flex items-center justify-between gap-3 rounded px-2 ${highlight ? "bg-neutral-100 py-1.5" : ""}`}
+                className={`flex items-center justify-between gap-3 rounded px-2 ${highlight ? "bg-inset py-1.5" : ""}`}
               >
-                <span className={`text-sm ${kind === "computed" ? "font-semibold" : "text-neutral-600"}`}>
+                <span className={`text-sm ${kind === "computed" ? "font-semibold" : "text-secondary"}`}>
                   {label}
                 </span>
                 {kind === "computed" ? (
@@ -274,7 +274,7 @@ export function AccountingClient({
               </div>
             );
           })}
-          <p className="pt-2 text-xs text-neutral-400">{t("expensesHint", { sum: fmt(preSplitSum) })}</p>
+          <p className="pt-2 text-xs text-tertiary">{t("expensesHint", { sum: fmt(preSplitSum) })}</p>
         </div>
       )}
 
@@ -321,7 +321,7 @@ function TicketsGrid({
   return (
     <div className="overflow-x-auto">
       <table className="w-full max-w-3xl text-sm">
-        <thead className="text-left text-xs uppercase text-neutral-500">
+        <thead className="text-left text-xs uppercase text-secondary">
           <tr>
             {["type", "capacity", "comps", "kills", "scans", "sold", "grossPrice", "grossTotal"].map((h) => (
               <th key={h} className="px-2 py-1">{t(h)}</th>
@@ -329,7 +329,7 @@ function TicketsGrid({
             <th />
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-100">
+        <tbody className="divide-y divide-hairline">
           {tickets.map((row) => (
             <tr key={row.id}>
               <td className="px-2 py-1 font-medium">{row.label}</td>
@@ -345,7 +345,7 @@ function TicketsGrid({
                   <button
                     disabled={pending}
                     onClick={() => run(() => deleteTicketSale(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, row.id))}
-                    className="text-xs text-red-600"
+                    className="text-xs text-danger"
                   >
                     🗑
                   </button>
@@ -360,7 +360,7 @@ function TicketsGrid({
                   <input
                     value={draft[key]}
                     onChange={(e) => setDraft({ ...draft, [key]: e.target.value })}
-                    className="w-16 rounded border border-neutral-300 px-1.5 py-0.5 text-xs"
+                    className="w-16 rounded border border-hairline px-1.5 py-0.5 text-xs"
                     placeholder={key === "label" ? "GA" : ""}
                   />
                 </td>
@@ -384,7 +384,7 @@ function TicketsGrid({
                       return r;
                     })
                   }
-                  className="rounded bg-neutral-900 px-2 py-0.5 text-xs text-white disabled:opacity-40"
+                  className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-xs text-white disabled:opacity-40"
                 >
                   +
                 </button>
@@ -392,7 +392,7 @@ function TicketsGrid({
             </tr>
           )}
         </tbody>
-        <tfoot className="bg-neutral-50 font-medium">
+        <tfoot className="bg-subtle font-medium">
           <tr>
             <td className="px-2 py-1">Σ</td>
             <td />
@@ -434,19 +434,19 @@ function ExpensesGrid({
         const rows = expenses.filter((e) => e.stage === stage);
         const sum = rows.reduce((s, e) => s + num(e.amount), 0);
         return (
-          <section key={stage} className="rounded-lg border border-neutral-200">
-            <header className="flex items-center justify-between border-b border-neutral-100 bg-neutral-50 px-3 py-1.5">
+          <section key={stage} className="rounded-lg border border-hairline bg-surface shadow-xs">
+            <header className="flex items-center justify-between border-b border-hairline bg-subtle px-3 py-1.5">
               <span className="text-xs font-bold uppercase tracking-wide">
                 {idx + 1}. {t(`stage_${stage}`)}
               </span>
               <span className="text-xs font-medium">{fmt(sum)}</span>
             </header>
-            <ul className="divide-y divide-neutral-100">
+            <ul className="divide-y divide-hairline">
               {rows.map((row) => (
                 <li key={row.id} className="flex items-center gap-2 px-3 py-1.5 text-sm">
                   <span className="min-w-0 flex-1">{row.label}</span>
                   {row.formula && (
-                    <span className="rounded bg-neutral-100 px-1.5 text-[10px] text-neutral-500">
+                    <span className="rounded bg-inset px-1.5 text-[10px] text-secondary">
                       {row.formula}
                     </span>
                   )}
@@ -455,7 +455,7 @@ function ExpensesGrid({
                     <button
                       disabled={pending}
                       onClick={() => run(() => deleteExpense(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, row.id))}
-                      className="text-xs text-red-600"
+                      className="text-xs text-danger"
                     >
                       🗑
                     </button>
@@ -472,7 +472,7 @@ function ExpensesGrid({
           <select
             value={draft.stage}
             onChange={(e) => setDraft({ ...draft, stage: e.target.value as ExpenseRow["stage"] })}
-            className="rounded border border-neutral-300 px-2 py-1 text-xs"
+            className="rounded border border-hairline px-2 py-1 text-xs"
           >
             {stages.map((s) => (
               <option key={s} value={s}>{t(`stage_${s}`)}</option>
@@ -482,13 +482,13 @@ function ExpensesGrid({
             value={draft.label}
             onChange={(e) => setDraft({ ...draft, label: e.target.value })}
             placeholder={t("expenseLabel")}
-            className="min-w-32 flex-1 rounded border border-neutral-300 px-2 py-1 text-xs"
+            className="min-w-32 flex-1 rounded border border-hairline px-2 py-1 text-xs"
           />
           <input
             value={draft.formula}
             onChange={(e) => setDraft({ ...draft, formula: e.target.value })}
             placeholder={t("formulaHint")}
-            className="w-40 rounded border border-neutral-300 px-2 py-1 text-xs"
+            className="w-40 rounded border border-hairline px-2 py-1 text-xs"
           />
           <button
             disabled={pending || !draft.label.trim() || !draft.formula.trim()}
@@ -506,7 +506,7 @@ function ExpensesGrid({
                 return r;
               })
             }
-            className="rounded bg-neutral-900 px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
           >
             +
           </button>
@@ -535,7 +535,7 @@ function LineItemsGrid({
   return (
     <div className="max-w-2xl overflow-x-auto">
       <table className="w-full text-sm">
-        <thead className="text-left text-xs uppercase text-neutral-500">
+        <thead className="text-left text-xs uppercase text-secondary">
           <tr>
             <th className="px-2 py-1">{t("category")}</th>
             <th className="px-2 py-1">{t("description")}</th>
@@ -544,7 +544,7 @@ function LineItemsGrid({
             <th />
           </tr>
         </thead>
-        <tbody className="divide-y divide-neutral-100">
+        <tbody className="divide-y divide-hairline">
           {items.map((row) => (
             <tr key={row.id}>
               <td className="px-2 py-1">{row.category}</td>
@@ -556,7 +556,7 @@ function LineItemsGrid({
                   <button
                     disabled={pending}
                     onClick={() => run(() => deleteLineItem(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, row.id))}
-                    className="text-xs text-red-600"
+                    className="text-xs text-danger"
                   >
                     🗑
                   </button>
@@ -566,10 +566,10 @@ function LineItemsGrid({
           ))}
           {canEdit && (
             <tr>
-              <td className="px-2 py-1"><input value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} className="w-24 rounded border border-neutral-300 px-1.5 py-0.5 text-xs" /></td>
-              <td className="px-2 py-1"><input value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} className="w-full rounded border border-neutral-300 px-1.5 py-0.5 text-xs" /></td>
-              <td className="px-2 py-1"><input value={draft.income} onChange={(e) => setDraft({ ...draft, income: e.target.value })} className="w-20 rounded border border-neutral-300 px-1.5 py-0.5 text-right text-xs" /></td>
-              <td className="px-2 py-1"><input value={draft.expense} onChange={(e) => setDraft({ ...draft, expense: e.target.value })} className="w-20 rounded border border-neutral-300 px-1.5 py-0.5 text-right text-xs" /></td>
+              <td className="px-2 py-1"><input value={draft.category} onChange={(e) => setDraft({ ...draft, category: e.target.value })} className="w-24 rounded border border-hairline px-1.5 py-0.5 text-xs" /></td>
+              <td className="px-2 py-1"><input value={draft.description} onChange={(e) => setDraft({ ...draft, description: e.target.value })} className="w-full rounded border border-hairline px-1.5 py-0.5 text-xs" /></td>
+              <td className="px-2 py-1"><input value={draft.income} onChange={(e) => setDraft({ ...draft, income: e.target.value })} className="w-20 rounded border border-hairline px-1.5 py-0.5 text-right text-xs" /></td>
+              <td className="px-2 py-1"><input value={draft.expense} onChange={(e) => setDraft({ ...draft, expense: e.target.value })} className="w-20 rounded border border-hairline px-1.5 py-0.5 text-right text-xs" /></td>
               <td className="px-2 py-1">
                 <button
                   disabled={pending || (!draft.category.trim() && !draft.description.trim())}
@@ -585,7 +585,7 @@ function LineItemsGrid({
                       return r;
                     })
                   }
-                  className="rounded bg-neutral-900 px-2 py-0.5 text-xs text-white disabled:opacity-40"
+                  className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-xs text-white disabled:opacity-40"
                 >
                   +
                 </button>
@@ -594,7 +594,7 @@ function LineItemsGrid({
           )}
         </tbody>
         {/* [C-S] TOTALINCOMEANDEXPENSE / TOTAL / GRANDTOTAL */}
-        <tfoot className="bg-neutral-50 text-sm font-medium">
+        <tfoot className="bg-subtle text-sm font-medium">
           <tr>
             <td className="px-2 py-1" colSpan={2}>{t("totalIncomeExpense")}</td>
             <td className="px-2 py-1 text-right">{fmt(totalIncome)}</td>

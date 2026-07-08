@@ -102,12 +102,12 @@ export function AdvanceEditor({
     <div className="grid gap-6 md:grid-cols-[16rem_1fr]">
       {/* Sidebar advances [C] */}
       <aside className="space-y-3">
-        <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 empty:hidden">
+        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
           {advances.map((advance) => (
             <li key={advance.id}>
               <button
                 onClick={() => setSelectedId(advance.id)}
-                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${advance.id === selectedId ? "bg-neutral-100 font-medium" : "hover:bg-neutral-50"}`}
+                className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${advance.id === selectedId ? "bg-inset font-medium" : "hover:bg-subtle"}`}
               >
                 <span>{STATUS_ICON[advance.status]}</span>
                 <span className="truncate">{advance.title}</span>
@@ -116,20 +116,20 @@ export function AdvanceEditor({
           ))}
         </ul>
         {advances.length === 0 && (
-          <p className="text-sm text-neutral-400">{t("noAdvances")}</p>
+          <p className="text-sm text-tertiary">{t("noAdvances")}</p>
         )}
         {canEdit && (
-          <div className="space-y-2 rounded-lg border border-neutral-200 p-3">
+          <div className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
             <input
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
               placeholder={t("advanceTitle")}
-              className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
+              className="w-full rounded border border-hairline px-2 py-1 text-xs"
             />
             <select
               value={newTemplate}
               onChange={(e) => setNewTemplate(e.target.value)}
-              className="w-full rounded border border-neutral-300 px-2 py-1 text-xs"
+              className="w-full rounded border border-hairline px-2 py-1 text-xs"
             >
               <option value="">{t("blank")}</option>
               {templates.map((tpl) => (
@@ -149,7 +149,7 @@ export function AdvanceEditor({
                   return r;
                 })
               }
-              className="w-full rounded bg-neutral-900 px-2 py-1 text-xs font-medium text-white disabled:opacity-40"
+              className="w-full rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs font-medium text-white disabled:opacity-40"
             >
               + {t("addAdvance")}
             </button>
@@ -161,7 +161,7 @@ export function AdvanceEditor({
       {selected && (
         <div className="space-y-4">
           <div className="flex flex-wrap items-center gap-2">
-            <h2 className="mr-auto text-lg font-medium">{selected.title}</h2>
+            <h2 className="mr-auto font-display text-lg font-semibold tracking-tight">{selected.title}</h2>
             {canEdit && (
               <>
                 <select
@@ -174,7 +174,7 @@ export function AdvanceEditor({
                       ),
                     )
                   }
-                  className="rounded border border-neutral-300 px-2 py-1 text-xs"
+                  className="rounded border border-hairline px-2 py-1 text-xs"
                 >
                   {(["not_started", "in_progress", "done"] as const).map((s) => (
                     <option key={s} value={s}>
@@ -183,12 +183,12 @@ export function AdvanceEditor({
                   ))}
                 </select>
                 {/* toggle advance|design [C-S] */}
-                <span className="flex overflow-hidden rounded-full border border-red-600 text-xs font-semibold">
+                <span className="flex rounded-full bg-inset p-0.5 text-xs font-semibold">
                   {(["advance", "design"] as const).map((m) => (
                     <button
                       key={m}
                       onClick={() => setMode(m)}
-                      className={`px-3 py-1 ${mode === m ? "bg-red-600 text-white" : "text-red-600"}`}
+                      className={`rounded-full px-3 py-1 transition-colors ${mode === m ? "bg-surface text-primary shadow-xs" : "text-tertiary hover:text-secondary"}`}
                     >
                       {t(`${m}Mode`)}
                     </button>
@@ -199,7 +199,7 @@ export function AdvanceEditor({
                   onClick={() =>
                     run(() => deleteAdvance(orgSlug, tourId, date, eventId, selected.id))
                   }
-                  className="rounded px-2 py-1 text-xs text-red-600 hover:bg-red-50"
+                  className="rounded px-2 py-1 text-xs text-danger hover:bg-danger-subtle"
                   title={t("remove")}
                 >
                   🗑
@@ -209,7 +209,7 @@ export function AdvanceEditor({
           </div>
 
           {selected.layout.length === 0 && (
-            <p className="text-sm text-neutral-400">{t("emptyLayout")}</p>
+            <p className="text-sm text-tertiary">{t("emptyLayout")}</p>
           )}
 
           {mode === "advance" ? (
@@ -222,7 +222,7 @@ export function AdvanceEditor({
                         {item.title}
                       </h3>
                       {item.description && (
-                        <p className="text-xs text-neutral-500">{item.description}</p>
+                        <p className="text-xs text-secondary">{item.description}</p>
                       )}
                     </div>
                   );
@@ -230,7 +230,7 @@ export function AdvanceEditor({
                 if (item.type === "field") {
                   return (
                     <label key={idx} className="block space-y-1">
-                      <span className="text-xs font-semibold text-neutral-500">
+                      <span className="text-xs font-semibold text-secondary">
                         {fieldLabel(item.key)}
                       </span>
                       <textarea
@@ -244,7 +244,7 @@ export function AdvanceEditor({
                             );
                           }
                         }}
-                        className="w-full rounded border border-neutral-200 px-2 py-1 text-sm read-only:bg-neutral-50"
+                        className="w-full rounded border border-hairline px-2 py-1 text-sm read-only:bg-subtle"
                       />
                     </label>
                   );
@@ -290,12 +290,12 @@ export function AdvanceEditor({
           )}
 
           {canEdit && (
-            <div className="flex items-center gap-2 border-t border-neutral-100 pt-3">
+            <div className="flex items-center gap-2 border-t border-hairline pt-3">
               <input
                 value={templateName}
                 onChange={(e) => setTemplateName(e.target.value)}
                 placeholder={t("templateTitle")}
-                className="rounded border border-neutral-300 px-2 py-1 text-xs"
+                className="rounded border border-hairline px-2 py-1 text-xs"
               />
               <button
                 disabled={pending || !templateName.trim()}
@@ -306,7 +306,7 @@ export function AdvanceEditor({
                     return r;
                   })
                 }
-                className="rounded border border-neutral-300 px-2 py-1 text-xs font-medium disabled:opacity-40"
+                className="rounded border border-hairline px-2 py-1 text-xs font-medium disabled:opacity-40"
               >
                 {t("saveAsTemplate")}
               </button>
@@ -340,27 +340,27 @@ function ScheduleRowEditor({
     title !== row.title || start !== row.start || end !== row.end || confirmed !== row.is_confirmed;
 
   return (
-    <div className="flex flex-wrap items-center gap-2 rounded-md border border-neutral-200 bg-neutral-50 p-2">
-      <span className="text-xs font-semibold text-neutral-500">SCHEDULE</span>
+    <div className="flex flex-wrap items-center gap-2 rounded-md border border-hairline bg-surface bg-subtle p-2">
+      <span className="text-xs font-semibold text-secondary">SCHEDULE</span>
       <input
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         readOnly={!canEdit}
-        className="min-w-32 flex-1 rounded border border-neutral-300 px-2 py-1 text-sm"
+        className="min-w-32 flex-1 rounded border border-hairline px-2 py-1 text-sm"
       />
       <input
         type="time"
         value={start}
         onChange={(e) => setStart(e.target.value)}
         readOnly={!canEdit}
-        className="rounded border border-neutral-300 px-2 py-1 text-sm"
+        className="rounded border border-hairline px-2 py-1 text-sm"
       />
       <input
         type="time"
         value={end}
         onChange={(e) => setEnd(e.target.value)}
         readOnly={!canEdit}
-        className="rounded border border-neutral-300 px-2 py-1 text-sm"
+        className="rounded border border-hairline px-2 py-1 text-sm"
       />
       <label className="flex items-center gap-1 text-xs">
         <input
@@ -375,7 +375,7 @@ function ScheduleRowEditor({
         <button
           disabled={pending}
           onClick={() => onSave({ title, start, end, confirmed })}
-          className="rounded bg-neutral-900 px-2 py-1 text-xs text-white"
+          className="rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs text-white"
         >
           ✓
         </button>
@@ -425,7 +425,7 @@ function DesignMode({
             if (e.target.value)
               onChange([...layout, { type: "field", key: e.target.value }]);
           }}
-          className="rounded border border-neutral-300 px-2 py-1 text-xs"
+          className="rounded border border-hairline px-2 py-1 text-xs"
         >
           <option value="">{t("addFieldRow")}…</option>
           {availableDefs.map((def) => (
@@ -437,27 +437,27 @@ function DesignMode({
         <button
           disabled={pending}
           onClick={() => onChange([...layout, { type: "title", title: "Titlu" }])}
-          className="rounded border border-neutral-300 px-2 py-1 text-xs font-medium"
+          className="rounded border border-hairline px-2 py-1 text-xs font-medium"
         >
           {t("addTitleRow")}
         </button>
         <button
           disabled={pending}
           onClick={onAddScheduleRow}
-          className="rounded border border-neutral-300 px-2 py-1 text-xs font-medium"
+          className="rounded border border-hairline px-2 py-1 text-xs font-medium"
         >
           {t("addScheduleRow")}
         </button>
       </div>
 
-      <ul className="divide-y divide-neutral-100 rounded-lg border border-neutral-200 empty:hidden">
+      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
         {layout.map((item, idx) => (
           <li key={idx} className="flex items-center gap-2 px-3 py-2 text-sm">
-            <span className="cursor-default text-neutral-300">⠿</span>
+            <span className="cursor-default text-disabled">⠿</span>
             <span className="min-w-0 flex-1">
               {item.type === "field" && (
                 <span>
-                  <span className="text-xs text-neutral-400">
+                  <span className="text-xs text-tertiary">
                     {sectionLabel(defs.find((d) => d.key === item.key)?.section ?? "custom")}
                     :{" "}
                   </span>
@@ -474,31 +474,31 @@ function DesignMode({
                       onChange(next);
                     }
                   }}
-                  className="w-full rounded border border-neutral-300 px-2 py-0.5 font-semibold"
+                  className="w-full rounded border border-hairline px-2 py-0.5 font-semibold"
                 />
               )}
               {item.type === "schedule_row" && (
-                <span className="text-xs font-semibold text-neutral-500">SCHEDULE ROW</span>
+                <span className="text-xs font-semibold text-secondary">SCHEDULE ROW</span>
               )}
             </span>
             <button
               disabled={pending}
               onClick={() => move(idx, -1)}
-              className="rounded px-1 text-xs hover:bg-neutral-100"
+              className="rounded px-1 text-xs hover:bg-subtle"
             >
               ↑
             </button>
             <button
               disabled={pending}
               onClick={() => move(idx, 1)}
-              className="rounded px-1 text-xs hover:bg-neutral-100"
+              className="rounded px-1 text-xs hover:bg-subtle"
             >
               ↓
             </button>
             <button
               disabled={pending}
               onClick={() => onChange(layout.filter((_, i) => i !== idx))}
-              className="rounded px-1 text-xs text-red-600 hover:bg-red-50"
+              className="rounded px-1 text-xs text-danger hover:bg-danger-subtle"
             >
               🗑
             </button>
