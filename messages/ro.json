@@ -90,7 +90,9 @@
     "saved": "Salvat",
     "pdf": "Day sheet PDF",
     "share": "Share day sheet",
-    "copied": "Copiat!"
+    "copied": "Copiat!",
+    "today": "Azi",
+    "tomorrow": "Mâine"
   },
   "schedule": {
     "add": "Adaugă",

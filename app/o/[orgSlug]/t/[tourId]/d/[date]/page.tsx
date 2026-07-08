@@ -22,6 +22,9 @@ import {
 } from "./extras-client";
 import { formatTimeInZone, dayInstant } from "@/lib/datetime";
 import { TimeRail, type RailBlock } from "@/components/TimeRail";
+import { WeatherCard, MapCard, type MapPinLink } from "@/components/DayDashboardCards";
+import { getWeather } from "@/lib/weather";
+import { isGoogleEnabled, searchGooglePlaces } from "@/lib/googlePlaces";
 
 export default async function DayPage({
   params,
@@ -37,7 +40,7 @@ export default async function DayPage({
   const { data: day } = await supabase
     .from("days")
     .select(
-      "id, date, day_type, city, state, country, timezone, general_notes, travel_notes, hotel_notes",
+      "id, date, day_type, city, state, country, lat, lng, timezone, general_notes, travel_notes, hotel_notes",
     )
     .eq("tour_id", tourId)
     .eq("date", date)
@@ -280,6 +283,52 @@ export default async function DayPage({
       }),
   ];
 
+  // ── Weather + Local Map (blueprint §3.3 [C-S]) ──
+  let dayLat = (day as { lat?: number | null }).lat ?? null;
+  let dayLng = (day as { lng?: number | null }).lng ?? null;
+  if (dayLat === null && day.city && isGoogleEnabled()) {
+    const hits = await searchGooglePlaces(
+      [day.city, day.country].filter(Boolean).join(", "),
+      { maxResults: 1 },
+    );
+    if (hits[0]?.lat != null) {
+      dayLat = hits[0].lat;
+      dayLng = hits[0].lng;
+      if (canEdit) {
+        // backfill o singură dată — următoarele vizite nu mai geocodează
+        await supabase
+          .from("days")
+          .update({ lat: dayLat, lng: dayLng })
+          .eq("id", day.id);
+      }
+    }
+  }
+  const weather =
+    dayLat !== null && dayLng !== null
+      ? await getWeather(dayLat, dayLng, date, tz).catch(() => null)
+      : null;
+
+  const mapPins: MapPinLink[] = [
+    ...(events ?? []).flatMap((e) => {
+      const v = e.venues as unknown as {
+        name: string;
+        address_line1: string | null;
+        city: string | null;
+      } | null;
+      if (!v) return [];
+      return [{
+        kind: "venue" as const,
+        name: v.name,
+        query: [v.name, v.address_line1, v.city].filter(Boolean).join(", "),
+      }];
+    }),
+    ...hotelData.map((h) => ({
+      kind: "hotel" as const,
+      name: h.name,
+      query: [h.name, h.city].filter(Boolean).join(", "),
+    })),
+  ];
+
   return (
     <main className="mx-auto w-full max-w-3xl space-y-8 p-6">
       <header className="space-y-1">
@@ -299,6 +348,17 @@ export default async function DayPage({
           </p>
         )}
       </header>
+
+      {(weather || dayLat !== null) && (
+        <div className="grid gap-4 md:grid-cols-2">
+          {weather && (
+            <WeatherCard days={weather} todayLabel={t("today")} tomorrowLabel={t("tomorrow")} />
+          )}
+          {dayLat !== null && dayLng !== null && (
+            <MapCard lat={dayLat} lng={dayLng} pins={mapPins} />
+          )}
+        </div>
+      )}
 
       <div id="notes" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
         <NotesSection

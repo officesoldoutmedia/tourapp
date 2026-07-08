@@ -90,7 +90,9 @@
     "saved": "Saved",
     "pdf": "Day sheet PDF",
     "share": "Share day sheet",
-    "copied": "Copied!"
+    "copied": "Copied!",
+    "today": "Today",
+    "tomorrow": "Tomorrow"
   },
   "schedule": {
     "add": "Add",
