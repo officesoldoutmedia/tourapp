@@ -81,9 +81,9 @@ fixtures reale de la Stefan (§10 Faza 7 DoD) și în trialul Eventric.
 Template-ul create-next-app comuta fundalul pe negru la prefers-color-scheme:
 dark, dar componentele MVP folosesc clase de temă deschisă → text ilizibil pe
 dark mode de sistem (raportat de Stefan la primul test). Am forțat
-`color-scheme: light`. Dark mode-ul COMPLET e cerință [C §9] ("crew-ul
-lucrează noaptea — e funcțional, nu estetic") și se face ca pas de design
-dedicat (tokens + variante dark pe toate componentele), nu acum.
+`color-scheme: light`. REZOLVAT ulterior în aceeași zi: dark mode complet
+activat prin design system (tokens [data-theme=dark], toggle în top bar cu
+cookie, color-scheme per temă) — cerința [C §9] e închisă.
 
 ## 2026-07-08 — Design system v1 aplicat (TOURAPP_DESIGN_SYSTEM.md)
 Faza 1 din §9: tokens compleți în globals.css (light + [data-theme=dark]
