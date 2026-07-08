@@ -88,3 +88,19 @@ Faza 1; la nivelul Fazei 0 verificăm motorul: `visibility_rules` +
       template aplicat, +1 corect, edit live vizibil la al doilea user.
 - [ ] Rămas din blueprint Faza 1: mini-calendar în sidebar (nice-to-have,
       lista pe luni acoperă navigarea).
+
+## Faza 3 — Stare
+
+- [x] Migrația 00008 (travel/flight_legs/passengers/day_hotels/key_contacts/
+      room_list) + RLS — `faza3_rls.test.sql`: 5 probe PASS (visibility per
+      hotel + per travel item, room list cascadat, extend-stay linked pe
+      3 zile + edit pe grup + unlink).
+- [x] `lib/travel.ts` — auto-title [C-S] + arrivalFrom (+1, DST) — 12 teste.
+- [x] Ground calc live prin Distance Matrix: Satu Mare→Cluj = 189 km/180 min
+      (DoD-ul fazei, verificat cu cheia reală).
+- [x] UI: secțiunile Travel (tabs ground/air/rail/sea, auto-calc, legs,
+      pasageri) și Hotels (căutare cu badge Google, extend stay/unlink,
+      sortare, room list grid + copy clipboard TSV) pe pagina zilei;
+      status advance agregat pe sidebarul zilelor (restanța Fazei 2).
+- [ ] DoD manual pe stack Supabase live (extend stay prin UI, copy/paste
+      room list în Excel) — la instalarea Docker/OrbStack sau proiect cloud.

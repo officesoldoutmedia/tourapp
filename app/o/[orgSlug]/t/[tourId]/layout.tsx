@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
+import { aggregateAdvanceStatus, type AdvanceStatus } from "@/lib/advance";
 
 function monthKey(date: string, locale: string): string {
   return new Intl.DateTimeFormat(locale, {
@@ -33,7 +34,7 @@ export default async function TourLayout({
       .maybeSingle(),
     supabase
       .from("days")
-      .select("id, date, day_type, city")
+      .select("id, date, day_type, city, events(advances(status, deleted_at))")
       .eq("tour_id", tourId)
       .is("deleted_at", null)
       .order("date"),
@@ -41,11 +42,34 @@ export default async function TourLayout({
 
   if (!tour) notFound();
 
-  const groups = new Map<string, { id: string; date: string; day_type: string; city: string | null }[]>();
+  type DayRow = {
+    id: string;
+    date: string;
+    day_type: string;
+    city: string | null;
+    advanceStatus: AdvanceStatus;
+  };
+
+  const groups = new Map<string, DayRow[]>();
   for (const day of days ?? []) {
+    // [C §6.6] status agregat pe Tour Date: pie dacă unele în lucru,
+    // check dacă TOATE advance-urile zilei sunt done
+    const statuses = (
+      (day.events ?? []) as { advances: { status: string; deleted_at: string | null }[] | null }[]
+    ).flatMap((event) =>
+      (event.advances ?? [])
+        .filter((a) => a.deleted_at === null)
+        .map((a) => a.status as AdvanceStatus),
+    );
     const key = monthKey(day.date, locale);
     if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push(day);
+    groups.get(key)!.push({
+      id: day.id,
+      date: day.date,
+      day_type: day.day_type,
+      city: day.city,
+      advanceStatus: aggregateAdvanceStatus(statuses),
+    });
   }
 
   return (
@@ -80,6 +104,12 @@ export default async function TourLayout({
                       >
                         {day.city || "—"}
                       </span>
+                      {day.advanceStatus === "in_progress" && (
+                        <span className="ml-auto text-[10px]" title="Advance in progress">🔵</span>
+                      )}
+                      {day.advanceStatus === "done" && (
+                        <span className="ml-auto text-[10px]" title="Advance done">✅</span>
+                      )}
                     </Link>
                   </li>
                 );
