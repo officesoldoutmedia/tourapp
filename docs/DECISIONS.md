@@ -93,3 +93,13 @@ globale, sweep pe toate ecranele (0 clase hardcodate rămase — verificat cu
 grep). Rămase pt faza 2 de design: time rail (semnătura §5.6), dashboard
 cards §5.5, nav stânga de module §4.4, bottom-tabs mobil §6, primitive React
 în components/ui, dark mode activat.
+
+## 2026-07-08 — Weather + Local Map pe dashboardul zilei [C-S §3.3]
+Vremea: Open-Meteo (gratuit, fără cheie), 2 zile (temp max/min, precipitații,
+vânt, răsărit/apus), cache 1h; cardul apare doar când ziua e în fereastra de
+prognoză (~16 zile) — altfel se ascunde. Coordonatele zilei se geocodează
+lazy din city+country prin Places (server) și se salvează pe zi la prima
+vizită a unui editor. Harta: embed Google keyless centrat pe zi (cheia
+server-side nu se expune) + listă de pins venue (accent) / hotel cu link
+spre Google Maps — pin-uri multiple pe embed ar cere Maps JS API cu cheie
+publică; reevaluăm la faza mobilă.
