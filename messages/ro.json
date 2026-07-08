@@ -563,6 +563,7 @@
     "addGroup": "Adaugă grup",
     "groupName": "Numele grupului",
     "noGroups": "Niciun grup. Grupurile se folosesc la visibility.",
-    "inGroup": "Membri în grup"
+    "inGroup": "Membri în grup",
+    "copyLink": "Copiază link"
   }
 }

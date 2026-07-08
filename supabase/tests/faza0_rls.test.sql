@@ -43,6 +43,13 @@ end $$;
 \echo 'PASS: non-membrul nu vede org'
 
 -- crew (free) nu poate crea organizatii
+-- (din 00014 default-ul de tier e 'pro' — proba forțează explicit 'free')
+select set_config('role', 'service_role', false);
+set role service_role;
+update public.profiles set user_tier = 'free'
+  where id = 'c0000000-0000-0000-0000-00000000000c';
+set role authenticated;
+select set_config('request.jwt.claims', '{"sub":"c0000000-0000-0000-0000-00000000000c"}', false);
 do $$ begin
   begin
     perform public.create_organization('Hack', 'hack', null);

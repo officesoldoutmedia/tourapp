@@ -168,9 +168,12 @@ export default async function UsersSettingsPage({
               <li key={inv.id} className="px-4 py-2 text-sm">
                 <b>{inv.email}</b>
                 <span className="ml-2 text-xs text-secondary">{tp(inv.permission)}</span>
-                <code className="mt-1 block truncate rounded bg-subtle px-2 py-1 text-xs text-secondary">
-                  {base}/invite/{inv.token}
-                </code>
+                <span className="mt-1 flex items-center gap-2">
+                  <code className="min-w-0 flex-1 truncate rounded bg-subtle px-2 py-1 text-xs text-secondary">
+                    {base}/invite/{inv.token}
+                  </code>
+                  <CopyButton text={`${base}/invite/${inv.token}`} label={t("copyLink")} />
+                </span>
               </li>
             ))}
           </ul>

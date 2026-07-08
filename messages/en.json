@@ -563,6 +563,7 @@
     "addGroup": "Add group",
     "groupName": "Group name",
     "noGroups": "No groups. Groups are used for visibility.",
-    "inGroup": "Group members"
+    "inGroup": "Group members",
+    "copyLink": "Copy link"
   }
 }
