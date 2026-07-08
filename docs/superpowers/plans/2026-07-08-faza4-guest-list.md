@@ -16,7 +16,7 @@
 
 ### Task 2: Email de aprobare (Resend)
 - [x] `lib/email.ts` server-only: fetch pe API-ul Resend; fără RESEND_API_KEY → console.log (mod dev [N §2.4])
-- [x] Trimis din server action la status→approved DACĂ org.settings.guest_list_approval_emails ȘI request.email_notify [C §6.9.1]; conținut: nr bilete + pass types aprobate [C]
+- [ ] Trimis din server action la status→approved DACĂ org.settings.guest_list_approval_emails ȘI request.email_notify [C §6.9.1] — template-ul e gata (lib/email.ts); apelul vine cu action-urile din Task 3
 - [x] Commit
 
 ### Task 3: Grid manager (§6.9.3 [C] — comportamentele de tastatură)
