@@ -7,17 +7,17 @@
 **DoD (blueprint):** un singur pass type OK; cutoff blochează submit dar nu managerul; remaining roșu la negativ; email conține bilete+passes.
 
 ### Task 1: Migration 00009 — tabele + RLS special
-- [ ] tour_passes (TUR-level [C-S]: name/description/image_path), event_guest_list_settings (cutoff_at, is_locked, tickets_allotment), event_pass_allotments (num_allowed, enforced), guest_list_requests (toate câmpurile v1.1: phone/row/seat/email_notify/priority/pickup/payment_status), guest_request_passes
-- [ ] Helper `private.gl_can_submit(event)` — false când locked SAU cutoff depășit; bypass gl_manage_all+ [C]; `private.gl_tickets_blocked(event, n)` pt Enforced Allotment
-- [ ] RLS §4.3.2: SELECT — gl_view_all_submit+ vede tot; gl_submit DOAR requesturile proprii; mobile_access nimic. INSERT — gl_submit+ cu requested_by=uid + gl_can_submit + enforced check. UPDATE/DELETE — gl_manage_all+ orice; ownerul doar rândurile proprii cât timp pending [D]
-- [ ] Teste RLS faza4: fiecare nivel de permisiune (schimb membru pe rând), cutoff blochează submitterul dar nu managerul, enforced allotment blochează, owner edit doar pending
-- [ ] Realtime += guest_list_requests
-- [ ] Commit
+- [x] tour_passes (TUR-level [C-S]: name/description/image_path), event_guest_list_settings (cutoff_at, is_locked, tickets_allotment), event_pass_allotments (num_allowed, enforced), guest_list_requests (toate câmpurile v1.1: phone/row/seat/email_notify/priority/pickup/payment_status), guest_request_passes
+- [x] Helper `private.gl_can_submit(event)` — false când locked SAU cutoff depășit; bypass gl_manage_all+ [C]; `private.gl_tickets_blocked(event, n)` pt Enforced Allotment
+- [x] RLS §4.3.2: SELECT — gl_view_all_submit+ vede tot; gl_submit DOAR requesturile proprii; mobile_access nimic. INSERT — gl_submit+ cu requested_by=uid + gl_can_submit + enforced check. UPDATE/DELETE — gl_manage_all+ orice; ownerul doar rândurile proprii cât timp pending [D]
+- [x] Teste RLS faza4: fiecare nivel de permisiune (schimb membru pe rând), cutoff blochează submitterul dar nu managerul, enforced allotment blochează, owner edit doar pending
+- [x] Realtime += guest_list_requests
+- [x] Commit
 
 ### Task 2: Email de aprobare (Resend)
-- [ ] `lib/email.ts` server-only: fetch pe API-ul Resend; fără RESEND_API_KEY → console.log (mod dev [N §2.4])
-- [ ] Trimis din server action la status→approved DACĂ org.settings.guest_list_approval_emails ȘI request.email_notify [C §6.9.1]; conținut: nr bilete + pass types aprobate [C]
-- [ ] Commit
+- [x] `lib/email.ts` server-only: fetch pe API-ul Resend; fără RESEND_API_KEY → console.log (mod dev [N §2.4])
+- [x] Trimis din server action la status→approved DACĂ org.settings.guest_list_approval_emails ȘI request.email_notify [C §6.9.1]; conținut: nr bilete + pass types aprobate [C]
+- [x] Commit
 
 ### Task 3: Grid manager (§6.9.3 [C] — comportamentele de tastatură)
 - [ ] Rând "New Guest" permanent sus; Tab/Shift-Tab între câmpuri; Enter/Shift-Enter între rânduri; în Notes Enter = rând nou de text, Tab iese; Tab din Notes pe rândul nou finalizează guestul și mută focus pe Last Name
