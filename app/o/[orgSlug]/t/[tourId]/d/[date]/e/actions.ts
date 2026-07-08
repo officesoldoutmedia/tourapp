@@ -4,6 +4,11 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
+import {
+  isGoogleEnabled,
+  searchGooglePlaces,
+  type GooglePlaceResult,
+} from "@/lib/googlePlaces";
 
 async function requireEditor(orgSlug: string) {
   const ctx = await requireOrg(orgSlug);
@@ -21,15 +26,46 @@ function normalize(s: string): string {
     .trim();
 }
 
+async function findDuplicates(
+  supabase: Awaited<ReturnType<typeof requireOrg>>["supabase"],
+  orgId: string,
+  name: string,
+  city: string,
+): Promise<VenueHit[]> {
+  const { data: candidates } = await supabase
+    .from("venues")
+    .select("id, name, city, country")
+    .eq("organization_id", orgId)
+    .is("deleted_at", null);
+  return (candidates ?? [])
+    .filter(
+      (v) =>
+        normalize(v.name) === normalize(name) &&
+        normalize(v.city ?? "") === normalize(city),
+    )
+    .map((v) => ({
+      id: v.id,
+      name: v.name,
+      city: v.city,
+      country: v.country,
+      source: "org" as const,
+    }));
+}
+
 export interface VenueHit {
   id: string;
   name: string;
   city: string | null;
   country: string | null;
-  source: "org" | "catalog";
+  source: "org" | "catalog" | "google";
+  /** doar pt source='google' — payload-ul complet pt creare la selectare */
+  google?: GooglePlaceResult;
 }
 
-/** Căutare venue: biblioteca org + catalogul global, cu badge sursă. [C §6.5.1] */
+/**
+ * Căutare venue [C §6.5.1]: (1) biblioteca org, (2) catalogul global,
+ * (3) fallback Google Places — fiecare cu badge de sursă.
+ */
 export async function searchVenues(
   orgSlug: string,
   query: string,
@@ -44,7 +80,7 @@ export async function searchVenues(
     .is("deleted_at", null)
     .limit(15);
 
-  return (data ?? [])
+  const local: VenueHit[] = (data ?? [])
     .filter((v) => v.organization_id === null || v.organization_id === org.id)
     .map((v) => ({
       id: v.id,
@@ -53,6 +89,28 @@ export async function searchVenues(
       country: v.country,
       source: v.organization_id === org.id ? ("org" as const) : ("catalog" as const),
     }));
+
+  // Fallback Google [C]: doar dacă stocul local e sărac și cheia există.
+  if (local.length < 3 && isGoogleEnabled()) {
+    const googleHits = await searchGooglePlaces(query);
+    const seen = new Set(
+      local.map((v) => `${normalize(v.name)}|${normalize(v.city ?? "")}`),
+    );
+    for (const hit of googleHits) {
+      const key = `${normalize(hit.name)}|${normalize(hit.city ?? "")}`;
+      if (seen.has(key)) continue;
+      local.push({
+        id: `google:${hit.googlePlaceId}`,
+        name: hit.name,
+        city: hit.city,
+        country: hit.country,
+        source: "google",
+        google: hit,
+      });
+    }
+  }
+
+  return local;
 }
 
 export interface CreateEventResult {
@@ -69,6 +127,7 @@ export async function createEvent(
     dayId: string;
     venueId?: string; // venue existent selectat
     newVenue?: { name: string; city: string; country: string }; // creare manuală
+    googleVenue?: GooglePlaceResult; // rezultat Google Places selectat [C]
     /** true = userul a confirmat "creează duplicat nou" în dialog */
     ignoreDuplicates?: boolean;
   },
@@ -78,33 +137,47 @@ export async function createEvent(
   let venueId = input.venueId ?? null;
   let venueName: string | null = null;
 
+  if (!venueId && input.googleVenue) {
+    const g = input.googleVenue;
+    // duplicate matching [C] se aplică și selecțiilor din Google
+    if (!input.ignoreDuplicates) {
+      const dupes = await findDuplicates(supabase, org.id, g.name, g.city ?? "");
+      if (dupes.length > 0) return { duplicates: dupes };
+    }
+    const { data: venue, error } = await supabase
+      .from("venues")
+      .insert({
+        organization_id: org.id,
+        name: g.name,
+        address_line1: g.addressLine1,
+        city: g.city,
+        state: g.state,
+        country: g.country,
+        postal_code: g.postalCode,
+        lat: g.lat,
+        lng: g.lng,
+        phones: g.phone ? [{ number: g.phone, label: "Main Number" }] : [],
+        urls: g.website ? [g.website] : [],
+        source: "google",
+        google_place_id: g.googlePlaceId,
+      })
+      .select("id, name")
+      .single();
+    if (error || !venue) return { error: error?.message ?? "venue_failed" };
+    venueId = venue.id;
+    venueName = venue.name;
+  }
+
   if (!venueId && input.newVenue) {
     const name = input.newVenue.name.trim();
     if (!name) return { error: "venue_name_required" };
 
     // Smart duplicate matching [C]: nume normalizat + oraș, în org
     if (!input.ignoreDuplicates) {
-      const { data: candidates } = await supabase
-        .from("venues")
-        .select("id, name, city, country, organization_id")
-        .eq("organization_id", org.id)
-        .is("deleted_at", null);
-      const dupes = (candidates ?? []).filter(
-        (v) =>
-          normalize(v.name) === normalize(name) &&
-          normalize(v.city ?? "") === normalize(input.newVenue!.city ?? ""),
+      const dupes = await findDuplicates(
+        supabase, org.id, name, input.newVenue.city ?? "",
       );
-      if (dupes.length > 0) {
-        return {
-          duplicates: dupes.map((v) => ({
-            id: v.id,
-            name: v.name,
-            city: v.city,
-            country: v.country,
-            source: "org" as const,
-          })),
-        };
-      }
+      if (dupes.length > 0) return { duplicates: dupes };
     }
 
     const { data: venue, error } = await supabase

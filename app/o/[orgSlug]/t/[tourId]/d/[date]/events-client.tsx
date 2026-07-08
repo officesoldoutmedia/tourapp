@@ -102,7 +102,13 @@ export function EventsSection({
                   <li key={hit.id}>
                     <button
                       disabled={pending}
-                      onClick={() => attach({ dayId, venueId: hit.id })}
+                      onClick={() =>
+                        attach(
+                          hit.source === "google"
+                            ? { dayId, googleVenue: hit.google }
+                            : { dayId, venueId: hit.id },
+                        )
+                      }
                       className="flex w-full items-center justify-between px-2 py-1.5 text-left text-sm hover:bg-neutral-50"
                     >
                       <span>
@@ -112,9 +118,19 @@ export function EventsSection({
                         </span>
                       </span>
                       <span
-                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${hit.source === "catalog" ? "bg-blue-100 text-blue-800" : "bg-neutral-100 text-neutral-600"}`}
+                        className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${
+                          hit.source === "google"
+                            ? "bg-emerald-100 text-emerald-800"
+                            : hit.source === "catalog"
+                              ? "bg-blue-100 text-blue-800"
+                              : "bg-neutral-100 text-neutral-600"
+                        }`}
                       >
-                        {hit.source === "catalog" ? t("sourceCatalog") : t("sourceOrg")}
+                        {hit.source === "google"
+                          ? "Google"
+                          : hit.source === "catalog"
+                            ? t("sourceCatalog")
+                            : t("sourceOrg")}
                       </span>
                     </button>
                   </li>
