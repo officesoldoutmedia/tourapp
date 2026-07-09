@@ -583,7 +583,8 @@
     "addExistingContact": "Add existing contact…",
     "costPerShow": "Cost/show",
     "paymentType": "Payment",
-    "individual": "Individual"
+    "individual": "Individual",
+    "currency": "Currency"
   },
   "tourSettings": {
     "title": "Tour settings",

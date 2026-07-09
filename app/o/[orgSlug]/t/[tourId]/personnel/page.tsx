@@ -22,7 +22,7 @@ export default async function PersonnelPage({
     supabase.from("tours").select("id, name").eq("id", tourId).is("deleted_at", null).maybeSingle(),
     supabase
       .from("tour_personnel")
-      .select("id, first_name, last_name, role, title, company, party, phones, emails, cost_per_show, payment_type")
+      .select("id, first_name, last_name, role, title, company, party, phones, emails, cost_per_show, cost_currency, payment_type")
       .eq("tour_id", tourId)
       .is("deleted_at", null)
       .order("last_name"),
@@ -57,6 +57,7 @@ export default async function PersonnelPage({
     if (formData.has("cost")) {
       Object.assign(row, {
         cost_per_show: Number(formData.get("cost")) || null,
+        cost_currency: String(formData.get("costCurrency") ?? "RON") || "RON",
         payment_type: String(formData.get("paymentType") ?? "") || null,
       });
     }
@@ -109,6 +110,7 @@ export default async function PersonnelPage({
     phones: { number?: string }[];
     emails: { email?: string }[];
     cost_per_show: number | null;
+    cost_currency: string;
     payment_type: string | null;
   };
 
@@ -174,6 +176,11 @@ export default async function PersonnelPage({
             {canSeeCosts && (
               <>
                 <input name="cost" type="number" step="0.01" defaultValue={p.cost_per_show ?? ""} placeholder={t("costPerShow")} title={t("costPerShow")} disabled={!canEdit} className={`${cell} w-20 text-right font-mono`} />
+                <select name="costCurrency" defaultValue={p.cost_currency ?? "RON"} title={t("currency")} disabled={!canEdit} className={`${cell} font-mono`}>
+                  {["RON", "EUR", "USD", "GBP"].map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
                 <select name="paymentType" defaultValue={p.payment_type ?? ""} title={t("paymentType")} disabled={!canEdit} className={cell}>
                   <option value="">—</option>
                   <option value="company">{t("company")}</option>
@@ -209,6 +216,11 @@ export default async function PersonnelPage({
             {canSeeCosts && (
               <>
                 <input name="cost" type="number" step="0.01" placeholder={t("costPerShow")} title={t("costPerShow")} className={`${cell} w-20 text-right font-mono`} />
+                <select name="costCurrency" defaultValue="RON" title={t("currency")} className={`${cell} font-mono`}>
+                  {["RON", "EUR", "USD", "GBP"].map((c) => (
+                    <option key={c} value={c}>{c}</option>
+                  ))}
+                </select>
                 <select name="paymentType" defaultValue="" title={t("paymentType")} className={cell}>
                   <option value="">—</option>
                   <option value="company">{t("company")}</option>

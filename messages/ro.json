@@ -583,7 +583,8 @@
     "addExistingContact": "Adaugă din contacte…",
     "costPerShow": "Cost/show",
     "paymentType": "Plată",
-    "individual": "Pers. fizică"
+    "individual": "Pers. fizică",
+    "currency": "Monedă"
   },
   "tourSettings": {
     "title": "Setări tur",

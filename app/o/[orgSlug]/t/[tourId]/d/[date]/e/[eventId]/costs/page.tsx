@@ -36,7 +36,7 @@ export default async function ShowCostsPage({
       supabase.from("show_finances").select("*").eq("event_id", eventId).maybeSingle(),
       supabase
         .from("show_costs")
-        .select("id, kind, label, payment_type, amount, personnel_id")
+        .select("id, kind, label, payment_type, amount, currency, personnel_id")
         .eq("event_id", eventId)
         .is("deleted_at", null)
         .order("kind")
@@ -44,7 +44,7 @@ export default async function ShowCostsPage({
         .order("created_at"),
       supabase
         .from("tour_personnel")
-        .select("id, first_name, last_name, role, cost_per_show, payment_type")
+        .select("id, first_name, last_name, role, cost_per_show, cost_currency, payment_type")
         .eq("tour_id", tourId)
         .is("deleted_at", null)
         .order("last_name"),
@@ -91,7 +91,7 @@ export default async function ShowCostsPage({
     } else {
       const { data: person } = await supabase
         .from("tour_personnel")
-        .select("first_name, last_name, role, cost_per_show, payment_type")
+        .select("first_name, last_name, role, cost_per_show, cost_currency, payment_type")
         .eq("id", personnelId)
         .maybeSingle();
       if (!person) return;
@@ -103,6 +103,7 @@ export default async function ShowCostsPage({
           [person.first_name, person.last_name].filter(Boolean).join(" ") +
           (person.role ? ` — ${person.role}` : ""),
         amount: person.cost_per_show ?? 0,
+        currency: person.cost_currency ?? "RON",
         payment_type: person.payment_type,
         updated_by: user.id,
       });
@@ -242,7 +243,7 @@ export default async function ShowCostsPage({
                       {name}
                       {person.cost_per_show != null && (
                         <span className="ml-1.5 font-mono text-xs opacity-70">
-                          {formatMoney(Number(person.cost_per_show), currency)}
+                          {formatMoney(Number(person.cost_per_show), person.cost_currency ?? "RON")}
                         </span>
                       )}
                     </button>
@@ -277,6 +278,9 @@ export default async function ShowCostsPage({
                   {paymentOptions}
                 </select>
                 <input name="amount" type="number" step="0.01" defaultValue={cost.amount} disabled={!canEdit} className={`${input} w-28 text-right font-mono`} />
+                <span className={`w-10 font-mono text-xs ${cost.currency !== currency ? "font-semibold text-warning" : "text-tertiary"}`}>
+                  {cost.currency}
+                </span>
                 {canEdit && (
                   <>
                     <button title={tc("save")} className="rounded px-2 py-1 text-xs text-accent hover:bg-accent-subtle">✓</button>
