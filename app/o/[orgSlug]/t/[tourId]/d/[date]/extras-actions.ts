@@ -102,7 +102,11 @@ export async function recordAttachment(
     uploaded_by: user.id,
   });
   if (error) return { error: error.message };
-  revalidatePath(dayPath(orgSlug, tourId, date));
+  revalidatePath(
+    input.parentType === "tour"
+      ? `/o/${orgSlug}/t/${tourId}/attachments`
+      : dayPath(orgSlug, tourId, date),
+  );
   return {};
 }
 

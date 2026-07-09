@@ -150,6 +150,7 @@ export function AttachmentsSection({
   orgId,
   attachments,
   canEdit,
+  parentType = "day",
 }: {
   orgSlug: string;
   tourId: string;
@@ -158,6 +159,7 @@ export function AttachmentsSection({
   orgId: string;
   attachments: AttachmentData[];
   canEdit: boolean;
+  parentType?: "tour" | "day";
 }) {
   const t = useTranslations("attachments");
   const [pending, startTransition] = useTransition();
@@ -169,8 +171,11 @@ export function AttachmentsSection({
     setUploading(true);
     setError(null);
     const supabase = createClient();
-    // path: {orgId}/tours/{tourId}/days/{date}/{uuid}-{nume} [N §6.13]
-    const path = `${orgId}/tours/${tourId}/days/${date}/${crypto.randomUUID()}-${file.name}`;
+    // path: {orgId}/tours/{tourId}/[days/{date}/]{uuid}-{nume} [N §6.13]
+    const path =
+      parentType === "tour"
+        ? `${orgId}/tours/${tourId}/${crypto.randomUUID()}-${file.name}`
+        : `${orgId}/tours/${tourId}/days/${date}/${crypto.randomUUID()}-${file.name}`;
     const { error: upError } = await supabase.storage
       .from("attachments")
       .upload(path, file);
@@ -181,8 +186,8 @@ export function AttachmentsSection({
     }
     startTransition(async () => {
       await recordAttachment(orgSlug, tourId, date, {
-        parentType: "day",
-        parentId: dayId,
+        parentType,
+        parentId: parentType === "tour" ? tourId : dayId,
         fileName: file.name,
         storagePath: path,
         mimeType: file.type,

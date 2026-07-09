@@ -62,6 +62,7 @@ export function ModuleNav({
             ["dashboard", "Tour overview", Map],
             ["calendar", "Calendar", CalendarDays],
             ...(canAccounting ? ([["finances", "Finances", Banknote]] as const) : []),
+            ["attachments", "Tour files", Paperclip],
             ["personnel", "Personnel", Users],
             ["passes", "Tour passes", Ticket],
             ["settings", "Tour settings", Settings],
