@@ -124,6 +124,7 @@ export default async function ShowCostsPage({
     const row = {
       label: String(formData.get("label") ?? "").trim(),
       amount: Number(formData.get("amount")) || 0,
+      currency: String(formData.get("costCurrency") ?? "RON") || "RON",
       payment_type: String(formData.get("paymentType") ?? "") || null,
       updated_by: user.id,
     };
@@ -166,6 +167,9 @@ export default async function ShowCostsPage({
   });
 
   const input = "rounded border border-hairline px-2 py-1 text-sm";
+  const currencyOptions = ["RON", "EUR", "USD", "GBP"].map((c) => (
+    <option key={c} value={c}>{c}</option>
+  ));
   const paymentOptions = (
     <>
       <option value="">—</option>
@@ -326,14 +330,19 @@ export default async function ShowCostsPage({
                   {paymentOptions}
                 </select>
                 <input name="amount" type="number" step="0.01" defaultValue={cost.amount} disabled={!canEdit} className={`${input} w-28 text-right font-mono`} />
-                <span className={`font-mono text-xs ${cost.currency !== currency && !fxRates[cost.currency] ? "font-semibold text-warning" : "text-tertiary"}`}>
-                  {cost.currency}
-                  {cost.currency !== currency && fxRates[cost.currency] > 0 && (
-                    <span className="ml-1 text-tertiary">
-                      ≈ {formatMoney(Math.round(Number(cost.amount) * fxRates[cost.currency] * 100) / 100, currency)}
-                    </span>
-                  )}
-                </span>
+                <select
+                  name="costCurrency"
+                  defaultValue={cost.currency}
+                  disabled={!canEdit}
+                  className={`${input} font-mono ${cost.currency !== currency && !fxRates[cost.currency] ? "border-warning font-semibold text-warning" : ""}`}
+                >
+                  {currencyOptions}
+                </select>
+                {cost.currency !== currency && fxRates[cost.currency] > 0 && (
+                  <span className="font-mono text-xs text-tertiary">
+                    ≈ {formatMoney(Math.round(Number(cost.amount) * fxRates[cost.currency] * 100) / 100, currency)}
+                  </span>
+                )}
                 {canEdit && (
                   <>
                     <button title={tc("save")} className="rounded px-2 py-1 text-xs text-accent hover:bg-accent-subtle">✓</button>
@@ -354,6 +363,9 @@ export default async function ShowCostsPage({
               {paymentOptions}
             </select>
             <input name="amount" type="number" step="0.01" placeholder="0.00" className={`${input} w-28 text-right font-mono`} />
+            <select name="costCurrency" defaultValue={currency} className={`${input} font-mono`}>
+              {currencyOptions}
+            </select>
             <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-sm font-medium text-white">
               + {t("addExtra")}
             </button>
