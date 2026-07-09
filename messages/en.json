@@ -6,7 +6,9 @@
     "cancel": "Cancel",
     "delete": "Delete",
     "error": "Something went wrong. Please try again.",
-    "signOut": "Sign out"
+    "signOut": "Sign out",
+    "yes": "Yes",
+    "no": "No"
   },
   "auth": {
     "email": "Email",
@@ -565,5 +567,27 @@
     "noGroups": "No groups. Groups are used for visibility.",
     "inGroup": "Group members",
     "copyLink": "Copy link"
+  },
+  "personnel": {
+    "title": "Tour personnel",
+    "last": "Last",
+    "first": "First",
+    "role": "Role",
+    "jobTitle": "Title",
+    "company": "Company",
+    "phone": "Phone",
+    "email": "Email",
+    "party": "Party",
+    "empty": "No personnel yet — add the first row below.",
+    "addExistingContact": "Add existing contact…"
+  },
+  "tourSettings": {
+    "title": "Tour settings",
+    "tourName": "Tour name",
+    "archived": "Tour is archived?",
+    "visibleMobile": "Visible to mobile users?",
+    "deleteTitle": "Delete this tour",
+    "deletePlaceholder": "Type DELETE to confirm",
+    "deleteHint": "The tour disappears from lists; data stays recoverable (soft delete)."
   }
 }

@@ -12,6 +12,8 @@ import {
   Paperclip,
   Star,
   Ticket,
+  Users,
+  Settings,
 } from "lucide-react";
 
 const MODULES = [
@@ -24,7 +26,7 @@ const MODULES = [
   { id: "attachments", label: "Files", icon: Paperclip },
 ] as const;
 
-export function ModuleNav({ passesHref }: { passesHref: string }) {
+export function ModuleNav({ tourBase }: { tourBase: string }) {
   const pathname = usePathname();
   const onDayPage = /\/d\/\d{4}-\d{2}-\d{2}/.test(pathname);
 
@@ -42,15 +44,23 @@ export function ModuleNav({ passesHref }: { passesHref: string }) {
             </a>
           </li>
         ))}
-        <li className="pt-3">
-          <Link
-            href={passesHref}
-            className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-secondary transition-colors hover:bg-surface hover:text-primary"
-          >
-            <Ticket size={18} strokeWidth={1.5} />
-            Tour passes
-          </Link>
-        </li>
+        {(
+          [
+            ["personnel", "Personnel", Users],
+            ["passes", "Tour passes", Ticket],
+            ["settings", "Tour settings", Settings],
+          ] as const
+        ).map(([slug, label, Icon], i) => (
+          <li key={slug} className={i === 0 ? "pt-3" : ""}>
+            <Link
+              href={`${tourBase}/${slug}`}
+              className="flex items-center gap-2.5 rounded-md px-2.5 py-2 text-sm text-secondary transition-colors hover:bg-surface hover:text-primary"
+            >
+              <Icon size={18} strokeWidth={1.5} />
+              {label}
+            </Link>
+          </li>
+        ))}
       </ul>
     </nav>
   );

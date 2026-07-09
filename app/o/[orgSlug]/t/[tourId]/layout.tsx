@@ -76,7 +76,7 @@ export default async function TourLayout({
 
   return (
     <div className="flex min-h-0 flex-1">
-      <ModuleNav passesHref={`/o/${orgSlug}/t/${tourId}/passes`} />
+      <ModuleNav tourBase={`/o/${orgSlug}/t/${tourId}`} />
       <div className="min-w-0 flex-1">{children}</div>
 
       {/* Sidebar zile — dreapta, mereu vizibil [A.2] */}

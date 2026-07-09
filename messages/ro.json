@@ -6,7 +6,9 @@
     "cancel": "Anulează",
     "delete": "Șterge",
     "error": "A apărut o eroare. Încearcă din nou.",
-    "signOut": "Deconectare"
+    "signOut": "Deconectare",
+    "yes": "Da",
+    "no": "Nu"
   },
   "auth": {
     "email": "Email",
@@ -565,5 +567,27 @@
     "noGroups": "Niciun grup. Grupurile se folosesc la visibility.",
     "inGroup": "Membri în grup",
     "copyLink": "Copiază link"
+  },
+  "personnel": {
+    "title": "Personal tur",
+    "last": "Nume",
+    "first": "Prenume",
+    "role": "Rol",
+    "jobTitle": "Titlu",
+    "company": "Companie",
+    "phone": "Telefon",
+    "email": "Email",
+    "party": "Party",
+    "empty": "Niciun membru încă — adaugă primul rând mai jos.",
+    "addExistingContact": "Adaugă din contacte…"
+  },
+  "tourSettings": {
+    "title": "Setări tur",
+    "tourName": "Numele turului",
+    "archived": "Turul e arhivat?",
+    "visibleMobile": "Vizibil pentru userii de mobil?",
+    "deleteTitle": "Șterge acest tur",
+    "deletePlaceholder": "Scrie DELETE pentru confirmare",
+    "deleteHint": "Turul dispare din listă; datele rămân recuperabile (soft delete)."
   }
 }

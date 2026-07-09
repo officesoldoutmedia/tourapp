@@ -17,6 +17,7 @@ export default async function OrgDashboard({
     .select("id, name, start_date, end_date, is_archived")
     .eq("organization_id", org.id)
     .is("deleted_at", null)
+      .eq("is_archived", false)
     .order("start_date", { ascending: false });
 
   const active = (tours ?? []).filter((t) => !t.is_archived);
