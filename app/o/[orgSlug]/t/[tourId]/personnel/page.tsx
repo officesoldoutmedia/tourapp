@@ -115,18 +115,18 @@ export default async function PersonnelPage({
   const cell = "rounded border border-hairline px-2 py-1 text-sm";
   // layout fluid — câmpurile curg pe 2 rânduri, FĂRĂ scroll orizontal
   const COLS = [
-    ["last", t("last"), "w-28"],
-    ["first", t("first"), "w-28"],
-    ["role", t("role"), "w-28"],
-    ["title", t("jobTitle"), "w-24"],
-    ["company", t("company"), "w-28"],
-    ["phone", t("phone"), "w-32"],
-    ["email", t("email"), "w-44"],
-    ["party", t("party"), "w-14"],
+    ["last", t("last"), "w-24"],
+    ["first", t("first"), "w-24"],
+    ["role", t("role"), "w-27"],
+    ["title", t("jobTitle"), "w-20"],
+    ["company", t("company"), "w-24"],
+    ["phone", t("phone"), "w-30"],
+    ["email", t("email"), "w-36"],
+    ["party", t("party"), "w-13"],
   ] as const;
 
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-6 p-6">
+    <main className="w-full space-y-6 p-6">
       <header className="flex flex-wrap items-center justify-between gap-2">
         <h1 className="font-display text-xl font-semibold tracking-tight">
           {t("title")} <span className="font-normal text-tertiary">· {tour.name}</span>
@@ -163,17 +163,17 @@ export default async function PersonnelPage({
             className="flex flex-wrap items-center gap-1.5 border-b border-hairline px-3 py-2 last:border-0"
           >
             <input type="hidden" name="id" value={p.id} />
-            <input name="last" defaultValue={p.last_name ?? ""} placeholder={t("last")} title={t("last")} disabled={!canEdit} className={`${cell} w-28 font-medium`} />
-            <input name="first" defaultValue={p.first_name ?? ""} placeholder={t("first")} title={t("first")} disabled={!canEdit} className={`${cell} w-28`} />
-            <input name="role" defaultValue={p.role ?? ""} placeholder={t("role")} title={t("role")} disabled={!canEdit} className={`${cell} w-28`} />
-            <input name="title" defaultValue={p.title ?? ""} placeholder={t("jobTitle")} title={t("jobTitle")} disabled={!canEdit} className={`${cell} w-24`} />
-            <input name="company" defaultValue={p.company ?? ""} placeholder={t("company")} title={t("company")} disabled={!canEdit} className={`${cell} w-28`} />
-            <input name="phone" defaultValue={p.phones?.[0]?.number ?? ""} placeholder={t("phone")} title={t("phone")} disabled={!canEdit} className={`${cell} w-32 font-mono`} />
-            <input name="email" defaultValue={p.emails?.[0]?.email ?? ""} placeholder={t("email")} title={t("email")} disabled={!canEdit} className={`${cell} w-44 min-w-0 flex-1`} />
-            <input name="party" defaultValue={p.party ?? ""} placeholder={t("party")} title={t("party")} disabled={!canEdit} className={`${cell} w-14`} />
+            <input name="last" defaultValue={p.last_name ?? ""} placeholder={t("last")} title={t("last")} disabled={!canEdit} className={`${cell} w-24 font-medium`} />
+            <input name="first" defaultValue={p.first_name ?? ""} placeholder={t("first")} title={t("first")} disabled={!canEdit} className={`${cell} w-24`} />
+            <input name="role" defaultValue={p.role ?? ""} placeholder={t("role")} title={t("role")} disabled={!canEdit} className={`${cell} w-27`} />
+            <input name="title" defaultValue={p.title ?? ""} placeholder={t("jobTitle")} title={t("jobTitle")} disabled={!canEdit} className={`${cell} w-20`} />
+            <input name="company" defaultValue={p.company ?? ""} placeholder={t("company")} title={t("company")} disabled={!canEdit} className={`${cell} w-24`} />
+            <input name="phone" defaultValue={p.phones?.[0]?.number ?? ""} placeholder={t("phone")} title={t("phone")} disabled={!canEdit} className={`${cell} w-30 font-mono`} />
+            <input name="email" defaultValue={p.emails?.[0]?.email ?? ""} placeholder={t("email")} title={t("email")} disabled={!canEdit} className={`${cell} min-w-36 flex-1`} />
+            <input name="party" defaultValue={p.party ?? ""} placeholder={t("party")} title={t("party")} disabled={!canEdit} className={`${cell} w-13`} />
             {canSeeCosts && (
               <>
-                <input name="cost" type="number" step="0.01" defaultValue={p.cost_per_show ?? ""} placeholder={t("costPerShow")} title={t("costPerShow")} disabled={!canEdit} className={`${cell} w-24 text-right font-mono`} />
+                <input name="cost" type="number" step="0.01" defaultValue={p.cost_per_show ?? ""} placeholder={t("costPerShow")} title={t("costPerShow")} disabled={!canEdit} className={`${cell} w-20 text-right font-mono`} />
                 <select name="paymentType" defaultValue={p.payment_type ?? ""} title={t("paymentType")} disabled={!canEdit} className={cell}>
                   <option value="">—</option>
                   <option value="company">{t("company")}</option>
@@ -208,7 +208,7 @@ export default async function PersonnelPage({
             ))}
             {canSeeCosts && (
               <>
-                <input name="cost" type="number" step="0.01" placeholder={t("costPerShow")} title={t("costPerShow")} className={`${cell} w-24 text-right font-mono`} />
+                <input name="cost" type="number" step="0.01" placeholder={t("costPerShow")} title={t("costPerShow")} className={`${cell} w-20 text-right font-mono`} />
                 <select name="paymentType" defaultValue="" title={t("paymentType")} className={cell}>
                   <option value="">—</option>
                   <option value="company">{t("company")}</option>
