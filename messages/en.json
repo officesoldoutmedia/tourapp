@@ -623,6 +623,7 @@
     "profit": "PROFIT",
     "costSheetPdf": "Cost sheet PDF",
     "fxPlaceholder": "rate",
-    "fxMissing": "No rate set for: {currencies} — those amounts are NOT converted in the totals."
+    "fxMissing": "No rate set for: {currencies} — those amounts are NOT converted in the totals.",
+    "totalCosts": "TOTAL COSTS (booking + crew + extra)"
   }
 }

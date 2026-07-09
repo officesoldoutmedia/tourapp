@@ -372,6 +372,10 @@ export default async function ShowCostsPage({
             <dt className="text-secondary">{t("extraTotal")}</dt>
             <dd className="font-mono text-danger">−{formatMoney(result.extraTotal, currency)}</dd>
           </div>
+          <div className="flex justify-between border-t border-hairline pt-2 font-medium">
+            <dt className="text-secondary">{t("totalCosts")}</dt>
+            <dd className="font-mono">−{formatMoney(result.totalCosts, currency)}</dd>
+          </div>
           <div className="flex justify-between border-t border-hairline pt-2 text-base font-semibold">
             <dt>{t("profit")}</dt>
             <dd className={`font-mono ${result.profit < 0 ? "text-danger" : "text-success"}`}>

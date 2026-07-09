@@ -623,6 +623,7 @@
     "profit": "PROFIT",
     "costSheetPdf": "Fișă costuri PDF",
     "fxPlaceholder": "curs",
-    "fxMissing": "Fără curs setat pentru: {currencies} — sumele NU sunt convertite în total."
+    "fxMissing": "Fără curs setat pentru: {currencies} — sumele NU sunt convertite în total.",
+    "totalCosts": "TOTAL COSTURI (booking + crew + extra)"
   }
 }
