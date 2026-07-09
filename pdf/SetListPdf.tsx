@@ -10,6 +10,8 @@ import {
   View,
   renderToBuffer,
 } from "@react-pdf/renderer";
+import { ensurePdfFonts } from "./fonts";
+ensurePdfFonts();
 import { formatMmSs, setListTotals } from "@/lib/setlist";
 
 export interface SetListPdfData {
@@ -24,12 +26,12 @@ export interface SetListPdfData {
 }
 
 const styles = StyleSheet.create({
-  page: { padding: 40, fontFamily: "Helvetica" },
+  page: { padding: 40, fontFamily: "Inter" },
   header: { fontSize: 14, color: "#555", marginBottom: 4 },
-  title: { fontSize: 22, fontFamily: "Helvetica-Bold", marginBottom: 20 },
+  title: { fontSize: 22, fontFamily: "Inter", fontWeight: 700, marginBottom: 20 },
   song: {
     fontSize: 26,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "Inter", fontWeight: 700,
     marginBottom: 10,
     flexDirection: "row",
     justifyContent: "space-between",

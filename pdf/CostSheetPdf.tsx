@@ -7,13 +7,15 @@ import {
   View,
   renderToBuffer,
 } from "@react-pdf/renderer";
+import { ensurePdfFonts } from "./fonts";
+ensurePdfFonts();
 import { formatMoney, type ShowCostLine } from "@/lib/showFinance";
 
 const styles = StyleSheet.create({
-  page: { padding: 44, fontFamily: "Helvetica", fontSize: 10 },
-  title: { fontSize: 16, fontFamily: "Helvetica-Bold" },
+  page: { padding: 44, fontFamily: "Inter", fontSize: 10 },
+  title: { fontSize: 16, fontFamily: "Inter", fontWeight: 700 },
   subtitle: { fontSize: 10, color: "#555", marginBottom: 16 },
-  section: { fontSize: 11, fontFamily: "Helvetica-Bold", marginTop: 14, marginBottom: 4 },
+  section: { fontSize: 11, fontFamily: "Inter", fontWeight: 700, marginTop: 14, marginBottom: 4 },
   row: {
     flexDirection: "row",
     justifyContent: "space-between",
@@ -32,7 +34,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: "#000",
     fontSize: 12,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "Inter", fontWeight: 700,
   },
 });
 

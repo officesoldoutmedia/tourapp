@@ -7,10 +7,12 @@ import {
   View,
   renderToBuffer,
 } from "@react-pdf/renderer";
+import { ensurePdfFonts } from "./fonts";
+ensurePdfFonts();
 
 const styles = StyleSheet.create({
-  page: { padding: 36, fontFamily: "Helvetica", fontSize: 9 },
-  title: { fontSize: 16, fontFamily: "Helvetica-Bold" },
+  page: { padding: 36, fontFamily: "Inter", fontSize: 9 },
+  title: { fontSize: 16, fontFamily: "Inter", fontWeight: 700 },
   subtitle: { fontSize: 10, color: "#555", marginBottom: 12 },
   headerRow: {
     flexDirection: "row",
@@ -18,7 +20,7 @@ const styles = StyleSheet.create({
     borderBottomColor: "#000",
     paddingBottom: 3,
     marginBottom: 3,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "Inter", fontWeight: 700,
   },
   row: {
     flexDirection: "row",
@@ -34,7 +36,7 @@ const styles = StyleSheet.create({
   cIn: { width: "12%" },
   cOut: { width: "12%" },
   cConf: { width: "8%" },
-  totals: { marginTop: 8, fontFamily: "Helvetica-Bold" },
+  totals: { marginTop: 8, fontFamily: "Inter", fontWeight: 700 },
 });
 
 interface RoomingInput {

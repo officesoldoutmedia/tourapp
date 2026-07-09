@@ -309,6 +309,26 @@ export default async function CrewProfilePage({
                     {t("issueDate")}
                     <input name="issueDate" type="date" defaultValue={new Date().toISOString().slice(0, 10)} className={`${input} block font-mono`} />
                   </label>
+                  <label className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+                    {t("annexLanguage")}
+                    <select name="language" defaultValue="ro" className={`${input} block`}>
+                      <option value="ro">Română</option>
+                      <option value="en">English</option>
+                    </select>
+                  </label>
+                  <label className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+                    {t("paymentCurrency")}
+                    <select name="paymentCurrency" defaultValue="" className={`${input} block font-mono`}>
+                      <option value="">{t("sameCurrency")}</option>
+                      {["RON", "EUR", "USD", "GBP"].map((c) => (
+                        <option key={c} value={c}>{c}</option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+                    {t("fxRate")}
+                    <input name="fxRate" type="number" step="0.0001" min="0" placeholder={t("fxRatePlaceholder")} className={`${input} block w-28 font-mono`} />
+                  </label>
                   <button className="rounded bg-accent hover:bg-accent-hover px-4 py-1.5 text-sm font-medium text-white">
                     <FileText size={14} strokeWidth={1.5} className="mr-1 inline" />
                     {t("createAnnex")}

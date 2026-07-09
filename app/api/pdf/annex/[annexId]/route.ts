@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { createServerSupabase } from "@/lib/supabase/server";
-import { buildAnnexPdf, type AnnexParty } from "@/pdf/AnnexPdf";
+import { buildAnnexPdf, type AnnexParty, type AnnexLanguage } from "@/pdf/AnnexPdf";
 
 /** PDF-ul anexei de plată — RLS: doar admin/accounting. */
 export async function GET(
@@ -31,9 +31,15 @@ export async function GET(
         venues: { name: string } | null;
         days: { date: string };
       };
+      // jobul prestat = ce e după "—" în eticheta liniei de cost
+      // (ex. "Petre Zola — Advancing" → "Advancing")
+      const service = line.label.includes("—")
+        ? line.label.split("—").slice(1).join("—").trim() || null
+        : null;
       return {
         date: event.days.date,
         label: event.title ?? event.venues?.name ?? "Show",
+        service,
         amount: Number(line.amount),
       };
     })
@@ -44,6 +50,9 @@ export async function GET(
     contractNumber: annex.contract_number,
     issueDate: annex.issue_date,
     currency: annex.currency,
+    language: (annex.language ?? "ro") as AnnexLanguage,
+    paymentCurrency: annex.payment_currency,
+    fxRate: annex.fx_rate ? Number(annex.fx_rate) : null,
     payer: annex.payer as AnnexParty,
     payee: annex.payee as AnnexParty,
     shows,

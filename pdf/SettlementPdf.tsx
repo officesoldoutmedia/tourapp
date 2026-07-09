@@ -7,11 +7,13 @@ import {
   View,
   renderToBuffer,
 } from "@react-pdf/renderer";
+import { ensurePdfFonts } from "./fonts";
+ensurePdfFonts();
 import { computeSettlement } from "@/lib/settlement";
 
 const styles = StyleSheet.create({
-  page: { padding: 44, fontFamily: "Helvetica", fontSize: 10 },
-  title: { fontSize: 16, fontFamily: "Helvetica-Bold" },
+  page: { padding: 44, fontFamily: "Inter", fontSize: 10 },
+  title: { fontSize: 16, fontFamily: "Inter", fontWeight: 700 },
   subtitle: { fontSize: 10, color: "#555", marginBottom: 16 },
   row: {
     flexDirection: "row",
@@ -20,8 +22,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: "#eee",
   },
-  computed: { fontFamily: "Helvetica-Bold", backgroundColor: "#f2f2f2", paddingHorizontal: 4 },
-  due: { fontSize: 12, fontFamily: "Helvetica-Bold", marginTop: 8 },
+  computed: { fontFamily: "Inter", fontWeight: 700, backgroundColor: "#f2f2f2", paddingHorizontal: 4 },
+  due: { fontSize: 12, fontFamily: "Inter", fontWeight: 700, marginTop: 8 },
 });
 
 interface SettlementRecord {

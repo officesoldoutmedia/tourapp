@@ -7,18 +7,20 @@ import {
   View,
   renderToBuffer,
 } from "@react-pdf/renderer";
+import { ensurePdfFonts } from "./fonts";
+ensurePdfFonts();
 import type { DaySheetData } from "@/lib/daysheet";
 import { formatTimeInZone, formatDayHeader } from "@/lib/datetime";
 
 const styles = StyleSheet.create({
-  page: { padding: 36, fontFamily: "Helvetica", fontSize: 10 },
+  page: { padding: 36, fontFamily: "Inter", fontSize: 10 },
   tour: { fontSize: 10, color: "#666" },
-  title: { fontSize: 18, fontFamily: "Helvetica-Bold", marginBottom: 2 },
+  title: { fontSize: 18, fontFamily: "Inter", fontWeight: 700, marginBottom: 2 },
   subtitle: { fontSize: 11, color: "#444", marginBottom: 14 },
   section: { marginBottom: 10 },
   sectionTitle: {
     fontSize: 9,
-    fontFamily: "Helvetica-Bold",
+    fontFamily: "Inter", fontWeight: 700,
     color: "#888",
     textTransform: "uppercase",
     borderBottomWidth: 1,
@@ -27,7 +29,7 @@ const styles = StyleSheet.create({
     paddingBottom: 2,
   },
   row: { flexDirection: "row", marginBottom: 2 },
-  time: { width: 80, fontFamily: "Helvetica-Bold" },
+  time: { width: 80, fontFamily: "Inter", fontWeight: 700 },
   cell: { flex: 1 },
   note: { color: "#333", marginBottom: 2 },
   small: { fontSize: 8, color: "#666" },

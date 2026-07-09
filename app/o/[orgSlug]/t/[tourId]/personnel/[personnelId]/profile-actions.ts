@@ -131,6 +131,10 @@ export async function createAnnex(
         new Date().toISOString().slice(0, 10),
       currency: lines![0].currency,
       total,
+      language: String(formData.get("language") ?? "ro"),
+      payment_currency:
+        String(formData.get("paymentCurrency") ?? "").trim().toUpperCase() || null,
+      fx_rate: Number(formData.get("fxRate")) > 0 ? Number(formData.get("fxRate")) : null,
       payer,
       payee,
       created_by: user.id,
