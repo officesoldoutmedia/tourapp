@@ -621,6 +621,8 @@
     "crewTotal": "Total crew",
     "extraTotal": "Total extra",
     "profit": "PROFIT",
-    "costSheetPdf": "Fișă costuri PDF"
+    "costSheetPdf": "Fișă costuri PDF",
+    "fxPlaceholder": "curs",
+    "fxMissing": "Fără curs setat pentru: {currencies} — sumele NU sunt convertite în total."
   }
 }

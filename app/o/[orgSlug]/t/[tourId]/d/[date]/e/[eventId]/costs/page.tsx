@@ -5,7 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { Trash2, Printer } from "lucide-react";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
-import { computeShowProfit, formatMoney } from "@/lib/showFinance";
+import { computeShowProfit, convertCostLines, formatMoney } from "@/lib/showFinance";
 
 /**
  * Costuri & profit per show (cererea lui Ștefan): echipa SELECTATĂ per
@@ -66,6 +66,11 @@ export default async function ShowCostsPage({
       fee_currency: String(formData.get("currency") ?? "RON").trim().toUpperCase() || "RON",
       booking_percent:
         formData.get("bookingPercent") === "" ? null : Number(formData.get("bookingPercent")),
+      fx_rates: Object.fromEntries(
+        [...formData.entries()]
+          .filter(([k, v]) => k.startsWith("fx_") && Number(v) > 0)
+          .map(([k, v]) => [k.slice(3), Number(v)]),
+      ),
       updated_by: user.id,
     };
     await supabase.from("show_finances").upsert(row, { onConflict: "event_id" });
@@ -137,14 +142,24 @@ export default async function ShowCostsPage({
     revalidatePath(path);
   }
 
-  const result = computeShowProfit({
-    fee: Number(finance?.fee ?? 0),
-    bookingPercent: Number(bookingPercent),
-    costs: (costs ?? []).map((c) => ({
+  const fxRates = (finance?.fx_rates ?? {}) as Record<string, number>;
+  const conversion = convertCostLines(
+    (costs ?? []).map((c) => ({
       kind: c.kind as "crew" | "extra",
       label: c.label,
       amount: Number(c.amount),
+      currency: c.currency,
     })),
+    currency,
+    fxRates,
+  );
+  const foreignCurrencies = [
+    ...new Set((costs ?? []).map((c) => c.currency).filter((c) => c !== currency)),
+  ];
+  const result = computeShowProfit({
+    fee: Number(finance?.fee ?? 0),
+    bookingPercent: Number(bookingPercent),
+    costs: conversion.lines,
   });
 
   const input = "rounded border border-hairline px-2 py-1 text-sm";
@@ -204,10 +219,33 @@ export default async function ShowCostsPage({
             className={`${input} block w-36 font-mono`}
           />
         </label>
+        {foreignCurrencies.map((ccy) => (
+          <label key={ccy} className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+            1 {ccy} =
+            <span className="flex items-center gap-1">
+              <input
+                name={`fx_${ccy}`}
+                type="number"
+                step="0.0001"
+                min="0"
+                defaultValue={fxRates[ccy] ?? ""}
+                placeholder={t("fxPlaceholder")}
+                disabled={!canEdit}
+                className={`${input} block w-24 font-mono`}
+              />
+              <span className="font-mono text-tertiary">{currency}</span>
+            </span>
+          </label>
+        ))}
         {canEdit && (
           <button className="rounded bg-accent hover:bg-accent-hover px-4 py-1.5 text-sm font-medium text-white">
             {tc("save")}
           </button>
+        )}
+        {conversion.missing.length > 0 && (
+          <p className="w-full text-xs font-medium text-warning">
+            {t("fxMissing", { currencies: conversion.missing.join(", ") })}
+          </p>
         )}
       </form>
 
@@ -278,8 +316,13 @@ export default async function ShowCostsPage({
                   {paymentOptions}
                 </select>
                 <input name="amount" type="number" step="0.01" defaultValue={cost.amount} disabled={!canEdit} className={`${input} w-28 text-right font-mono`} />
-                <span className={`w-10 font-mono text-xs ${cost.currency !== currency ? "font-semibold text-warning" : "text-tertiary"}`}>
+                <span className={`font-mono text-xs ${cost.currency !== currency && !fxRates[cost.currency] ? "font-semibold text-warning" : "text-tertiary"}`}>
                   {cost.currency}
+                  {cost.currency !== currency && fxRates[cost.currency] > 0 && (
+                    <span className="ml-1 text-tertiary">
+                      ≈ {formatMoney(Math.round(Number(cost.amount) * fxRates[cost.currency] * 100) / 100, currency)}
+                    </span>
+                  )}
                 </span>
                 {canEdit && (
                   <>

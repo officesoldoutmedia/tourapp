@@ -52,3 +52,31 @@ export function formatMoney(amount: number, currency: string): string {
     maximumFractionDigits: 2,
   })} ${currency}`;
 }
+
+export interface RawCostLine extends ShowCostLine {
+  currency: string;
+}
+
+/**
+ * Convertește liniile în moneda show-ului cu cursuri setate manual
+ * ({"EUR": 5.05} = 1 EUR în moneda show-ului). Liniile fără curs rămân
+ * neconvertite și sunt raportate în `missing`.
+ */
+export function convertCostLines(
+  lines: RawCostLine[],
+  showCurrency: string,
+  rates: Record<string, number>,
+): { lines: ShowCostLine[]; missing: string[] } {
+  const round = (n: number) => Math.round(n * 100) / 100;
+  const missing = new Set<string>();
+  const converted = lines.map((line) => {
+    if (line.currency === showCurrency) return line;
+    const rate = rates[line.currency];
+    if (!rate || rate <= 0) {
+      missing.add(line.currency);
+      return line;
+    }
+    return { ...line, amount: round(line.amount * rate) };
+  });
+  return { lines: converted, missing: [...missing] };
+}

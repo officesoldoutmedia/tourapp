@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { computeShowProfit } from "./showFinance";
+import { computeShowProfit, convertCostLines } from "./showFinance";
 
 describe("computeShowProfit", () => {
   it("scade booking-ul, crew-ul și extra din fee", () => {
@@ -42,5 +42,31 @@ describe("computeShowProfit", () => {
       costs: [{ kind: "crew", label: "band", amount: 2000 }],
     });
     expect(r.profit).toBe(-1100);
+  });
+});
+
+describe("convertCostLines", () => {
+  it("convertește cu cursul manual și lasă moneda show-ului neatinsă", () => {
+    const r = convertCostLines(
+      [
+        { kind: "crew", label: "TM", amount: 500, currency: "EUR" },
+        { kind: "extra", label: "Diurnă", amount: 1000, currency: "RON" },
+      ],
+      "RON",
+      { EUR: 5.05 },
+    );
+    expect(r.lines[0].amount).toBe(2525);
+    expect(r.lines[1].amount).toBe(1000);
+    expect(r.missing).toEqual([]);
+  });
+
+  it("raportează monedele fără curs setat", () => {
+    const r = convertCostLines(
+      [{ kind: "crew", label: "x", amount: 100, currency: "USD" }],
+      "RON",
+      {},
+    );
+    expect(r.missing).toEqual(["USD"]);
+    expect(r.lines[0].amount).toBe(100); // neconvertit
   });
 });

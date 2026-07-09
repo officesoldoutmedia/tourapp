@@ -38,6 +38,8 @@ const styles = StyleSheet.create({
 
 export interface CostSheetLine extends ShowCostLine {
   paymentType: string | null; // 'company' | 'individual'
+  originalAmount?: number;
+  originalCurrency?: string;
 }
 
 export async function buildCostSheetPdf(input: {
@@ -68,7 +70,12 @@ export async function buildCostSheetPdf(input: {
             <Text style={styles.section}>Crew</Text>
             {crew.map((line, i) => (
               <View key={i} style={styles.row}>
-                <Text style={styles.label}>{line.label}</Text>
+                <Text style={styles.label}>
+                  {line.label}
+                  {line.originalCurrency && line.originalCurrency !== input.currency
+                    ? `  (${formatMoney(line.originalAmount ?? 0, line.originalCurrency)})`
+                    : ""}
+                </Text>
                 <Text style={styles.meta}>{paymentLabel(line.paymentType)}</Text>
                 <Text style={styles.amount}>{formatMoney(line.amount, input.currency)}</Text>
               </View>
@@ -81,7 +88,12 @@ export async function buildCostSheetPdf(input: {
             <Text style={styles.section}>Other costs</Text>
             {extra.map((line, i) => (
               <View key={i} style={styles.row}>
-                <Text style={styles.label}>{line.label}</Text>
+                <Text style={styles.label}>
+                  {line.label}
+                  {line.originalCurrency && line.originalCurrency !== input.currency
+                    ? `  (${formatMoney(line.originalAmount ?? 0, line.originalCurrency)})`
+                    : ""}
+                </Text>
                 <Text style={styles.meta}>{paymentLabel(line.paymentType)}</Text>
                 <Text style={styles.amount}>{formatMoney(line.amount, input.currency)}</Text>
               </View>

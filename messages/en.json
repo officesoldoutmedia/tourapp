@@ -621,6 +621,8 @@
     "crewTotal": "Crew total",
     "extraTotal": "Extra total",
     "profit": "PROFIT",
-    "costSheetPdf": "Cost sheet PDF"
+    "costSheetPdf": "Cost sheet PDF",
+    "fxPlaceholder": "rate",
+    "fxMissing": "No rate set for: {currencies} — those amounts are NOT converted in the totals."
   }
 }
