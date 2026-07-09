@@ -20,9 +20,18 @@ import {
   type AttachmentData,
   type TaskData,
 } from "./extras-client";
-import { formatTimeInZone, dayInstant } from "@/lib/datetime";
+import { formatTimeInZone, dayInstant, dayKeyInZone } from "@/lib/datetime";
 import { TimeRail, type RailBlock } from "@/components/TimeRail";
-import { WeatherCard, MapCard, type MapPinLink } from "@/components/DayDashboardCards";
+import {
+  WeatherCard,
+  MapCard,
+  VenuesCard,
+  HotelsCard,
+  KeyContactsCard,
+  type MapPinLink,
+  type VenueCardData,
+  type HotelCardData,
+} from "@/components/DayDashboardCards";
 import { getWeather } from "@/lib/weather";
 import { isGoogleEnabled, searchGooglePlaces } from "@/lib/googlePlaces";
 
@@ -69,7 +78,7 @@ export default async function DayPage({
       .order("name"),
     supabase
       .from("events")
-      .select("id, title, venues(name)")
+      .select("id, title, venues(name, address_line1, city, postal_code, country, urls, phones)")
       .eq("day_id", day.id)
       .is("deleted_at", null)
       .order("created_at"),
@@ -303,10 +312,60 @@ export default async function DayPage({
       }
     }
   }
+  const todayKey = dayKeyInZone(new Date(), tz);
+  const weatherStart = addDaysIso(todayKey, -1);
   const weather =
     dayLat !== null && dayLng !== null
-      ? await getWeather(dayLat, dayLng, date, tz).catch(() => null)
+      ? await getWeather(dayLat, dayLng, weatherStart, tz, 4).catch(() => null)
       : null;
+  const weatherHighlight =
+    weather?.some((w) => w.date === date) ? date : todayKey;
+
+  // cardurile Venues / Hotels / Key contacts (dashboard MT)
+  type VenueJoin = {
+    name: string;
+    address_line1: string | null;
+    city: string | null;
+    postal_code: string | null;
+    country: string | null;
+    urls: { url?: string }[] | string[] | null;
+    phones: { number?: string }[] | null;
+  } | null;
+  const venueCards: VenueCardData[] = (events ?? []).flatMap((e) => {
+    const v = e.venues as unknown as VenueJoin;
+    if (!v) return [];
+    const firstUrl = Array.isArray(v.urls)
+      ? typeof v.urls[0] === "string"
+        ? (v.urls[0] as string)
+        : ((v.urls[0] as { url?: string } | undefined)?.url ?? null)
+      : null;
+    return [{
+      eventHref: `/o/${orgSlug}/t/${tourId}/d/${date}/e/${e.id}`,
+      name: v.name,
+      address: [v.address_line1, v.city, v.postal_code, v.country].filter(Boolean).join(", "),
+      url: firstUrl,
+    }];
+  });
+  const hotelCards: HotelCardData[] = hotelData.map((h) => ({
+    name: h.name,
+    address: [
+      (h as { address_line1?: string | null }).address_line1,
+      h.city,
+      (h as { country?: string | null }).country,
+    ].filter(Boolean).join(", "),
+    phone: ((h as { phones?: { number?: string }[] }).phones ?? [])[0]?.number ?? null,
+  }));
+  const { data: contactValues } = (events ?? []).length
+    ? await supabase
+        .from("event_field_values")
+        .select("value")
+        .in("event_id", (events ?? []).map((e) => e.id))
+        .eq("field_key", "venue_info.venue_contacts")
+    : { data: [] as { value: string | null }[] };
+  const keyContactsText = (contactValues ?? [])
+    .map((r) => r.value ?? "")
+    .filter(Boolean)
+    .join("\n");
 
   const firstTimed = (items ?? [])
     .filter((i) => i.start_at)
@@ -359,13 +418,27 @@ export default async function DayPage({
       {(weather || dayLat !== null) && (
         <div className="grid gap-4 md:grid-cols-2">
           {weather && (
-            <WeatherCard days={weather} todayLabel={t("today")} tomorrowLabel={t("tomorrow")} />
+            <WeatherCard
+              days={weather}
+              highlight={weatherHighlight}
+              tz={tz}
+              locale={locale}
+              locationLabel={day.city ?? ""}
+            />
           )}
           {dayLat !== null && dayLng !== null && (
             <MapCard lat={dayLat} lng={dayLng} pins={mapPins} />
           )}
         </div>
       )}
+
+      {(venueCards.length > 0 || hotelCards.length > 0) && (
+        <div className="grid gap-4 md:grid-cols-2">
+          <VenuesCard venues={venueCards} />
+          <HotelsCard hotels={hotelCards} />
+        </div>
+      )}
+      <KeyContactsCard text={keyContactsText} />
 
       <div id="notes" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
         <NotesSection

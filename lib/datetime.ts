@@ -51,7 +51,7 @@ export function isPlusOne(startAt: Date, endAt: Date, tz: string): boolean {
   return dayKeyInZone(startAt, tz) !== dayKeyInZone(endAt, tz)
 }
 
-function dayKeyInZone(instant: Date, tz: string): string {
+export function dayKeyInZone(instant: Date, tz: string): string {
   return new Intl.DateTimeFormat('en-CA', {
     timeZone: tz,
     year: 'numeric',

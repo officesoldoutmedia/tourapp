@@ -28,13 +28,14 @@ export async function getWeather(
   lng: number,
   date: string,
   tz: string,
+  days = 2,
 ): Promise<WeatherDay[] | null> {
   const url =
     "https://api.open-meteo.com/v1/forecast" +
     `?latitude=${lat}&longitude=${lng}` +
     "&daily=temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max,sunrise,sunset,weather_code" +
     `&timezone=${encodeURIComponent(tz)}` +
-    `&start_date=${date}&end_date=${addDaysIso(date, 1)}`;
+    `&start_date=${date}&end_date=${addDaysIso(date, days - 1)}`;
 
   const response = await fetch(url, { next: { revalidate: 3600 } });
   if (!response.ok) return null;

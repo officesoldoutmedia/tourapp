@@ -18,6 +18,8 @@ import {
   Hotel,
 } from "lucide-react";
 import { weatherGroup, type WeatherDay } from "@/lib/weather";
+import { LocalClock } from "@/components/LocalClock";
+import { Star, Hotel as HotelIcon, Phone, Mail, Globe, Users } from "lucide-react";
 
 const WEATHER_ICON = {
   sun: Sun,
@@ -31,62 +33,180 @@ const WEATHER_ICON = {
 
 export function WeatherCard({
   days,
-  todayLabel,
-  tomorrowLabel,
+  highlight,
+  tz,
+  locale,
+  locationLabel,
 }: {
   days: WeatherDay[];
-  todayLabel: string;
-  tomorrowLabel: string;
+  highlight: string; // ziua evidențiată (show day sau azi)
+  tz: string;
+  locale: string;
+  locationLabel: string;
 }) {
   return (
     <div className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
-      <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">Weather</h2>
-      <div className="grid grid-cols-2 gap-4">
-        {days.slice(0, 2).map((day, i) => {
+      <div className="mb-3 flex flex-wrap items-baseline justify-between gap-2">
+        <h2 className="font-display text-lg font-semibold tracking-tight">
+          {locationLabel} <span className="font-normal text-tertiary">local time</span>
+        </h2>
+        <LocalClock tz={tz} locale={locale} />
+      </div>
+      <div className="grid grid-cols-4 gap-2">
+        {days.slice(0, 4).map((day) => {
           const Icon = WEATHER_ICON[weatherGroup(day.code)];
-          const isFirst = i === 0;
+          const isHl = day.date === highlight;
+          const weekday = new Intl.DateTimeFormat(locale, {
+            weekday: "short",
+            timeZone: "UTC",
+          }).format(new Date(`${day.date}T00:00:00Z`));
           return (
-            <div key={day.date} className={isFirst ? "" : "opacity-80"}>
-              <p className="text-xs font-medium uppercase tracking-wider text-tertiary">
-                {isFirst ? todayLabel : tomorrowLabel}
+            <div
+              key={day.date}
+              className={`rounded-md px-2 py-2 text-center ${isHl ? "border border-accent-border bg-accent-subtle/40" : ""}`}
+            >
+              <p className="text-[11px] font-semibold uppercase tracking-wider text-tertiary">
+                {weekday}
               </p>
-              <p className="mt-1 flex items-center gap-2">
-                <Icon
-                  size={28}
-                  strokeWidth={1.5}
-                  className={isFirst ? "text-accent" : "text-secondary"}
-                />
-                <span className="font-mono text-xl font-medium">
-                  {day.tMax}°
-                  <span className="ml-1 text-sm text-tertiary">{day.tMin}°</span>
-                </span>
+              <Icon
+                size={26}
+                strokeWidth={1.5}
+                className={`mx-auto mt-1 ${isHl ? "text-accent" : "text-secondary"}`}
+              />
+              <p className="mt-1 font-mono text-sm font-medium">
+                {day.tMax}°<span className="text-tertiary">/{day.tMin}°</span>
               </p>
-              <ul className="mt-2 space-y-1 text-xs text-secondary">
+              <ul className="mt-1 space-y-0.5 text-[11px] text-secondary">
                 {day.precipProb != null && (
-                  <li className="flex items-center gap-1.5">
-                    <Droplets size={13} strokeWidth={1.5} className="text-tertiary" />
+                  <li className="flex items-center justify-center gap-1">
+                    <Droplets size={11} strokeWidth={1.5} className="text-tertiary" />
                     <span className="font-mono">{day.precipProb}%</span>
                   </li>
                 )}
-                <li className="flex items-center gap-1.5">
-                  <Wind size={13} strokeWidth={1.5} className="text-tertiary" />
-                  <span className="font-mono">{day.windMax} km/h</span>
+                <li className="flex items-center justify-center gap-1">
+                  <Wind size={11} strokeWidth={1.5} className="text-tertiary" />
+                  <span className="font-mono">{day.windMax}</span>
                 </li>
-                <li className="flex items-center gap-3">
-                  <span className="flex items-center gap-1.5">
-                    <Sunrise size={13} strokeWidth={1.5} className="text-tertiary" />
-                    <span className="font-mono">{day.sunrise}</span>
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Sunset size={13} strokeWidth={1.5} className="text-tertiary" />
-                    <span className="font-mono">{day.sunset}</span>
-                  </span>
+                <li className="flex items-center justify-center gap-1 font-mono text-tertiary">
+                  <Sunrise size={11} strokeWidth={1.5} />
+                  {day.sunrise}
+                </li>
+                <li className="flex items-center justify-center gap-1 font-mono text-tertiary">
+                  <Sunset size={11} strokeWidth={1.5} />
+                  {day.sunset}
                 </li>
               </ul>
             </div>
           );
         })}
       </div>
+    </div>
+  );
+}
+
+export interface VenueCardData {
+  eventHref: string;
+  name: string;
+  address: string;
+  url: string | null;
+}
+
+/** Cardul VENUES de pe dashboardul zilei (ca în Master Tour). */
+export function VenuesCard({ venues }: { venues: VenueCardData[] }) {
+  if (venues.length === 0) return null;
+  return (
+    <div className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <h2 className="mb-2 flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
+        <Star size={16} strokeWidth={1.5} className="text-accent" /> Venues
+      </h2>
+      <ul className="space-y-3">
+        {venues.map((v, i) => (
+          <li key={i} className="text-sm">
+            <a href={v.eventHref} className="font-medium hover:underline">
+              {v.name}
+            </a>
+            {v.address && <p className="text-secondary">{v.address}</p>}
+            {v.url && (
+              <a
+                href={v.url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-1 text-xs text-accent hover:underline"
+              >
+                <Globe size={11} strokeWidth={1.5} /> {v.url.replace(/^https?:\/\//, "")}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+export interface HotelCardData {
+  name: string;
+  address: string;
+  phone: string | null;
+}
+
+export function HotelsCard({ hotels }: { hotels: HotelCardData[] }) {
+  if (hotels.length === 0) return null;
+  return (
+    <div className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <h2 className="mb-2 flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
+        <HotelIcon size={16} strokeWidth={1.5} className="text-secondary" /> Hotels
+      </h2>
+      <ul className="space-y-3">
+        {hotels.map((h, i) => (
+          <li key={i} className="text-sm">
+            <p className="font-medium">{h.name}</p>
+            {h.address && <p className="text-secondary">{h.address}</p>}
+            {h.phone && (
+              <a
+                href={`tel:${h.phone.replace(/\s+/g, "")}`}
+                className="flex items-center gap-1 font-mono text-xs text-accent hover:underline"
+              >
+                <Phone size={11} strokeWidth={1.5} /> {h.phone}
+              </a>
+            )}
+          </li>
+        ))}
+      </ul>
+    </div>
+  );
+}
+
+/** KEY CONTACTS — valoarea câmpului venue_info.venue_contacts (text liber). */
+export function KeyContactsCard({ text }: { text: string }) {
+  if (!text.trim()) return null;
+  // liniile "Nume - Rol - telefon - email" devin rânduri; tel/email → linkuri
+  const lines = text.split(/\n+/).filter((l) => l.trim());
+  return (
+    <div className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <h2 className="mb-2 flex items-center gap-2 font-display text-lg font-semibold tracking-tight">
+        <Users size={16} strokeWidth={1.5} className="text-secondary" /> Key contacts
+      </h2>
+      <ul className="space-y-1.5 text-sm">
+        {lines.map((line, i) => {
+          const email = line.match(/[\w.+-]+@[\w.-]+\.\w+/)?.[0];
+          const phone = line.match(/\+?[\d][\d\s().-]{6,}\d/)?.[0];
+          return (
+            <li key={i} className="flex flex-wrap items-center gap-x-2">
+              <span>{line.replace(email ?? "", "").replace(phone ?? "", "").replace(/[-–,;·]+\s*$/, "").trim()}</span>
+              {phone && (
+                <a href={`tel:${phone.replace(/[\s().-]/g, "")}`} className="flex items-center gap-1 font-mono text-xs text-accent hover:underline">
+                  <Phone size={11} strokeWidth={1.5} /> {phone.trim()}
+                </a>
+              )}
+              {email && (
+                <a href={`mailto:${email}`} className="flex items-center gap-1 text-xs text-accent hover:underline">
+                  <Mail size={11} strokeWidth={1.5} /> {email}
+                </a>
+              )}
+            </li>
+          );
+        })}
+      </ul>
     </div>
   );
 }
