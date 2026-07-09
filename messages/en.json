@@ -694,7 +694,7 @@
     "annexNumber": "Annex no.",
     "issueDate": "Issue date",
     "createAnnex": "Create annex",
-    "createAnnexHint": "Check shows above (same currency). If payment happens in another currency (e.g. costs in EUR, paid in RON), pick the payment currency and the rate: 1 <cost currency> = X <payment currency>.",
+    "createAnnexHint": "Check shows above (same currency). If payment happens in another currency (e.g. costs in EUR, paid in RON), pick the payment currency and the rate: 1 unit of the cost currency = X in the payment currency.",
     "annexesTitle": "Issued annexes",
     "annexNr": "Annex {nr}",
     "toContract": "to contract {nr}",

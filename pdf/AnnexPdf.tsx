@@ -37,7 +37,6 @@ const styles = StyleSheet.create({
   fxNote: { marginTop: 6, fontSize: 9, color: "#555" },
   total: {
     flexDirection: "row",
-    justifyContent: "space-between",
     marginTop: 12,
     paddingTop: 8,
     borderTopWidth: 1,
@@ -45,6 +44,8 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: 700,
   },
+  totalLabel: { flex: 1 },
+  totalAmount: { width: 140, textAlign: "right" },
   signatures: { flexDirection: "row", gap: 48, marginTop: 56 },
   signBox: { flex: 1, textAlign: "center" },
   signLine: {
@@ -194,8 +195,10 @@ export async function buildAnnexPdf(input: {
         )}
 
         <View style={styles.total}>
-          <Text>{t.total}</Text>
-          <Text>{formatMoney(convert ? convert(total) : total, displayCurrency)}</Text>
+          <Text style={styles.totalLabel}>{t.total}</Text>
+          <Text style={styles.totalAmount}>
+            {formatMoney(convert ? convert(total) : total, displayCurrency)}
+          </Text>
         </View>
 
         {input.notes && (

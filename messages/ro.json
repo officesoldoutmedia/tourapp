@@ -694,7 +694,7 @@
     "annexNumber": "Nr. anexă",
     "issueDate": "Data emiterii",
     "createAnnex": "Creează anexa",
-    "createAnnexHint": "Bifează show-urile de sus (aceeași monedă). Dacă plata se face în altă monedă (ex. costuri în EUR, plată în RON), alege moneda plății și cursul: 1 <monedă costuri> = X <monedă plată>.",
+    "createAnnexHint": "Bifează show-urile de sus (aceeași monedă). Dacă plata se face în altă monedă (ex. costuri în EUR, plată în RON), alege moneda plății și cursul: 1 unitate din moneda costurilor = X în moneda plății.",
     "annexesTitle": "Anexe emise",
     "annexNr": "Anexa {nr}",
     "toContract": "la contractul {nr}",
