@@ -1,6 +1,8 @@
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { Users, ChevronRight } from "lucide-react";
 import { requireOrg } from "@/lib/org";
 import { hasMinPermission } from "@/lib/permissions";
 
@@ -112,6 +114,20 @@ export default async function TourSettingsPage({
           </div>
         ))}
       </div>
+
+      <Link
+        href={`/o/${orgSlug}/t/${tourId}/personnel`}
+        className="flex items-center justify-between rounded-lg border border-hairline bg-surface px-4 py-3 shadow-xs transition-colors hover:bg-subtle"
+      >
+        <span className="flex items-center gap-2.5 text-sm">
+          <Users size={18} strokeWidth={1.5} className="text-secondary" />
+          <span>
+            <span className="block font-medium">{t("crewLink")}</span>
+            <span className="text-xs text-secondary">{t("crewLinkHint")}</span>
+          </span>
+        </span>
+        <ChevronRight size={16} className="text-tertiary" />
+      </Link>
 
       <form action={saveBooking} className="space-y-2 rounded-lg border border-hairline bg-surface p-4 shadow-xs">
         <label className="block text-xs font-semibold uppercase tracking-wider text-secondary">

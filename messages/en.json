@@ -593,7 +593,9 @@
     "deletePlaceholder": "Type DELETE to confirm",
     "deleteHint": "The tour disappears from lists; data stays recoverable (soft delete).",
     "bookingPercent": "Booking commission (default, %)",
-    "bookingPercentHint": "Applied to each show's fee; can be overridden per show in Costs & profit."
+    "bookingPercentHint": "Applied to each show's fee; can be overridden per show in Costs & profit.",
+    "crewLink": "Tour crew (roles, costs, contacts)",
+    "crewLinkHint": "The full roster — per show you then pick who comes, in Costs & profit."
   },
   "showCosts": {
     "title": "Costs & profit",

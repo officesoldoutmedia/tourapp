@@ -593,7 +593,9 @@
     "deletePlaceholder": "Scrie DELETE pentru confirmare",
     "deleteHint": "Turul dispare din listă; datele rămân recuperabile (soft delete).",
     "bookingPercent": "Comision booking (default, %)",
-    "bookingPercentHint": "Se aplică la fee-ul fiecărui show; poate fi suprascris per show în Costuri & profit."
+    "bookingPercentHint": "Se aplică la fee-ul fiecărui show; poate fi suprascris per show în Costuri & profit.",
+    "crewLink": "Crew-ul turului (roluri, costuri, contacte)",
+    "crewLinkHint": "Tot crew-ul posibil — per show alegi apoi cine vine, în Costs & profit."
   },
   "showCosts": {
     "title": "Costuri & profit",
