@@ -113,19 +113,16 @@ export default async function PersonnelPage({
   };
 
   const cell = "rounded border border-hairline px-2 py-1 text-sm";
-  const grid = canSeeCosts
-    ? "grid-cols-[7rem_7rem_8rem_7rem_7rem_8rem_10rem_4rem_6rem_6rem_2rem]"
-    : "grid-cols-[7rem_7rem_8rem_7rem_7rem_8rem_10rem_4rem_2rem]";
-  const minW = canSeeCosts ? "min-w-[1100px]" : "min-w-[900px]";
+  // layout fluid — câmpurile curg pe 2 rânduri, FĂRĂ scroll orizontal
   const COLS = [
     ["last", t("last"), "w-28"],
     ["first", t("first"), "w-28"],
-    ["role", t("role"), "w-32"],
-    ["title", t("jobTitle"), "w-28"],
+    ["role", t("role"), "w-28"],
+    ["title", t("jobTitle"), "w-24"],
     ["company", t("company"), "w-28"],
     ["phone", t("phone"), "w-32"],
-    ["email", t("email"), "w-40"],
-    ["party", t("party"), "w-16"],
+    ["email", t("email"), "w-44"],
+    ["party", t("party"), "w-14"],
   ] as const;
 
   return (
@@ -154,58 +151,43 @@ export default async function PersonnelPage({
         )}
       </header>
 
-      <div className="overflow-x-auto rounded-lg border border-hairline bg-surface shadow-xs">
-        <div className={`grid ${minW} ${grid} gap-2 border-b border-hairline bg-subtle px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-secondary`}>
-          {COLS.map(([, label]) => (
-            <span key={label}>{label}</span>
-          ))}
-          {canSeeCosts && (
-            <>
-              <span>{t("costPerShow")}</span>
-              <span>{t("paymentType")}</span>
-            </>
-          )}
-          <span />
-        </div>
-
+      <div className="rounded-lg border border-hairline bg-surface shadow-xs">
         {(people ?? []).length === 0 && (
-          <p className="px-3 py-4 text-sm text-tertiary">{t("empty")}</p>
+          <p className="px-4 py-4 text-sm text-tertiary">{t("empty")}</p>
         )}
 
         {((people ?? []) as Person[]).map((p) => (
           <form
             key={p.id}
             action={savePerson}
-            className={`grid ${minW} ${grid} items-center gap-2 border-b border-hairline px-3 py-1.5 last:border-0`}
+            className="flex flex-wrap items-center gap-1.5 border-b border-hairline px-3 py-2 last:border-0"
           >
             <input type="hidden" name="id" value={p.id} />
-            <input name="last" defaultValue={p.last_name ?? ""} disabled={!canEdit} className={cell} />
-            <input name="first" defaultValue={p.first_name ?? ""} disabled={!canEdit} className={cell} />
-            <input name="role" defaultValue={p.role ?? ""} disabled={!canEdit} className={cell} />
-            <input name="title" defaultValue={p.title ?? ""} disabled={!canEdit} className={cell} />
-            <input name="company" defaultValue={p.company ?? ""} disabled={!canEdit} className={cell} />
-            <input name="phone" defaultValue={p.phones?.[0]?.number ?? ""} disabled={!canEdit} className={`${cell} font-mono`} />
-            <input name="email" defaultValue={p.emails?.[0]?.email ?? ""} disabled={!canEdit} className={cell} />
-            <input name="party" defaultValue={p.party ?? ""} disabled={!canEdit} className={cell} />
+            <input name="last" defaultValue={p.last_name ?? ""} placeholder={t("last")} title={t("last")} disabled={!canEdit} className={`${cell} w-28 font-medium`} />
+            <input name="first" defaultValue={p.first_name ?? ""} placeholder={t("first")} title={t("first")} disabled={!canEdit} className={`${cell} w-28`} />
+            <input name="role" defaultValue={p.role ?? ""} placeholder={t("role")} title={t("role")} disabled={!canEdit} className={`${cell} w-28`} />
+            <input name="title" defaultValue={p.title ?? ""} placeholder={t("jobTitle")} title={t("jobTitle")} disabled={!canEdit} className={`${cell} w-24`} />
+            <input name="company" defaultValue={p.company ?? ""} placeholder={t("company")} title={t("company")} disabled={!canEdit} className={`${cell} w-28`} />
+            <input name="phone" defaultValue={p.phones?.[0]?.number ?? ""} placeholder={t("phone")} title={t("phone")} disabled={!canEdit} className={`${cell} w-32 font-mono`} />
+            <input name="email" defaultValue={p.emails?.[0]?.email ?? ""} placeholder={t("email")} title={t("email")} disabled={!canEdit} className={`${cell} w-44 min-w-0 flex-1`} />
+            <input name="party" defaultValue={p.party ?? ""} placeholder={t("party")} title={t("party")} disabled={!canEdit} className={`${cell} w-14`} />
             {canSeeCosts && (
               <>
-                <input name="cost" type="number" step="0.01" defaultValue={p.cost_per_show ?? ""} disabled={!canEdit} className={`${cell} text-right font-mono`} />
-                <select name="paymentType" defaultValue={p.payment_type ?? ""} disabled={!canEdit} className={cell}>
+                <input name="cost" type="number" step="0.01" defaultValue={p.cost_per_show ?? ""} placeholder={t("costPerShow")} title={t("costPerShow")} disabled={!canEdit} className={`${cell} w-24 text-right font-mono`} />
+                <select name="paymentType" defaultValue={p.payment_type ?? ""} title={t("paymentType")} disabled={!canEdit} className={cell}>
                   <option value="">—</option>
                   <option value="company">{t("company")}</option>
                   <option value="individual">{t("individual")}</option>
                 </select>
               </>
             )}
-            {canEdit ? (
-              <span className="flex items-center gap-1">
+            {canEdit && (
+              <span className="ml-auto flex items-center gap-1">
                 <button title={tc("save")} className="rounded px-1.5 py-1 text-xs text-accent hover:bg-accent-subtle">✓</button>
                 <button formAction={removePerson} title={tc("delete")} className="rounded p-1 text-danger hover:bg-danger-subtle">
                   <Trash2 size={13} strokeWidth={1.5} />
                 </button>
               </span>
-            ) : (
-              <span />
             )}
           </form>
         ))}
@@ -213,28 +195,29 @@ export default async function PersonnelPage({
         {canEdit && (
           <form
             action={savePerson}
-            className={`grid ${minW} ${grid} items-center gap-2 bg-subtle/50 px-3 py-2`}
+            className="flex flex-wrap items-center gap-1.5 border-t border-hairline bg-subtle/50 px-3 py-2"
           >
-            {COLS.map(([name, label]) => (
+            {COLS.map(([name, label, width]) => (
               <input
                 key={name}
                 name={name}
                 placeholder={label}
-                className={`${cell} ${name === "phone" ? "font-mono" : ""}`}
+                title={label}
+                className={`${cell} ${width} ${name === "phone" ? "font-mono" : ""} ${name === "email" ? "min-w-0 flex-1" : ""}`}
               />
             ))}
             {canSeeCosts && (
               <>
-                <input name="cost" type="number" step="0.01" placeholder={t("costPerShow")} className={`${cell} text-right font-mono`} />
-                <select name="paymentType" defaultValue="" className={cell}>
+                <input name="cost" type="number" step="0.01" placeholder={t("costPerShow")} title={t("costPerShow")} className={`${cell} w-24 text-right font-mono`} />
+                <select name="paymentType" defaultValue="" title={t("paymentType")} className={cell}>
                   <option value="">—</option>
                   <option value="company">{t("company")}</option>
                   <option value="individual">{t("individual")}</option>
                 </select>
               </>
             )}
-            <button className="rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs font-medium text-white">
-              +
+            <button className="ml-auto rounded bg-accent hover:bg-accent-hover px-3 py-1 text-sm font-medium text-white">
+              + {tc("add")}
             </button>
           </form>
         )}

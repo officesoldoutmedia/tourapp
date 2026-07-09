@@ -8,7 +8,8 @@
     "error": "A apărut o eroare. Încearcă din nou.",
     "signOut": "Deconectare",
     "yes": "Da",
-    "no": "Nu"
+    "no": "Nu",
+    "add": "Adaugă"
   },
   "auth": {
     "email": "Email",
