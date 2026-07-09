@@ -630,5 +630,31 @@
     "baseGross": "Din fee-ul total",
     "ofNet": "din net",
     "ofGross": "din fee"
+  },
+  "tourDashboard": {
+    "title": "Privire de ansamblu",
+    "nextStop": "Următoarea oprire",
+    "fullRoute": "Ruta completă în Google Maps",
+    "eventsRemaining": "Show-uri rămase",
+    "outOfTotal": "din {total} în total",
+    "distanceRemaining": "Distanță rămasă",
+    "traveledSoFar": "parcurși {km} km din {total} km",
+    "upcoming": "Următoarele show-uri"
+  },
+  "tourFinances": {
+    "title": "Finanțe tur",
+    "empty": "Niciun show cu event creat încă.",
+    "date": "Data",
+    "show": "Show",
+    "fee": "Fee",
+    "costs": "Costuri",
+    "profit": "Profit",
+    "open": "Deschide",
+    "total": "TOTAL",
+    "fxMissing": "Curs valutar lipsă pe unele linii"
+  },
+  "tourCalendar": {
+    "title": "Calendar",
+    "showDay": "Show Day"
   }
 }

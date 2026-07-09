@@ -630,5 +630,31 @@
     "baseGross": "On total fee",
     "ofNet": "of net",
     "ofGross": "of fee"
+  },
+  "tourDashboard": {
+    "title": "Tour overview",
+    "nextStop": "Next stop",
+    "fullRoute": "Full route in Google Maps",
+    "eventsRemaining": "Events remaining",
+    "outOfTotal": "out of {total} total",
+    "distanceRemaining": "Distance remaining",
+    "traveledSoFar": "traveled {km} km of {total} km",
+    "upcoming": "Upcoming shows"
+  },
+  "tourFinances": {
+    "title": "Tour finances",
+    "empty": "No shows with events yet.",
+    "date": "Date",
+    "show": "Show",
+    "fee": "Fee",
+    "costs": "Costs",
+    "profit": "Profit",
+    "open": "Open",
+    "total": "TOTAL",
+    "fxMissing": "Missing FX rate on some lines"
+  },
+  "tourCalendar": {
+    "title": "Calendar",
+    "showDay": "Show Day"
   }
 }

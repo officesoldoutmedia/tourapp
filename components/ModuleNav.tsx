@@ -14,6 +14,9 @@ import {
   Ticket,
   Users,
   Settings,
+  Map,
+  CalendarDays,
+  Banknote,
 } from "lucide-react";
 
 const MODULES = [
@@ -29,9 +32,11 @@ const MODULES = [
 export function ModuleNav({
   tourBase,
   defaultDate,
+  canAccounting = false,
 }: {
   tourBase: string;
   defaultDate: string | null;
+  canAccounting?: boolean;
 }) {
   const pathname = usePathname();
   const onDayPage = /\/d\/\d{4}-\d{2}-\d{2}/.test(pathname);
@@ -54,6 +59,9 @@ export function ModuleNav({
         ))}
         {(
           [
+            ["dashboard", "Tour overview", Map],
+            ["calendar", "Calendar", CalendarDays],
+            ...(canAccounting ? ([["finances", "Finances", Banknote]] as const) : []),
             ["personnel", "Personnel", Users],
             ["passes", "Tour passes", Ticket],
             ["settings", "Tour settings", Settings],

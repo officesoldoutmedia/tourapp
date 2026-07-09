@@ -134,7 +134,6 @@ body {
 /* Cifrele sunt conținutul (§3.1): tot ce e mono → tabular */
 .font-mono {
   font-variant-numeric: tabular-nums;
-  font-size: 0.93em;
 }
 
 /* Focus vizibil pe tot ce e interactiv (§5, checklist) */

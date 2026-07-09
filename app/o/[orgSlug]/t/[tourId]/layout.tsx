@@ -2,6 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
+import { can } from "@/lib/permissions";
 import { aggregateAdvanceStatus, type AdvanceStatus } from "@/lib/advance";
 import { MiniCalendar } from "@/components/MiniCalendar";
 import { ModuleNav } from "@/components/ModuleNav";
@@ -24,7 +25,7 @@ export default async function TourLayout({
   params: Promise<{ orgSlug: string; tourId: string }>;
 }) {
   const { orgSlug, tourId } = await params;
-  const { supabase } = await requireOrg(orgSlug);
+  const { supabase, permission, tier } = await requireOrg(orgSlug);
   const locale = await getLocale();
 
   const [{ data: tour }, { data: days }] = await Promise.all([
@@ -82,7 +83,11 @@ export default async function TourLayout({
 
   return (
     <div className="flex min-h-0 flex-1">
-      <ModuleNav tourBase={`/o/${orgSlug}/t/${tourId}`} defaultDate={defaultDate} />
+      <ModuleNav
+        tourBase={`/o/${orgSlug}/t/${tourId}`}
+        defaultDate={defaultDate}
+        canAccounting={can({ tier, permission }, "view_accounting")}
+      />
       <div className="min-w-0 flex-1">{children}</div>
 
       {/* Sidebar zile — dreapta, mereu vizibil [A.2] */}
