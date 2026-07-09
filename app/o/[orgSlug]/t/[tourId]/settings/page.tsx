@@ -18,7 +18,7 @@ export default async function TourSettingsPage({
 
   const { data: tour } = await supabase
     .from("tours")
-    .select("id, name, is_archived, visible_on_mobile")
+    .select("id, name, is_archived, visible_on_mobile, booking_percent")
     .eq("id", tourId)
     .is("deleted_at", null)
     .maybeSingle();
@@ -33,6 +33,17 @@ export default async function TourSettingsPage({
     if (!name) return;
     await supabase.from("tours").update({ name }).eq("id", tourId);
     revalidatePath(`/o/${orgSlug}`, "layout");
+  }
+
+  async function saveBooking(formData: FormData) {
+    "use server";
+    const { supabase } = await requireOrg(orgSlug);
+    const raw = String(formData.get("bookingPercent") ?? "");
+    await supabase
+      .from("tours")
+      .update({ booking_percent: raw === "" ? null : Number(raw) })
+      .eq("id", tourId);
+    revalidatePath(path);
   }
 
   async function toggle(formData: FormData) {
@@ -101,6 +112,27 @@ export default async function TourSettingsPage({
           </div>
         ))}
       </div>
+
+      <form action={saveBooking} className="space-y-2 rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-secondary">
+          {t("bookingPercent")}
+        </label>
+        <p className="text-xs text-tertiary">{t("bookingPercentHint")}</p>
+        <div className="flex gap-2">
+          <input
+            name="bookingPercent"
+            type="number"
+            step="0.1"
+            min="0"
+            max="100"
+            defaultValue={tour.booking_percent ?? ""}
+            className="w-32 rounded border border-hairline px-3 py-2 font-mono text-sm"
+          />
+          <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
+            {tc("save")}
+          </button>
+        </div>
+      </form>
 
       <form
         action={removeTour}

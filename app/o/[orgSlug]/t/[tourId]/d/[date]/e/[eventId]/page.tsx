@@ -122,6 +122,14 @@ export default async function EventPage({
         <span className="flex gap-2">
           {can({ tier, permission }, "view_accounting") && (
             <Link
+              href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/costs`}
+              className="rounded-md border border-hairline bg-surface px-3 py-1.5 text-sm shadow-xs transition-colors hover:bg-subtle"
+            >
+              💸 Costs & profit
+            </Link>
+          )}
+          {can({ tier, permission }, "view_accounting") && (
+            <Link
               href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/accounting`}
               className="rounded border border-hairline px-3 py-1 text-xs font-medium"
             >

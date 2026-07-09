@@ -16,12 +16,13 @@ export default async function PersonnelPage({
   const t = await getTranslations("personnel");
   const tc = await getTranslations("common");
   const canEdit = can({ tier, permission }, "edit_tour_content");
+  const canSeeCosts = can({ tier, permission }, "view_accounting");
 
   const [{ data: tour }, { data: people }, { data: contacts }] = await Promise.all([
     supabase.from("tours").select("id, name").eq("id", tourId).is("deleted_at", null).maybeSingle(),
     supabase
       .from("tour_personnel")
-      .select("id, first_name, last_name, role, title, company, party, phones, emails")
+      .select("id, first_name, last_name, role, title, company, party, phones, emails, cost_per_show, payment_type")
       .eq("tour_id", tourId)
       .is("deleted_at", null)
       .order("last_name"),
@@ -53,6 +54,12 @@ export default async function PersonnelPage({
       emails: email ? [{ email }] : [],
     };
     if (!row.last_name && !row.first_name) return;
+    if (formData.has("cost")) {
+      Object.assign(row, {
+        cost_per_show: Number(formData.get("cost")) || null,
+        payment_type: String(formData.get("paymentType") ?? "") || null,
+      });
+    }
     if (id) await supabase.from("tour_personnel").update(row).eq("id", id);
     else await supabase.from("tour_personnel").insert({ ...row, tour_id: tourId });
     revalidatePath(path);
@@ -101,9 +108,15 @@ export default async function PersonnelPage({
     party: string | null;
     phones: { number?: string }[];
     emails: { email?: string }[];
+    cost_per_show: number | null;
+    payment_type: string | null;
   };
 
   const cell = "rounded border border-hairline px-2 py-1 text-sm";
+  const grid = canSeeCosts
+    ? "grid-cols-[7rem_7rem_8rem_7rem_7rem_8rem_10rem_4rem_6rem_6rem_2rem]"
+    : "grid-cols-[7rem_7rem_8rem_7rem_7rem_8rem_10rem_4rem_2rem]";
+  const minW = canSeeCosts ? "min-w-[1100px]" : "min-w-[900px]";
   const COLS = [
     ["last", t("last"), "w-28"],
     ["first", t("first"), "w-28"],
@@ -142,10 +155,16 @@ export default async function PersonnelPage({
       </header>
 
       <div className="overflow-x-auto rounded-lg border border-hairline bg-surface shadow-xs">
-        <div className="grid min-w-[900px] grid-cols-[7rem_7rem_8rem_7rem_7rem_8rem_10rem_4rem_2rem] gap-2 border-b border-hairline bg-subtle px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-secondary">
+        <div className={`grid ${minW} ${grid} gap-2 border-b border-hairline bg-subtle px-3 py-2 text-[11px] font-semibold uppercase tracking-wider text-secondary`}>
           {COLS.map(([, label]) => (
             <span key={label}>{label}</span>
           ))}
+          {canSeeCosts && (
+            <>
+              <span>{t("costPerShow")}</span>
+              <span>{t("paymentType")}</span>
+            </>
+          )}
           <span />
         </div>
 
@@ -157,7 +176,7 @@ export default async function PersonnelPage({
           <form
             key={p.id}
             action={savePerson}
-            className="grid min-w-[900px] grid-cols-[7rem_7rem_8rem_7rem_7rem_8rem_10rem_4rem_2rem] items-center gap-2 border-b border-hairline px-3 py-1.5 last:border-0"
+            className={`grid ${minW} ${grid} items-center gap-2 border-b border-hairline px-3 py-1.5 last:border-0`}
           >
             <input type="hidden" name="id" value={p.id} />
             <input name="last" defaultValue={p.last_name ?? ""} disabled={!canEdit} className={cell} />
@@ -168,6 +187,16 @@ export default async function PersonnelPage({
             <input name="phone" defaultValue={p.phones?.[0]?.number ?? ""} disabled={!canEdit} className={`${cell} font-mono`} />
             <input name="email" defaultValue={p.emails?.[0]?.email ?? ""} disabled={!canEdit} className={cell} />
             <input name="party" defaultValue={p.party ?? ""} disabled={!canEdit} className={cell} />
+            {canSeeCosts && (
+              <>
+                <input name="cost" type="number" step="0.01" defaultValue={p.cost_per_show ?? ""} disabled={!canEdit} className={`${cell} text-right font-mono`} />
+                <select name="paymentType" defaultValue={p.payment_type ?? ""} disabled={!canEdit} className={cell}>
+                  <option value="">—</option>
+                  <option value="company">{t("company")}</option>
+                  <option value="individual">{t("individual")}</option>
+                </select>
+              </>
+            )}
             {canEdit ? (
               <span className="flex items-center gap-1">
                 <button title={tc("save")} className="rounded px-1.5 py-1 text-xs text-accent hover:bg-accent-subtle">✓</button>
@@ -184,7 +213,7 @@ export default async function PersonnelPage({
         {canEdit && (
           <form
             action={savePerson}
-            className="grid min-w-[900px] grid-cols-[7rem_7rem_8rem_7rem_7rem_8rem_10rem_4rem_2rem] items-center gap-2 bg-subtle/50 px-3 py-2"
+            className={`grid ${minW} ${grid} items-center gap-2 bg-subtle/50 px-3 py-2`}
           >
             {COLS.map(([name, label]) => (
               <input
@@ -194,6 +223,16 @@ export default async function PersonnelPage({
                 className={`${cell} ${name === "phone" ? "font-mono" : ""}`}
               />
             ))}
+            {canSeeCosts && (
+              <>
+                <input name="cost" type="number" step="0.01" placeholder={t("costPerShow")} className={`${cell} text-right font-mono`} />
+                <select name="paymentType" defaultValue="" className={cell}>
+                  <option value="">—</option>
+                  <option value="company">{t("company")}</option>
+                  <option value="individual">{t("individual")}</option>
+                </select>
+              </>
+            )}
             <button className="rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs font-medium text-white">
               +
             </button>

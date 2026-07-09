@@ -579,7 +579,10 @@
     "email": "Email",
     "party": "Party",
     "empty": "No personnel yet — add the first row below.",
-    "addExistingContact": "Add existing contact…"
+    "addExistingContact": "Add existing contact…",
+    "costPerShow": "Cost/show",
+    "paymentType": "Payment",
+    "individual": "Individual"
   },
   "tourSettings": {
     "title": "Tour settings",
@@ -588,6 +591,32 @@
     "visibleMobile": "Visible to mobile users?",
     "deleteTitle": "Delete this tour",
     "deletePlaceholder": "Type DELETE to confirm",
-    "deleteHint": "The tour disappears from lists; data stays recoverable (soft delete)."
+    "deleteHint": "The tour disappears from lists; data stays recoverable (soft delete).",
+    "bookingPercent": "Booking commission (default, %)",
+    "bookingPercentHint": "Applied to each show's fee; can be overridden per show in Costs & profit."
+  },
+  "showCosts": {
+    "title": "Costs & profit",
+    "fee": "Show fee",
+    "currency": "Currency",
+    "bookingPercent": "Booking commission %",
+    "tourDefault": "tour default",
+    "crewTitle": "This show's crew",
+    "crewHint": "Pick who goes to this show — each person's cost lands on the sheet automatically.",
+    "noCrew": "No tour personnel yet.",
+    "goPersonnel": "Add in Personnel →",
+    "costsTitle": "Cost lines",
+    "noCosts": "No lines yet — select the crew or add an extra cost.",
+    "kindCrew": "crew",
+    "kindExtra": "extra",
+    "extraPlaceholder": "Extra cost (e.g. transport, hotel)",
+    "addExtra": "Add cost",
+    "company": "Company",
+    "individual": "Individual",
+    "bookingCommission": "Booking commission",
+    "crewTotal": "Crew total",
+    "extraTotal": "Extra total",
+    "profit": "PROFIT",
+    "costSheetPdf": "Cost sheet PDF"
   }
 }
