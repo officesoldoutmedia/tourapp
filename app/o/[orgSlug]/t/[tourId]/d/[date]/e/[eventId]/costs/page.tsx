@@ -36,7 +36,7 @@ export default async function ShowCostsPage({
       supabase.from("show_finances").select("*").eq("event_id", eventId).maybeSingle(),
       supabase
         .from("show_costs")
-        .select("id, kind, label, payment_type, amount, currency, personnel_id")
+        .select("id, kind, label, payment_type, amount, currency, personnel_id, billable_to_booker")
         .eq("event_id", eventId)
         .is("deleted_at", null)
         .order("kind")
@@ -126,6 +126,7 @@ export default async function ShowCostsPage({
       amount: Number(formData.get("amount")) || 0,
       currency: String(formData.get("costCurrency") ?? "RON") || "RON",
       payment_type: String(formData.get("paymentType") ?? "") || null,
+      billable_to_booker: formData.get("toBooker") === "on",
       updated_by: user.id,
     };
     if (!row.label) return;
@@ -151,6 +152,7 @@ export default async function ShowCostsPage({
       label: c.label,
       amount: Number(c.amount),
       currency: c.currency,
+      toBooker: c.billable_to_booker,
     })),
     currency,
     fxRates,
@@ -343,6 +345,19 @@ export default async function ShowCostsPage({
                     ≈ {formatMoney(Math.round(Number(cost.amount) * fxRates[cost.currency] * 100) / 100, currency)}
                   </span>
                 )}
+                <label
+                  title={t("toBookerHint")}
+                  className={`flex cursor-pointer items-center gap-1 rounded-full px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide ${cost.billable_to_booker ? "bg-accent-subtle text-accent" : "bg-inset text-tertiary"}`}
+                >
+                  <input
+                    type="checkbox"
+                    name="toBooker"
+                    defaultChecked={cost.billable_to_booker}
+                    disabled={!canEdit}
+                    className="accent-[var(--accent)]"
+                  />
+                  {t("toBooker")}
+                </label>
                 {canEdit && (
                   <>
                     <button title={tc("save")} className="rounded px-2 py-1 text-xs text-accent hover:bg-accent-subtle">✓</button>
@@ -366,6 +381,10 @@ export default async function ShowCostsPage({
             <select name="costCurrency" defaultValue={currency} className={`${input} font-mono`}>
               {currencyOptions}
             </select>
+            <label title={t("toBookerHint")} className="flex items-center gap-1 text-xs text-secondary">
+              <input type="checkbox" name="toBooker" defaultChecked className="accent-[var(--accent)]" />
+              {t("toBooker")}
+            </label>
             <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-sm font-medium text-white">
               + {t("addExtra")}
             </button>
@@ -379,6 +398,10 @@ export default async function ShowCostsPage({
           <div className="flex justify-between">
             <dt className="text-secondary">{t("fee")}</dt>
             <dd className="font-mono">{formatMoney(result.fee, currency)}</dd>
+          </div>
+          <div className="flex justify-between text-xs">
+            <dt className="text-tertiary">{t("bookerCosts")}</dt>
+            <dd className="font-mono text-tertiary">{formatMoney(result.bookerCostsTotal, currency)}</dd>
           </div>
           <div className="flex justify-between">
             <dt className="text-secondary">

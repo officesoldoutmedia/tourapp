@@ -97,3 +97,21 @@ describe("convertCostLines", () => {
     expect(r.lines[0].amount).toBe(100); // neconvertit
   });
 });
+
+describe("costuri care nu intră la booker", () => {
+  it("costul intern nu intră în baza net, dar scade profitul", () => {
+    // fee 5.000; către booker: crew 1.500 → net 3.500; 20% = 700
+    // editul extra 100 (intern) NU intră în net, dar scade profitul
+    const r = computeShowProfit({
+      fee: 5000,
+      bookingPercent: 20,
+      costs: [
+        { kind: "crew", label: "crew", amount: 1500, toBooker: true },
+        { kind: "extra", label: "Edit extra", amount: 100, toBooker: false },
+      ],
+    });
+    expect(r.bookerCostsTotal).toBe(1500);
+    expect(r.bookingFee).toBe(700);
+    expect(r.profit).toBe(5000 - 700 - 1500 - 100); // 2700
+  });
+});

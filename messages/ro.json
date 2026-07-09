@@ -629,7 +629,10 @@
     "baseNet": "După costuri (fee − costuri)",
     "baseGross": "Din fee-ul total",
     "ofNet": "din net",
-    "ofGross": "din fee"
+    "ofGross": "din fee",
+    "toBooker": "Booker",
+    "toBookerHint": "Bifat = intră în înțelegerea cu booking-ul: se scade din baza comisionului și apare pe fișa de costuri. Nebifat = cost intern, doar al tău.",
+    "bookerCosts": "din care costuri către booker"
   },
   "tourDashboard": {
     "title": "Privire de ansamblu",

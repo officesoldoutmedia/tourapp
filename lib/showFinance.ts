@@ -7,6 +7,8 @@ export interface ShowCostLine {
   kind: "crew" | "extra";
   label: string;
   amount: number;
+  /** intră în înțelegerea cu booking-ul (baza net + fișa de costuri) */
+  toBooker?: boolean;
 }
 
 export interface ShowProfitInput {
@@ -23,6 +25,7 @@ export interface ShowProfitResult {
   bookingFee: number;
   crewTotal: number;
   extraTotal: number;
+  bookerCostsTotal: number; // doar liniile care intră la booker
   totalCosts: number; // booking + crew + extra
   profit: number;
 }
@@ -35,10 +38,12 @@ export function computeShowProfit(input: ShowProfitInput): ShowProfitResult {
   const extraTotal = round(
     input.costs.filter((c) => c.kind === "extra").reduce((s, c) => s + c.amount, 0),
   );
+  // în baza NET intră DOAR costurile convenite cu booking-ul
+  const bookerCostsTotal = round(
+    input.costs.filter((c) => c.toBooker !== false).reduce((s, c) => s + c.amount, 0),
+  );
   const bookingBaseAmount =
-    (input.bookingBase ?? "net") === "net"
-      ? input.fee - crewTotal - extraTotal
-      : input.fee;
+    (input.bookingBase ?? "net") === "net" ? input.fee - bookerCostsTotal : input.fee;
   const bookingFee = round((Math.max(bookingBaseAmount, 0) * input.bookingPercent) / 100);
   const totalCosts = round(bookingFee + crewTotal + extraTotal);
   return {
@@ -47,6 +52,7 @@ export function computeShowProfit(input: ShowProfitInput): ShowProfitResult {
     bookingFee,
     crewTotal,
     extraTotal,
+    bookerCostsTotal,
     totalCosts,
     profit: round(input.fee - totalCosts),
   };

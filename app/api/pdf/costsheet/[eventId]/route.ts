@@ -14,7 +14,7 @@ export async function GET(
   const [{ data: costs }, { data: event }, { data: finance }] = await Promise.all([
     supabase
       .from("show_costs")
-      .select("kind, label, payment_type, amount, currency")
+      .select("kind, label, payment_type, amount, currency, billable_to_booker")
       .eq("event_id", eventId)
       .is("deleted_at", null)
       .order("kind")
@@ -33,9 +33,11 @@ export async function GET(
     date: string;
     tours: { name: string; organizations: { name: string } | null };
   };
-  const showCurrency = finance?.fee_currency ?? costs[0]?.currency ?? "RON";
+  // fișa merge la booking → conține DOAR costurile convenite cu ei
+  const bookerCosts = costs.filter((c) => c.billable_to_booker);
+  const showCurrency = finance?.fee_currency ?? bookerCosts[0]?.currency ?? "RON";
   const conversion = convertCostLines(
-    costs.map((c) => ({
+    bookerCosts.map((c) => ({
       kind: c.kind as CostSheetLine["kind"],
       label: c.label,
       amount: Number(c.amount),
@@ -53,9 +55,9 @@ export async function GET(
     currency: showCurrency,
     lines: conversion.lines.map((line, i) => ({
       ...line,
-      paymentType: costs[i].payment_type,
-      originalAmount: Number(costs[i].amount),
-      originalCurrency: costs[i].currency,
+      paymentType: bookerCosts[i].payment_type,
+      originalAmount: Number(bookerCosts[i].amount),
+      originalCurrency: bookerCosts[i].currency,
     })),
   });
   return new NextResponse(new Uint8Array(pdf), {

@@ -629,7 +629,10 @@
     "baseNet": "After costs (fee − costs)",
     "baseGross": "On total fee",
     "ofNet": "of net",
-    "ofGross": "of fee"
+    "ofGross": "of fee",
+    "toBooker": "Booker",
+    "toBookerHint": "Checked = part of the booking deal: deducted from the commission base and shown on the cost sheet. Unchecked = internal cost, yours only.",
+    "bookerCosts": "of which costs to booker"
   },
   "tourDashboard": {
     "title": "Tour overview",

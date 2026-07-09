@@ -56,7 +56,7 @@ export default async function TourFinancesPage({
     eventIds.length
       ? supabase
           .from("show_costs")
-          .select("event_id, kind, label, amount, currency")
+          .select("event_id, kind, label, amount, currency, billable_to_booker")
           .in("event_id", eventIds)
           .is("deleted_at", null)
       : { data: [] },
@@ -73,6 +73,7 @@ export default async function TourFinancesPage({
           label: c.label,
           amount: Number(c.amount),
           currency: c.currency,
+          toBooker: c.billable_to_booker,
         })),
       currency,
       (fin?.fx_rates ?? {}) as Record<string, number>,
