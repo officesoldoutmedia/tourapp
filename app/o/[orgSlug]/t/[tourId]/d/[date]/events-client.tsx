@@ -18,6 +18,7 @@ export function EventsSection({
   dayId,
   events,
   canEdit,
+  canAccounting = false,
 }: {
   orgSlug: string;
   tourId: string;
@@ -25,6 +26,7 @@ export function EventsSection({
   dayId: string;
   events: EventSummary[];
   canEdit: boolean;
+  canAccounting?: boolean;
 }) {
   const t = useTranslations("events");
   const tc = useTranslations("common");
@@ -72,16 +74,25 @@ export function EventsSection({
 
       <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
         {events.map((event) => (
-          <li key={event.id}>
+          <li key={event.id} className="flex items-center gap-2 px-3 py-2 hover:bg-subtle">
             <Link
               href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${event.id}`}
-              className="flex items-center justify-between px-3 py-2 hover:bg-subtle"
+              className="flex min-w-0 flex-1 items-center justify-between"
             >
               <span className="text-sm font-medium">
                 {event.title ?? event.venue_name ?? "—"}
               </span>
               <span className="text-xs text-secondary">{event.venue_name}</span>
             </Link>
+            {canAccounting && (
+              <Link
+                href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${event.id}/costs`}
+                title="Costs & profit"
+                className="shrink-0 rounded-md border border-hairline bg-surface px-2 py-1 text-xs shadow-xs transition-colors hover:bg-accent-subtle"
+              >
+                💸 P&L
+              </Link>
+            )}
           </li>
         ))}
       </ul>

@@ -74,9 +74,15 @@ export default async function TourLayout({
     });
   }
 
+  const allDates = (days ?? []).map((d) => d.date);
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const defaultDate = allDates.includes(todayKey)
+    ? todayKey
+    : (allDates.find((d) => d >= todayKey) ?? allDates.at(-1) ?? null);
+
   return (
     <div className="flex min-h-0 flex-1">
-      <ModuleNav tourBase={`/o/${orgSlug}/t/${tourId}`} />
+      <ModuleNav tourBase={`/o/${orgSlug}/t/${tourId}`} defaultDate={defaultDate} />
       <div className="min-w-0 flex-1">{children}</div>
 
       {/* Sidebar zile — dreapta, mereu vizibil [A.2] */}

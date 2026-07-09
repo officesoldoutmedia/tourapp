@@ -463,6 +463,7 @@ export default async function DayPage({
                 (e.venues as unknown as { name: string } | null)?.name ?? null,
             }))}
             canEdit={canEdit}
+            canAccounting={can({ tier, permission }, "view_accounting")}
           />
         </div>
       )}
