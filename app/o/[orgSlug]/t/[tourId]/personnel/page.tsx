@@ -3,7 +3,8 @@ import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
-import { Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Trash2, UserRound } from "lucide-react";
 
 /** Tour Personnel [C-S] — grid-ul MT: Last/First/Role/Title/Company/Phone/Email. */
 export default async function PersonnelPage({
@@ -193,6 +194,13 @@ export default async function PersonnelPage({
             )}
             {canEdit && (
               <span className="flex items-center gap-1">
+                <Link
+                  href={`/o/${orgSlug}/t/${tourId}/personnel/${p.id}`}
+                  title={t("profile")}
+                  className="rounded p-1 text-secondary hover:bg-accent-subtle hover:text-accent"
+                >
+                  <UserRound size={13} strokeWidth={1.5} />
+                </Link>
                 <button title={tc("save")} className="rounded px-1.5 py-1 text-xs text-accent hover:bg-accent-subtle">✓</button>
                 <button formAction={removePerson} title={tc("delete")} className="rounded p-1 text-danger hover:bg-danger-subtle">
                   <Trash2 size={13} strokeWidth={1.5} />

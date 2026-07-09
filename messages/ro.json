@@ -567,7 +567,14 @@
     "groupName": "Numele grupului",
     "noGroups": "Niciun grup. Grupurile se folosesc la visibility.",
     "inGroup": "Membri în grup",
-    "copyLink": "Copiază link"
+    "copyLink": "Copiază link",
+    "billingTitle": "Datele societății (pentru anexe)",
+    "billingHint": "Intră pe anexele de plată ca BENEFICIAR (plătitor).",
+    "billingName": "Denumire societate",
+    "billingAddress": "Adresă / sediu",
+    "billingBank": "Banca",
+    "billingRepresentative": "Reprezentant legal",
+    "billingSave": "Salvează"
   },
   "personnel": {
     "title": "Personal tur",
@@ -584,7 +591,8 @@
     "costPerShow": "Cost/show",
     "paymentType": "Plată",
     "individual": "Pers. fizică",
-    "currency": "Monedă"
+    "currency": "Monedă",
+    "profile": "Profil & plăți"
   },
   "tourSettings": {
     "title": "Setări tur",
@@ -659,5 +667,44 @@
   "tourCalendar": {
     "title": "Calendar",
     "showDay": "Show Day"
+  },
+  "crewProfile": {
+    "backToPersonnel": "Înapoi la Personnel",
+    "paid": "Plătit",
+    "pending": "De plătit",
+    "showsCount": "{count} show-uri în acest tur",
+    "billingTitle": "Date de plată (firmă / persoană fizică)",
+    "billingHint": "Datele astea intră pe anexe ca PRESTATOR, exact cum sunt completate aici la momentul emiterii.",
+    "paymentType": "Tip plată",
+    "company": "Firmă",
+    "individual": "Persoană fizică",
+    "companyName": "Denumire firmă",
+    "fullName": "Nume complet",
+    "idNumber": "CI / CNP",
+    "address": "Adresă",
+    "bank": "Banca",
+    "representative": "Reprezentant",
+    "contractNumber": "Nr. contract",
+    "save": "Salvează",
+    "showsTitle": "Show-uri & plăți",
+    "noShows": "Niciun show alocat încă — bifează-l în Costs & profit pe show.",
+    "unallocated": "nealocat",
+    "onAnnex": "Anexa {nr} · de plătit",
+    "paidAnnex": "Anexa {nr} · plătit",
+    "annexNumber": "Nr. anexă",
+    "issueDate": "Data emiterii",
+    "createAnnex": "Creează anexa",
+    "createAnnexHint": "Bifează show-urile de sus (aceeași monedă) — anexa se generează cu datele societății tale și ale prestatorului.",
+    "annexesTitle": "Anexe emise",
+    "annexNr": "Anexa {nr}",
+    "toContract": "la contractul {nr}",
+    "markPaid": "Marchează plătită",
+    "paidOn": "plătită {date}",
+    "deleteAnnex": "Șterge anexa (liniile redevin nealocate)",
+    "error_no_lines": "Bifează cel puțin un show pentru anexă.",
+    "error_mixed_currencies": "Show-urile bifate au monede diferite — fă câte o anexă per monedă.",
+    "error_already_annexed": "Unele linii sunt deja pe o anexă.",
+    "error_not_found": "Persoana nu a fost găsită.",
+    "error_insert_failed": "Nu am putut crea anexa (verifică numărul — poate există deja)."
   }
 }

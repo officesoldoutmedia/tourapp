@@ -33,6 +33,32 @@ export default async function OrgSettingsPage({
     revalidatePath(`/o/${orgSlug}/settings`);
   }
 
+  const billing = ((org.settings ?? {}) as { billing?: Record<string, string> }).billing ?? {};
+
+  async function saveBilling(formData: FormData) {
+    "use server";
+    const ctx = await requireOrg(orgSlug);
+    const keys = ["name", "cui", "reg_com", "address", "iban", "bank", "representative"];
+    const next = Object.fromEntries(
+      keys.map((k) => [k, String(formData.get(k) ?? "").trim()]).filter(([, v]) => v),
+    );
+    await ctx.supabase
+      .from("organizations")
+      .update({ settings: { ...ctx.org.settings, billing: next } })
+      .eq("id", ctx.org.id);
+    revalidatePath(`/o/${orgSlug}/settings`);
+  }
+
+  const BILLING_FIELDS: [string, string][] = [
+    ["name", t("billingName")],
+    ["cui", "CUI"],
+    ["reg_com", "Reg. Com."],
+    ["address", t("billingAddress")],
+    ["iban", "IBAN"],
+    ["bank", t("billingBank")],
+    ["representative", t("billingRepresentative")],
+  ];
+
   return (
     <main className="mx-auto w-full max-w-2xl space-y-6 p-6">
       <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
@@ -56,6 +82,28 @@ export default async function OrgSettingsPage({
           </Link>
         </li>
       </ul>
+
+      {canManageUsers && (
+        <section className="rounded-lg border border-hairline bg-surface shadow-xs p-4">
+          <h2 className="mb-1 font-display text-lg font-semibold tracking-tight">{t("billingTitle")}</h2>
+          <p className="mb-3 text-xs text-tertiary">{t("billingHint")}</p>
+          <form action={saveBilling} className="flex flex-wrap gap-2">
+            {BILLING_FIELDS.map(([key, label]) => (
+              <label key={key} className="min-w-44 flex-1 space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+                {label}
+                <input
+                  name={key}
+                  defaultValue={billing[key] ?? ""}
+                  className={`block w-full rounded border border-hairline px-2 py-1 text-sm ${key === "iban" || key === "cui" ? "font-mono" : ""}`}
+                />
+              </label>
+            ))}
+            <button className="self-end rounded bg-accent hover:bg-accent-hover px-4 py-1.5 text-sm font-medium text-white">
+              {t("billingSave")}
+            </button>
+          </form>
+        </section>
+      )}
 
       {canManageUsers && (
         <form action={toggleGlEmails} className="flex items-center justify-between rounded-lg border border-hairline bg-surface shadow-xs px-4 py-3">

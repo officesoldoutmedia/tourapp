@@ -567,7 +567,14 @@
     "groupName": "Group name",
     "noGroups": "No groups. Groups are used for visibility.",
     "inGroup": "Group members",
-    "copyLink": "Copy link"
+    "copyLink": "Copy link",
+    "billingTitle": "Company details (for annexes)",
+    "billingHint": "Used on payment annexes as the PAYER.",
+    "billingName": "Company name",
+    "billingAddress": "Address / HQ",
+    "billingBank": "Bank",
+    "billingRepresentative": "Legal representative",
+    "billingSave": "Save"
   },
   "personnel": {
     "title": "Tour personnel",
@@ -584,7 +591,8 @@
     "costPerShow": "Cost/show",
     "paymentType": "Payment",
     "individual": "Individual",
-    "currency": "Currency"
+    "currency": "Currency",
+    "profile": "Profile & payments"
   },
   "tourSettings": {
     "title": "Tour settings",
@@ -659,5 +667,44 @@
   "tourCalendar": {
     "title": "Calendar",
     "showDay": "Show Day"
+  },
+  "crewProfile": {
+    "backToPersonnel": "Back to Personnel",
+    "paid": "Paid",
+    "pending": "Pending",
+    "showsCount": "{count} shows on this tour",
+    "billingTitle": "Payment details (company / individual)",
+    "billingHint": "These details go on annexes as the PROVIDER, exactly as filled in at issue time.",
+    "paymentType": "Payment type",
+    "company": "Company",
+    "individual": "Individual",
+    "companyName": "Company name",
+    "fullName": "Full name",
+    "idNumber": "ID number",
+    "address": "Address",
+    "bank": "Bank",
+    "representative": "Representative",
+    "contractNumber": "Contract no.",
+    "save": "Save",
+    "showsTitle": "Shows & payments",
+    "noShows": "No shows allocated yet — check them in the show's Costs & profit.",
+    "unallocated": "unallocated",
+    "onAnnex": "Annex {nr} · pending",
+    "paidAnnex": "Annex {nr} · paid",
+    "annexNumber": "Annex no.",
+    "issueDate": "Issue date",
+    "createAnnex": "Create annex",
+    "createAnnexHint": "Check shows above (same currency) — the annex is generated with your company's and the provider's details.",
+    "annexesTitle": "Issued annexes",
+    "annexNr": "Annex {nr}",
+    "toContract": "to contract {nr}",
+    "markPaid": "Mark paid",
+    "paidOn": "paid {date}",
+    "deleteAnnex": "Delete annex (lines become unallocated)",
+    "error_no_lines": "Check at least one show for the annex.",
+    "error_mixed_currencies": "Selected shows have different currencies — create one annex per currency.",
+    "error_already_annexed": "Some lines are already on an annex.",
+    "error_not_found": "Person not found.",
+    "error_insert_failed": "Could not create the annex (check the number — it may already exist)."
   }
 }
