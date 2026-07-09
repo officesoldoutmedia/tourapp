@@ -7,6 +7,7 @@ describe("computeShowProfit", () => {
     const r = computeShowProfit({
       fee: 10_000,
       bookingPercent: 15,
+      bookingBase: "gross",
       costs: [
         { kind: "crew", label: "TM", amount: 1200 },
         { kind: "crew", label: "FOH", amount: 800 },
@@ -20,6 +21,30 @@ describe("computeShowProfit", () => {
     expect(r.profit).toBe(6000);
   });
 
+  it("default: comisionul se aplică DUPĂ costuri (net)", () => {
+    // fee 10.000 − costuri 4.000 = 6.000; 15% din 6.000 = 900 → profit 5.100
+    const r = computeShowProfit({
+      fee: 10_000,
+      bookingPercent: 15,
+      costs: [
+        { kind: "crew", label: "TM", amount: 3000 },
+        { kind: "extra", label: "Promo", amount: 1000 },
+      ],
+    });
+    expect(r.bookingFee).toBe(900);
+    expect(r.profit).toBe(5100);
+  });
+
+  it("baza net nu produce comision negativ când costurile > fee", () => {
+    const r = computeShowProfit({
+      fee: 1000,
+      bookingPercent: 10,
+      costs: [{ kind: "crew", label: "x", amount: 2000 }],
+    });
+    expect(r.bookingFee).toBe(0);
+    expect(r.profit).toBe(-1000);
+  });
+
   it("fără booking și fără costuri → profit = fee", () => {
     const r = computeShowProfit({ fee: 5000, bookingPercent: 0, costs: [] });
     expect(r.profit).toBe(5000);
@@ -29,16 +54,18 @@ describe("computeShowProfit", () => {
     const r = computeShowProfit({
       fee: 1000,
       bookingPercent: 12.345,
+      bookingBase: "gross",
       costs: [{ kind: "extra", label: "x", amount: 0.005 }],
     });
     expect(r.bookingFee).toBe(123.45);
     expect(r.profit).toBe(876.54);
   });
 
-  it("poate ieși pe minus (costuri > fee)", () => {
+  it("poate ieși pe minus (costuri > fee, bază gross)", () => {
     const r = computeShowProfit({
       fee: 1000,
       bookingPercent: 10,
+      bookingBase: "gross",
       costs: [{ kind: "crew", label: "band", amount: 2000 }],
     });
     expect(r.profit).toBe(-1100);

@@ -66,6 +66,7 @@ export default async function ShowCostsPage({
       fee_currency: String(formData.get("currency") ?? "RON").trim().toUpperCase() || "RON",
       booking_percent:
         formData.get("bookingPercent") === "" ? null : Number(formData.get("bookingPercent")),
+      booking_base: String(formData.get("bookingBase") ?? "net"),
       fx_rates: Object.fromEntries(
         [...formData.entries()]
           .filter(([k, v]) => k.startsWith("fx_") && Number(v) > 0)
@@ -156,9 +157,11 @@ export default async function ShowCostsPage({
   const foreignCurrencies = [
     ...new Set((costs ?? []).map((c) => c.currency).filter((c) => c !== currency)),
   ];
+  const bookingBase = (finance?.booking_base ?? "net") as "gross" | "net";
   const result = computeShowProfit({
     fee: Number(finance?.fee ?? 0),
     bookingPercent: Number(bookingPercent),
+    bookingBase,
     costs: conversion.lines,
   });
 
@@ -218,6 +221,13 @@ export default async function ShowCostsPage({
             disabled={!canEdit}
             className={`${input} block w-36 font-mono`}
           />
+        </label>
+        <label className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+          {t("bookingBase")}
+          <select name="bookingBase" defaultValue={bookingBase} disabled={!canEdit} className={`${input} block`}>
+            <option value="net">{t("baseNet")}</option>
+            <option value="gross">{t("baseGross")}</option>
+          </select>
         </label>
         {foreignCurrencies.map((ccy) => (
           <label key={ccy} className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
@@ -360,7 +370,8 @@ export default async function ShowCostsPage({
           </div>
           <div className="flex justify-between">
             <dt className="text-secondary">
-              {t("bookingCommission")} ({result.bookingPercent}%)
+              {t("bookingCommission")} ({result.bookingPercent}%
+              {bookingBase === "net" ? ` ${t("ofNet")}` : ` ${t("ofGross")}`})
             </dt>
             <dd className="font-mono text-danger">−{formatMoney(result.bookingFee, currency)}</dd>
           </div>

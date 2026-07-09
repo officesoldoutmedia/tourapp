@@ -12,6 +12,8 @@ export interface ShowCostLine {
 export interface ShowProfitInput {
   fee: number;
   bookingPercent: number; // 0–100
+  /** 'gross' = % din fee; 'net' = % din (fee − costuri) */
+  bookingBase?: "gross" | "net";
   costs: ShowCostLine[];
 }
 
@@ -27,13 +29,17 @@ export interface ShowProfitResult {
 
 export function computeShowProfit(input: ShowProfitInput): ShowProfitResult {
   const round = (n: number) => Math.round(n * 100) / 100;
-  const bookingFee = round((input.fee * input.bookingPercent) / 100);
   const crewTotal = round(
     input.costs.filter((c) => c.kind === "crew").reduce((s, c) => s + c.amount, 0),
   );
   const extraTotal = round(
     input.costs.filter((c) => c.kind === "extra").reduce((s, c) => s + c.amount, 0),
   );
+  const bookingBaseAmount =
+    (input.bookingBase ?? "net") === "net"
+      ? input.fee - crewTotal - extraTotal
+      : input.fee;
+  const bookingFee = round((Math.max(bookingBaseAmount, 0) * input.bookingPercent) / 100);
   const totalCosts = round(bookingFee + crewTotal + extraTotal);
   return {
     fee: input.fee,

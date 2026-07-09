@@ -624,6 +624,11 @@
     "costSheetPdf": "Fișă costuri PDF",
     "fxPlaceholder": "curs",
     "fxMissing": "Fără curs setat pentru: {currencies} — sumele NU sunt convertite în total.",
-    "totalCosts": "TOTAL COSTURI (booking + crew + extra)"
+    "totalCosts": "TOTAL COSTURI (booking + crew + extra)",
+    "bookingBase": "Baza comisionului",
+    "baseNet": "După costuri (fee − costuri)",
+    "baseGross": "Din fee-ul total",
+    "ofNet": "din net",
+    "ofGross": "din fee"
   }
 }

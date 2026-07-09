@@ -624,6 +624,11 @@
     "costSheetPdf": "Cost sheet PDF",
     "fxPlaceholder": "rate",
     "fxMissing": "No rate set for: {currencies} — those amounts are NOT converted in the totals.",
-    "totalCosts": "TOTAL COSTS (booking + crew + extra)"
+    "totalCosts": "TOTAL COSTS (booking + crew + extra)",
+    "bookingBase": "Commission base",
+    "baseNet": "After costs (fee − costs)",
+    "baseGross": "On total fee",
+    "ofNet": "of net",
+    "ofGross": "of fee"
   }
 }
