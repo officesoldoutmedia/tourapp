@@ -114,17 +114,20 @@ export default async function PersonnelPage({
     payment_type: string | null;
   };
 
-  const cell = "rounded border border-hairline px-2 py-1 text-sm";
-  // layout fluid — câmpurile curg pe 2 rânduri, FĂRĂ scroll orizontal
+  const cell = "w-full min-w-0 rounded border border-hairline px-2 py-1 text-sm";
+  // coloane PROPORȚIONALE (fr) — felii echilibrate, fără scroll orizontal
+  const grid = canSeeCosts
+    ? "grid-cols-[1fr_1fr_1.1fr_0.9fr_1.1fr_1.1fr_1.5fr_0.5fr_0.7fr_0.65fr_0.95fr_auto]"
+    : "grid-cols-[1fr_1fr_1.1fr_0.9fr_1.1fr_1.1fr_1.5fr_0.5fr_auto]";
   const COLS = [
-    ["last", t("last"), "w-24"],
-    ["first", t("first"), "w-24"],
-    ["role", t("role"), "w-27"],
-    ["title", t("jobTitle"), "w-20"],
-    ["company", t("company"), "w-24"],
-    ["phone", t("phone"), "w-30"],
-    ["email", t("email"), "w-36"],
-    ["party", t("party"), "w-13"],
+    ["last", t("last")],
+    ["first", t("first")],
+    ["role", t("role")],
+    ["title", t("jobTitle")],
+    ["company", t("company")],
+    ["phone", t("phone")],
+    ["email", t("email")],
+    ["party", t("party")],
   ] as const;
 
   return (
@@ -162,20 +165,20 @@ export default async function PersonnelPage({
           <form
             key={p.id}
             action={savePerson}
-            className="flex flex-wrap items-center gap-1.5 border-b border-hairline px-3 py-2 last:border-0"
+            className={`grid ${grid} items-center gap-1.5 border-b border-hairline px-3 py-2 last:border-0`}
           >
             <input type="hidden" name="id" value={p.id} />
-            <input name="last" defaultValue={p.last_name ?? ""} placeholder={t("last")} title={t("last")} disabled={!canEdit} className={`${cell} w-24 font-medium`} />
-            <input name="first" defaultValue={p.first_name ?? ""} placeholder={t("first")} title={t("first")} disabled={!canEdit} className={`${cell} w-24`} />
-            <input name="role" defaultValue={p.role ?? ""} placeholder={t("role")} title={t("role")} disabled={!canEdit} className={`${cell} w-27`} />
-            <input name="title" defaultValue={p.title ?? ""} placeholder={t("jobTitle")} title={t("jobTitle")} disabled={!canEdit} className={`${cell} w-20`} />
-            <input name="company" defaultValue={p.company ?? ""} placeholder={t("company")} title={t("company")} disabled={!canEdit} className={`${cell} w-24`} />
+            <input name="last" defaultValue={p.last_name ?? ""} placeholder={t("last")} title={t("last")} disabled={!canEdit} className={`${cell} font-medium`} />
+            <input name="first" defaultValue={p.first_name ?? ""} placeholder={t("first")} title={t("first")} disabled={!canEdit} className={cell} />
+            <input name="role" defaultValue={p.role ?? ""} placeholder={t("role")} title={t("role")} disabled={!canEdit} className={cell} />
+            <input name="title" defaultValue={p.title ?? ""} placeholder={t("jobTitle")} title={t("jobTitle")} disabled={!canEdit} className={cell} />
+            <input name="company" defaultValue={p.company ?? ""} placeholder={t("company")} title={t("company")} disabled={!canEdit} className={cell} />
             <input name="phone" defaultValue={p.phones?.[0]?.number ?? ""} placeholder={t("phone")} title={t("phone")} disabled={!canEdit} className={`${cell} w-30 font-mono`} />
-            <input name="email" defaultValue={p.emails?.[0]?.email ?? ""} placeholder={t("email")} title={t("email")} disabled={!canEdit} className={`${cell} min-w-36 flex-1`} />
-            <input name="party" defaultValue={p.party ?? ""} placeholder={t("party")} title={t("party")} disabled={!canEdit} className={`${cell} w-13`} />
+            <input name="email" defaultValue={p.emails?.[0]?.email ?? ""} placeholder={t("email")} title={t("email")} disabled={!canEdit} className={cell} />
+            <input name="party" defaultValue={p.party ?? ""} placeholder={t("party")} title={t("party")} disabled={!canEdit} className={cell} />
             {canSeeCosts && (
               <>
-                <input name="cost" type="number" step="0.01" defaultValue={p.cost_per_show ?? ""} placeholder={t("costPerShow")} title={t("costPerShow")} disabled={!canEdit} className={`${cell} w-20 text-right font-mono`} />
+                <input name="cost" type="number" step="0.01" defaultValue={p.cost_per_show ?? ""} placeholder={t("costPerShow")} title={t("costPerShow")} disabled={!canEdit} className={`${cell} text-right font-mono`} />
                 <select name="costCurrency" defaultValue={p.cost_currency ?? "RON"} title={t("currency")} disabled={!canEdit} className={`${cell} font-mono`}>
                   {["RON", "EUR", "USD", "GBP"].map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -189,7 +192,7 @@ export default async function PersonnelPage({
               </>
             )}
             {canEdit && (
-              <span className="ml-auto flex items-center gap-1">
+              <span className="flex items-center gap-1">
                 <button title={tc("save")} className="rounded px-1.5 py-1 text-xs text-accent hover:bg-accent-subtle">✓</button>
                 <button formAction={removePerson} title={tc("delete")} className="rounded p-1 text-danger hover:bg-danger-subtle">
                   <Trash2 size={13} strokeWidth={1.5} />
@@ -202,20 +205,20 @@ export default async function PersonnelPage({
         {canEdit && (
           <form
             action={savePerson}
-            className="flex flex-wrap items-center gap-1.5 border-t border-hairline bg-subtle/50 px-3 py-2"
+            className={`grid ${grid} items-center gap-1.5 border-t border-hairline bg-subtle/50 px-3 py-2`}
           >
-            {COLS.map(([name, label, width]) => (
+            {COLS.map(([name, label]) => (
               <input
                 key={name}
                 name={name}
                 placeholder={label}
                 title={label}
-                className={`${cell} ${width} ${name === "phone" ? "font-mono" : ""} ${name === "email" ? "min-w-0 flex-1" : ""}`}
+                className={`${cell} ${name === "phone" ? "font-mono" : ""}`}
               />
             ))}
             {canSeeCosts && (
               <>
-                <input name="cost" type="number" step="0.01" placeholder={t("costPerShow")} title={t("costPerShow")} className={`${cell} w-20 text-right font-mono`} />
+                <input name="cost" type="number" step="0.01" placeholder={t("costPerShow")} title={t("costPerShow")} className={`${cell} text-right font-mono`} />
                 <select name="costCurrency" defaultValue="RON" title={t("currency")} className={`${cell} font-mono`}>
                   {["RON", "EUR", "USD", "GBP"].map((c) => (
                     <option key={c} value={c}>{c}</option>
@@ -228,7 +231,7 @@ export default async function PersonnelPage({
                 </select>
               </>
             )}
-            <button className="ml-auto rounded bg-accent hover:bg-accent-hover px-3 py-1 text-sm font-medium text-white">
+            <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-sm font-medium text-white">
               + {tc("add")}
             </button>
           </form>
