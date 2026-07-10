@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
+import { PageHeader } from "@/components/ui/PageHeader";
 import {
   CrewGlForm,
   GuestListGrid,
@@ -110,17 +111,25 @@ export default async function GuestListPage({
   };
   const ctx = { orgSlug, tourId, date, eventId };
 
+  const totalPasses = rows
+    .filter((r) => r.status !== "declined")
+    .reduce((s, r) => s + r.num_tickets + Object.values(r.passes).reduce((a, b) => a + b, 0), 0);
+  const eventName = event.title ?? (event.venues as unknown as { name: string } | null)?.name;
+
   return (
-    <main className="mx-auto w-full max-w-6xl space-y-4 p-6">
-      <header>
-        <Link
-          href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}`}
-          className="text-xs text-secondary hover:underline"
-        >
-          ← {event.title ?? (event.venues as unknown as { name: string } | null)?.name}
-        </Link>
-        <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
-      </header>
+    <main className="w-full pb-11">
+      <PageHeader
+        eyebrow={
+          <Link
+            href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}`}
+            className="hover:text-primary"
+          >
+            {eventName} · {t("metaLine", { entries: rows.length, passes: totalPasses })}
+          </Link>
+        }
+        title={t("title")}
+      />
+      <div className="max-w-[1040px] space-y-4 px-8 pt-4">
 
       {!glViewAll && !glSubmit ? (
         <p className="text-sm text-secondary">{t("noAccess")}</p>
@@ -148,6 +157,7 @@ export default async function GuestListPage({
           canSubmit
         />
       )}
+      </div>
     </main>
   );
 }

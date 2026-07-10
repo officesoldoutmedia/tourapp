@@ -550,18 +550,18 @@ function NewGuestRow({
 
   return (
     <tr className="bg-warning-subtle/50" title={t("newGuestHint")}>
-      <td className="px-2 py-1">＋</td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">＋</td>
+      <td className="px-2 py-[7px]">
         <input ref={lastNameRef} value={draft.lastName} onChange={(e) => setDraft({ ...draft, lastName: e.target.value })} onKeyDown={onEnter} placeholder={t("last")} className={cell} />
       </td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <input value={draft.firstName} onChange={(e) => setDraft({ ...draft, firstName: e.target.value })} onKeyDown={onEnter} placeholder={t("first")} className={cell} />
       </td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <input type="number" min={0} value={draft.numTickets || ""} onChange={(e) => setDraft({ ...draft, numTickets: Number(e.target.value) || 0 })} onKeyDown={onEnter} className={`${cell} w-14`} />
       </td>
       {passTypes.map((pass) => (
-        <td key={pass.id} className="px-2 py-1">
+        <td key={pass.id} className="px-2 py-[7px]">
           <input
             type="number" min={0}
             value={draft.passes[pass.id] || ""}
@@ -574,18 +574,18 @@ function NewGuestRow({
         </td>
       ))}
       <td className="px-2 py-1 text-tertiary">{t("pending")}</td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <input value={draft.affiliation} onChange={(e) => setDraft({ ...draft, affiliation: e.target.value })} onKeyDown={onEnter} className={cell} />
       </td>
       <td className="px-2 py-1 text-tertiary">—</td>
       <td className="px-2 py-1 text-tertiary">—</td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <select value={draft.pickup} onChange={(e) => setDraft({ ...draft, pickup: e.target.value })} className={cell}>
           <option value="" />
           {PICKUPS.map((p) => (<option key={p} value={p}>{t(`pickup_${p}`)}</option>))}
         </select>
       </td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         {/* Space comută [C] — comportament nativ de buton */}
         <button
           onClick={() => setDraft({ ...draft, priority: !draft.priority })}
@@ -594,7 +594,7 @@ function NewGuestRow({
           {draft.priority ? "Yes" : "No"}
         </button>
       </td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <textarea
           rows={1}
           value={draft.notes}
@@ -645,20 +645,20 @@ function GuestRowView({
 
   return (
     <tr className={selected ? "bg-accent-subtle/50" : undefined}>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <input type="checkbox" checked={selected} onChange={(e) => onSelect(e.target.checked)} />
       </td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <button onClick={onOpen} className="font-medium hover:underline">{row.last_name}</button>
       </td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <input defaultValue={row.first_name ?? ""} onBlur={(e) => e.target.value !== (row.first_name ?? "") && patch({ firstName: e.target.value })} className={cell} readOnly={!canManage} />
       </td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <input type="number" min={0} defaultValue={row.num_tickets} onBlur={(e) => Number(e.target.value) !== row.num_tickets && patch({ numTickets: Number(e.target.value) || 0 })} className={`${cell} w-14`} readOnly={!canManage} />
       </td>
       {passTypes.map((pass) => (
-        <td key={pass.id} className="px-2 py-1">
+        <td key={pass.id} className="px-2 py-[7px]">
           <input
             type="number" min={0}
             defaultValue={row.passes[pass.id] || ""}
@@ -672,7 +672,7 @@ function GuestRowView({
           />
         </td>
       ))}
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         {canManage ? (
           <select
             value={row.status}
@@ -692,12 +692,12 @@ function GuestRowView({
           <span className={`font-medium ${statusColor}`}>{t(row.status)}</span>
         )}
       </td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <input defaultValue={row.affiliation ?? ""} onBlur={(e) => e.target.value !== (row.affiliation ?? "") && patch({ affiliation: e.target.value })} className={cell} readOnly={!canManage} />
       </td>
-      <td className="px-2 py-1 text-secondary">{row.requestor_name}</td>
-      <td className="px-2 py-1 text-secondary">{row.requested_at.slice(0, 10)}</td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px] text-secondary">{row.requestor_name}</td>
+      <td className="px-2 py-[7px] text-secondary">{row.requested_at.slice(0, 10)}</td>
+      <td className="px-2 py-[7px]">
         {canManage ? (
           <select value={row.pickup ?? ""} onChange={(e) => patch({ pickup: e.target.value })} className="rounded border border-hairline px-1 py-0.5">
             <option value="" />
@@ -707,7 +707,7 @@ function GuestRowView({
           <span>{row.pickup ? t(`pickup_${row.pickup}` as Parameters<typeof t>[0]) : "—"}</span>
         )}
       </td>
-      <td className="px-2 py-1">
+      <td className="px-2 py-[7px]">
         <button
           disabled={!canManage || pending}
           onClick={() => patch({ priority: !row.priority })}

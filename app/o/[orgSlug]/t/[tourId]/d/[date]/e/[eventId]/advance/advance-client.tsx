@@ -30,11 +30,17 @@ export interface ScheduleRowData {
   is_confirmed: boolean;
 }
 
-const STATUS_ICON: Record<AdvanceStatus, string> = {
-  not_started: "◯",
-  in_progress: "🔵",
-  done: "✅",
-};
+function StatusMark({ status }: { status: AdvanceStatus }) {
+  if (status === "done")
+    return (
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="var(--success)" strokeWidth="2.25" strokeLinecap="round" strokeLinejoin="round" className="shrink-0">
+        <path d="M20 6 9 17l-5-5" />
+      </svg>
+    );
+  if (status === "in_progress")
+    return <i className="h-[7px] w-[7px] shrink-0 rounded-full bg-warning" />;
+  return <i className="h-[7px] w-[7px] shrink-0 rounded-full border border-strong" />;
+}
 
 export function AdvanceEditor({
   orgSlug,
@@ -109,7 +115,7 @@ export function AdvanceEditor({
                 onClick={() => setSelectedId(advance.id)}
                 className={`flex w-full items-center gap-2 px-3 py-2 text-left text-sm ${advance.id === selectedId ? "bg-inset font-medium" : "hover:bg-subtle"}`}
               >
-                <span>{STATUS_ICON[advance.status]}</span>
+                <StatusMark status={advance.status} />
                 <span className="truncate">{advance.title}</span>
               </button>
             </li>

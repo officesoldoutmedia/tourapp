@@ -453,7 +453,8 @@
     "bulkApproved": "{count, plural, one {# guest approved} other {# guests approved}}",
     "bulkDeclined": "{count, plural, one {# guest declined} other {# guests declined}}",
     "bulkRemoved": "{count, plural, one {# guest removed} other {# guests removed}}",
-    "clearSelection": "Clear"
+    "clearSelection": "Clear",
+    "metaLine": "{entries, plural, one {# entry} other {# entries}} · {passes} passes"
   },
   "passes": {
     "title": "Tour Passes",

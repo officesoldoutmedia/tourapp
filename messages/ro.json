@@ -453,7 +453,8 @@
     "bulkApproved": "{count, plural, one {# invitat aprobat} other {# invitați aprobați}}",
     "bulkDeclined": "{count, plural, one {# invitat respins} other {# invitați respinși}}",
     "bulkRemoved": "{count, plural, one {# invitat șters} other {# invitați șterși}}",
-    "clearSelection": "Deselectează"
+    "clearSelection": "Deselectează",
+    "metaLine": "{entries, plural, one {# intrare} few {# intrări} other {# de intrări}} · {passes} pass-uri"
   },
   "passes": {
     "title": "Tour Passes",
