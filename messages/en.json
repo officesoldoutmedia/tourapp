@@ -786,5 +786,28 @@
     "nextShow": "Next show",
     "crew": "Crew",
     "crewSub": "across active tours"
+  },
+  "gear": {
+    "title": "Gear",
+    "hint": "The tour inventory. Open the shows counter on an item to pick which shows it travels to.",
+    "empty": "No gear yet — add the first item below.",
+    "name": "Item (e.g. bass amp)",
+    "quantity": "Quantity",
+    "notes": "Notes",
+    "add": "Add item",
+    "save": "Save",
+    "cancel": "Cancel",
+    "edit": "Edit",
+    "delete": "Delete",
+    "addedToast": "Item added",
+    "deletedToast": "Item deleted",
+    "showsTitle": "Shows this item travels to",
+    "cat_backline": "Backline",
+    "cat_lights": "Lights",
+    "cat_video": "Video",
+    "cat_other": "Other",
+    "prov_own": "We bring it",
+    "prov_venue": "Venue provides",
+    "prov_rented": "Rented"
   }
 }

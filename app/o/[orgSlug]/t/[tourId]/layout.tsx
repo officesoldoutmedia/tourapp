@@ -58,6 +58,7 @@ export default async function TourLayout({
         { label: "Travel", href: `${dayBase}#travel` },
         { label: "Hotels", href: `${dayBase}#hotels` },
         { label: "Documents", href: `${base}/attachments`, match: "/attachments" },
+        { label: "Gear", href: `${base}/gear`, match: "/gear" },
       ],
     },
     {

@@ -786,5 +786,28 @@
     "nextShow": "Următorul show",
     "crew": "Echipă",
     "crewSub": "în tururile active"
+  },
+  "gear": {
+    "title": "Gear",
+    "hint": "Inventarul turului. Deschide contorul de show-uri de pe un articol ca să alegi la ce show-uri merge.",
+    "empty": "Niciun articol încă — adaugă primul mai jos.",
+    "name": "Articol (ex: amplificator bas)",
+    "quantity": "Cantitate",
+    "notes": "Notițe",
+    "add": "Adaugă articol",
+    "save": "Salvează",
+    "cancel": "Renunță",
+    "edit": "Editează",
+    "delete": "Șterge",
+    "addedToast": "Articol adăugat",
+    "deletedToast": "Articol șters",
+    "showsTitle": "Show-urile la care merge articolul",
+    "cat_backline": "Backline",
+    "cat_lights": "Lumini",
+    "cat_video": "Video",
+    "cat_other": "Altele",
+    "prov_own": "Îl aducem noi",
+    "prov_venue": "Dă venue-ul",
+    "prov_rented": "Închiriat"
   }
 }
