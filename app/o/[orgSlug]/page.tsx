@@ -1,7 +1,8 @@
 import Link from "next/link";
-import { getTranslations } from "next-intl/server";
+import { getTranslations, getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
+import { MetricStrip, type Metric } from "@/components/ui/MetricStrip";
 
 export default async function OrgDashboard({
   params,
@@ -11,18 +12,59 @@ export default async function OrgDashboard({
   const { orgSlug } = await params;
   const { supabase, org, permission, tier } = await requireOrg(orgSlug);
   const t = await getTranslations("tours");
+  const ts = await getTranslations("orgStats");
+  const locale = await getLocale();
 
   const { data: tours } = await supabase
     .from("tours")
     .select("id, name, start_date, end_date, is_archived")
     .eq("organization_id", org.id)
     .is("deleted_at", null)
-      .eq("is_archived", false)
     .order("start_date", { ascending: false });
 
   const active = (tours ?? []).filter((t) => !t.is_archived);
   const archived = (tours ?? []).filter((t) => t.is_archived);
   const canManage = can({ tier, permission }, "manage_tours");
+
+  // ── statistici agregate peste tururile active ──
+  const activeIds = active.map((t) => t.id);
+  const tourName = new Map(active.map((t) => [t.id, t.name]));
+  const [{ data: showDays }, { count: crewCount }] = activeIds.length
+    ? await Promise.all([
+        supabase
+          .from("days")
+          .select("date, city, tour_id")
+          .in("tour_id", activeIds)
+          .eq("day_type", "show")
+          .is("deleted_at", null)
+          .order("date"),
+        supabase
+          .from("tour_personnel")
+          .select("id", { count: "exact", head: true })
+          .in("tour_id", activeIds)
+          .is("deleted_at", null),
+      ])
+    : [{ data: [] as { date: string; city: string | null; tour_id: string }[] }, { count: 0 }];
+
+  const todayKey = new Date().toISOString().slice(0, 10);
+  const upcoming = (showDays ?? []).filter((d) => d.date >= todayKey);
+  const nextShow = upcoming[0];
+  const nextShowDate = nextShow
+    ? new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }).format(
+        new Date(`${nextShow.date}T00:00:00`),
+      )
+    : "—";
+
+  const metrics: Metric[] = [
+    { label: ts("activeTours"), value: String(active.length), sub: archived.length ? ts("archivedSub", { count: archived.length }) : undefined },
+    { label: ts("upcomingShows"), value: String(upcoming.length), sub: ts("showsTotalSub", { count: (showDays ?? []).length }) },
+    {
+      label: ts("nextShow"),
+      value: nextShowDate,
+      sub: nextShow ? [nextShow.city, tourName.get(nextShow.tour_id)].filter(Boolean).join(" · ") : undefined,
+    },
+    { label: ts("crew"), value: String(crewCount ?? 0), sub: ts("crewSub") },
+  ];
 
   return (
     <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
@@ -37,6 +79,8 @@ export default async function OrgDashboard({
           </Link>
         )}
       </div>
+
+      <MetricStrip metrics={metrics} />
 
       {active.length === 0 ? (
         <p className="text-sm text-secondary">{t("empty")}</p>

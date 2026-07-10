@@ -766,5 +766,14 @@
     "email": "Email",
     "costPerShow": "Cost / show",
     "currency": "Currency"
+  },
+  "orgStats": {
+    "activeTours": "Active tours",
+    "archivedSub": "{count, plural, one {# archived} other {# archived}}",
+    "upcomingShows": "Upcoming shows",
+    "showsTotalSub": "{count, plural, one {of # total} other {of # total}}",
+    "nextShow": "Next show",
+    "crew": "Crew",
+    "crewSub": "across active tours"
   }
 }

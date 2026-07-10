@@ -766,5 +766,14 @@
     "email": "Email",
     "costPerShow": "Cost / show",
     "currency": "Monedă"
+  },
+  "orgStats": {
+    "activeTours": "Tururi active",
+    "archivedSub": "{count, plural, one {# arhivat} few {# arhivate} other {# arhivate}}",
+    "upcomingShows": "Show-uri viitoare",
+    "showsTotalSub": "{count, plural, one {din # în total} other {din # în total}}",
+    "nextShow": "Următorul show",
+    "crew": "Echipă",
+    "crewSub": "în tururile active"
   }
 }
