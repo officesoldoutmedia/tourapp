@@ -1,0 +1,40 @@
+diff --git a/lib/index.js b/lib/index.js
+index 0000000..1111111 100644
+--- a/lib/index.js
++++ b/lib/index.js
+@@ -2,8 +2,20 @@
+ import * as P from '@react-pdf/primitives';
+ import resolveStyle, { transformColor, flatten } from '@react-pdf/stylesheet';
+ import layoutEngine, { fontSubstitution, wordHyphenation, scriptItemizer, textDecoration, justification, linebreaker, bidi, fromFragments } from '@react-pdf/textkit';
+-import * as Yoga from 'yoga-layout/load';
+-import { loadYoga as loadYoga$1 } from 'yoga-layout/load';
++import * as Yoga from 'yoga-layout/asmjs-sync';
++
++// Patch TourApp: Cloudflare Workers interzice compilarea WASM la runtime
++// ("Wasm code generation disallowed by embedder"), deci folosim build-ul
++// asm.js (JS pur) din yoga-layout v2 (pnpm override yoga-layout=2.0.1).
++// Namespace-ul Yoga ține enum-urile (Edge, Overflow, ...); instanța
++// (Config/Node) stă în exports.default — poziția diferă după interopul
++// CJS al fiecărui bundler (Node/esbuild vs Turbopack), de aici fallback-urile.
++// Vezi https://github.com/diegomura/react-pdf/issues/2757
++const yogaInstance = Yoga.default && Yoga.default.Config
++    ? Yoga.default
++    : Yoga.default && Yoga.default.default && Yoga.default.default.Config
++        ? Yoga.default.default
++        : Yoga;
+ import emojiRegex from 'emoji-regex-xs';
+ import resolveImage from '@react-pdf/image';
+ 
+@@ -588,11 +600,8 @@
+     return Object.assign({}, root, { children });
+ };
+ 
+-let instancePromise;
+ const loadYoga = async () => {
+-    // Yoga WASM binaries must be asynchronously compiled and loaded
+-    // to prevent Event emitter memory leak warnings, Yoga must be loaded only once
+-    const instance = await (instancePromise ??= loadYoga$1());
++    const instance = yogaInstance;
+     const config = instance.Config.create();
+     config.setPointScaleFactor(0);
+     const node = { create: () => instance.Node.createWithConfig(config) };
