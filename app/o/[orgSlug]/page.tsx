@@ -70,14 +70,21 @@ export default async function OrgDashboard({
     <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-semibold tracking-tight">{t("title")}</h1>
-        {canManage && (
-          <Link
-            href={`/o/${org.slug}/tours/new`}
-            className="btn-primary h-9"
-          >
-            {t("newTour")}
-          </Link>
-        )}
+        <div className="flex items-center gap-2">
+          {can({ tier, permission }, "view_accounting") && (
+            <Link href={`/o/${org.slug}/reports/annual`} className="btn-quiet h-9">
+              {ts("reportsLink")}
+            </Link>
+          )}
+          {canManage && (
+            <Link
+              href={`/o/${org.slug}/tours/new`}
+              className="btn-primary h-9"
+            >
+              {t("newTour")}
+            </Link>
+          )}
+        </div>
       </div>
 
       <MetricStrip metrics={metrics} />

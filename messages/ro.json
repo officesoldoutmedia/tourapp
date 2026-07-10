@@ -785,7 +785,8 @@
     "showsTotalSub": "{count, plural, one {din # în total} other {din # în total}}",
     "nextShow": "Următorul show",
     "crew": "Echipă",
-    "crewSub": "în tururile active"
+    "crewSub": "în tururile active",
+    "reportsLink": "Rapoarte"
   },
   "gear": {
     "title": "Gear",
@@ -809,5 +810,14 @@
     "prov_own": "Îl aducem noi",
     "prov_venue": "Dă venue-ul",
     "prov_rented": "Închiriat"
+  },
+  "annualReport": {
+    "title": "Raport anual de plăți",
+    "hint": "Toate anexele de plată emise în an, grupate pe persoană, peste toate tururile. Totalurile sunt în moneda de plată.",
+    "empty": "Nicio anexă emisă în {year}.",
+    "paid": "Plătită",
+    "pending": "De plată",
+    "pendingSub": "{amount} rest de plată",
+    "allPaid": "totul plătit"
   }
 }

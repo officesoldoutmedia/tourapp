@@ -785,7 +785,8 @@
     "showsTotalSub": "{count, plural, one {of # total} other {of # total}}",
     "nextShow": "Next show",
     "crew": "Crew",
-    "crewSub": "across active tours"
+    "crewSub": "across active tours",
+    "reportsLink": "Reports"
   },
   "gear": {
     "title": "Gear",
@@ -809,5 +810,14 @@
     "prov_own": "We bring it",
     "prov_venue": "Venue provides",
     "prov_rented": "Rented"
+  },
+  "annualReport": {
+    "title": "Annual payment report",
+    "hint": "Every payment annex issued in the year, grouped by person across all tours. Totals are in the payment currency.",
+    "empty": "No annexes issued in {year}.",
+    "paid": "Paid",
+    "pending": "Pending",
+    "pendingSub": "{amount} outstanding",
+    "allPaid": "all paid"
   }
 }
