@@ -26,7 +26,12 @@ import { MetricStrip, type Metric } from "@/components/ui/MetricStrip";
 import { HeaderClock } from "@/components/ui/HeaderClock";
 import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
 import Link from "next/link";
-import type { VenueCardData } from "@/components/DayDashboardCards";
+interface VenueCardData {
+  eventHref: string;
+  name: string;
+  address: string;
+  url: string | null;
+}
 import { getWeather } from "@/lib/weather";
 import { isGoogleEnabled, searchGooglePlaces } from "@/lib/googlePlaces";
 
@@ -516,7 +521,7 @@ export default async function DayPage({
 
       <MetricStrip metrics={metrics} />
 
-      <div id="notes" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <div id="notes" className="rounded-[12px] border border-hairline bg-surface p-4">
         <NotesSection
           orgSlug={orgSlug}
           tourId={tourId}
@@ -526,7 +531,7 @@ export default async function DayPage({
       </div>
 
       {day.day_type === "show" && (
-        <div id="events" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <div id="events" className="rounded-[12px] border border-hairline bg-surface p-4">
           <EventsSection
             orgSlug={orgSlug}
             tourId={tourId}
@@ -544,7 +549,7 @@ export default async function DayPage({
         </div>
       )}
 
-      <div id="schedule" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs space-y-4">
+      <div id="schedule" className="rounded-[12px] border border-hairline bg-surface p-4 space-y-4">
         <ScheduleSection
           orgSlug={orgSlug}
           tourId={tourId}
@@ -555,7 +560,7 @@ export default async function DayPage({
         />
       </div>
 
-      <div id="travel" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <div id="travel" className="rounded-[12px] border border-hairline bg-surface p-4">
         <TravelSection
           orgSlug={orgSlug}
           tourId={tourId}
@@ -570,7 +575,7 @@ export default async function DayPage({
         />
       </div>
 
-      <div id="hotels" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <div id="hotels" className="rounded-[12px] border border-hairline bg-surface p-4">
         <HotelsSection
           orgSlug={orgSlug}
           tourId={tourId}
@@ -583,7 +588,7 @@ export default async function DayPage({
         />
       </div>
 
-      <div id="tasks" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <div id="tasks" className="rounded-[12px] border border-hairline bg-surface p-4">
         <TasksSection
           orgSlug={orgSlug}
           tourId={tourId}
@@ -594,7 +599,7 @@ export default async function DayPage({
         />
       </div>
 
-      <div id="attachments" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <div id="attachments" className="rounded-[12px] border border-hairline bg-surface p-4">
         <AttachmentsSection
           orgSlug={orgSlug}
           tourId={tourId}

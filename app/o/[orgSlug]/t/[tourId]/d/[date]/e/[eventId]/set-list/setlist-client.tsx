@@ -133,7 +133,7 @@ export function SetListEditor({
       {items.length === 0 ? (
         <p className="text-sm text-tertiary">{t("empty")}</p>
       ) : (
-        <ol className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+        <ol className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
           {items.map((item, idx) => (
             <li key={item.id} className="px-3 py-2">
               <div className="flex items-center gap-2">

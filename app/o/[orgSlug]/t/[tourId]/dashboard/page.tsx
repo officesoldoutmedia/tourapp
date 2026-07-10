@@ -79,7 +79,7 @@ export default async function TourDashboardPage({
 
       {/* harta pe următoarea oprire + link rută completă */}
       {nextStop && (
-        <div className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-xs">
+        <div className="overflow-hidden rounded-[12px] border border-hairline bg-surface">
           <iframe
             title="Tour route"
             src={`https://maps.google.com/maps?q=${nextStop.lat},${nextStop.lng}&z=8&output=embed`}
@@ -108,7 +108,7 @@ export default async function TourDashboardPage({
 
       {/* statisticile mari — MT: EVENTS REMAINING / DISTANCE REMAINING */}
       <div className="grid gap-4 sm:grid-cols-2">
-        <div className="rounded-lg border border-hairline bg-surface p-5 text-center shadow-xs">
+        <div className="rounded-lg border border-hairline bg-surface p-5 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider text-tertiary">
             {t("eventsRemaining")}
           </p>
@@ -117,7 +117,7 @@ export default async function TourDashboardPage({
             {t("outOfTotal", { total: allEvents.length })}
           </p>
         </div>
-        <div className="rounded-lg border border-hairline bg-surface p-5 text-center shadow-xs">
+        <div className="rounded-lg border border-hairline bg-surface p-5 text-center">
           <p className="text-xs font-semibold uppercase tracking-wider text-tertiary">
             {t("distanceRemaining")}
           </p>
@@ -133,7 +133,7 @@ export default async function TourDashboardPage({
 
       {/* următoarele show-uri */}
       {upcoming.length > 0 && (
-        <section className="rounded-lg border border-hairline bg-surface shadow-xs">
+        <section className="rounded-[12px] border border-hairline bg-surface">
           <h2 className="border-b border-hairline px-4 py-2 font-display text-lg font-semibold tracking-tight">
             {t("upcoming")}
           </h2>

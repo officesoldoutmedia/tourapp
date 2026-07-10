@@ -33,6 +33,7 @@
   --text-secondary: #9a9da4;
   --text-tertiary: #686c73;
   --text-disabled: #50545b;
+  --text-done: #b9bcc1;
 
   /* accent — DOAR activ/selectat/focus/link */
   --accent: #4793f2;
@@ -105,6 +106,7 @@
   --color-secondary: var(--text-secondary);
   --color-tertiary: var(--text-tertiary);
   --color-disabled: var(--text-disabled);
+  --color-done: var(--text-done);
   --color-accent: var(--accent);
   --color-accent-hover: var(--accent-hover);
   --color-accent-active: var(--accent-active);

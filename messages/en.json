@@ -24,7 +24,8 @@
     "orSeparator": "or",
     "invalidCredentials": "Invalid email or password.",
     "firstName": "First name",
-    "lastName": "Last name"
+    "lastName": "Last name",
+    "heading": "Sign in"
   },
   "invite": {
     "title": "Organization invitation",
@@ -599,22 +600,29 @@
     "billingSave": "Save"
   },
   "personnel": {
-    "title": "Tour personnel",
-    "last": "Last",
-    "first": "First",
+    "title": "Personnel",
+    "last": "Last name",
+    "first": "First name",
     "role": "Role",
     "jobTitle": "Title",
     "company": "Company",
     "phone": "Phone",
     "email": "Email",
     "party": "Party",
-    "empty": "No personnel yet — add the first row below.",
+    "empty": "No personnel yet — add the first person below.",
     "addExistingContact": "Add existing contact…",
     "costPerShow": "Cost/show",
     "paymentType": "Payment",
     "individual": "Individual",
     "currency": "Currency",
-    "profile": "Profile & payments"
+    "profile": "Profile & payments",
+    "identityTitle": "Identity & contact",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "companyLabel": "Company",
+    "countLine": "{count, plural, one {# person on the crew} other {# people on the crew}}",
+    "addPerson": "Add person",
+    "addHint": "After adding, open the profile to set the photo, contact, costs and payment details."
   },
   "tourSettings": {
     "title": "Tour settings",
@@ -688,7 +696,11 @@
   },
   "tourCalendar": {
     "title": "Calendar",
-    "showDay": "Show Day"
+    "showDay": "Show Day",
+    "todayTag": "Today",
+    "legendShow": "Show",
+    "legendTravel": "Travel",
+    "legendDayOff": "Day off"
   },
   "crewProfile": {
     "backToPersonnel": "Back to Personnel",

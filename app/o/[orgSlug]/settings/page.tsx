@@ -63,7 +63,7 @@ export default async function OrgSettingsPage({
     <main className="mx-auto w-full max-w-2xl space-y-6 p-6">
       <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
 
-      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+      <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
         {canManageUsers && (
           <li>
             <Link href={`/o/${orgSlug}/settings/users`} className="block px-4 py-3 hover:bg-subtle">
@@ -84,7 +84,7 @@ export default async function OrgSettingsPage({
       </ul>
 
       {canManageUsers && (
-        <section className="rounded-lg border border-hairline bg-surface shadow-xs p-4">
+        <section className="rounded-[12px] border border-hairline bg-surface p-4">
           <h2 className="mb-1 font-display text-lg font-semibold tracking-tight">{t("billingTitle")}</h2>
           <p className="mb-3 text-xs text-tertiary">{t("billingHint")}</p>
           <form action={saveBilling} className="flex flex-wrap gap-2">
@@ -98,7 +98,7 @@ export default async function OrgSettingsPage({
                 />
               </label>
             ))}
-            <button className="self-end rounded bg-accent hover:bg-accent-hover px-4 py-1.5 text-sm font-medium text-white">
+            <button className="btn-quiet h-7 px-2.5 self-end">
               {t("billingSave")}
             </button>
           </form>
@@ -106,7 +106,7 @@ export default async function OrgSettingsPage({
       )}
 
       {canManageUsers && (
-        <form action={toggleGlEmails} className="flex items-center justify-between rounded-lg border border-hairline bg-surface shadow-xs px-4 py-3">
+        <form action={toggleGlEmails} className="flex items-center justify-between rounded-[12px] border border-hairline bg-surface px-4 py-3">
           <span>
             <span className="block text-sm font-medium">{t("glEmails")}</span>
             <span className="text-xs text-secondary">{t("glEmailsHint")}</span>

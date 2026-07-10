@@ -51,7 +51,7 @@ export default async function AppPage({
         {orgs.length === 0 ? (
           <p className="text-sm text-secondary">{t("empty")}</p>
         ) : (
-          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+          <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
             {orgs.map((org) => (
               <li key={org.id}>
                 <Link
@@ -101,7 +101,7 @@ export default async function AppPage({
           </label>
           <button
             type="submit"
-            className="rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
+            className="btn-primary h-9"
           >
             {t("create")}
           </button>

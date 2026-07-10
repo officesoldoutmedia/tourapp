@@ -115,7 +115,7 @@ export default async function UsersSettingsPage({
 
       <section className="space-y-2">
         <h2 className="text-sm font-medium text-secondary">{t("members")}</h2>
-        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+        <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
           {(members ?? []).map((member) => {
             const profile = profileOf.get(member.user_id);
             const name =
@@ -144,7 +144,7 @@ export default async function UsersSettingsPage({
                     ))}
                   </select>
                   {member.user_id !== user.id && (
-                    <button className="rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs text-white">✓</button>
+                    <button className="btn-quiet h-7 px-2.5">✓</button>
                   )}
                 </form>
                 {member.user_id !== user.id && (
@@ -164,7 +164,7 @@ export default async function UsersSettingsPage({
       {(invites ?? []).length > 0 && (
         <section className="space-y-2">
           <h2 className="text-sm font-medium text-secondary">{t("pendingInvites")}</h2>
-          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+          <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
             {(invites ?? []).map((inv) => (
               <li key={inv.id} className="px-4 py-2 text-sm">
                 <b>{inv.email}</b>
@@ -181,14 +181,14 @@ export default async function UsersSettingsPage({
         </section>
       )}
 
-      <form action={invite} className="flex flex-wrap gap-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
+      <form action={invite} className="flex flex-wrap gap-2 rounded-[12px] border border-hairline bg-surface p-3">
         <input name="email" type="email" required placeholder={t("email")} className="min-w-48 flex-1 rounded border border-hairline px-3 py-2 text-sm" />
         <select name="permission" defaultValue="mobile_access" className="rounded border border-hairline px-2 py-2 text-sm">
           {PERMISSIONS.map((p) => (
             <option key={p} value={p}>{tp(p)}</option>
           ))}
         </select>
-        <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
+        <button className="btn-primary h-9">
           + {t("invite")}
         </button>
       </form>

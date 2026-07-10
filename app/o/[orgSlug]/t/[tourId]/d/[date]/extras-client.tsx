@@ -55,7 +55,7 @@ export function TasksSection({
 
       {tasks.length === 0 && <p className="text-sm text-tertiary">{t("empty")}</p>}
 
-      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
+      <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface empty:hidden">
         {tasks.map((task) => {
           const overdue =
             !task.is_complete && task.due_at !== null && Date.parse(task.due_at) < now;
@@ -124,7 +124,7 @@ export function TasksSection({
                 return r;
               })
             }
-            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+            className="btn-quiet h-7 px-2.5 disabled:opacity-40"
           >
             + {t("add")}
           </button>
@@ -214,7 +214,7 @@ export function AttachmentsSection({
         <p className="text-sm text-tertiary">{t("empty")}</p>
       )}
 
-      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
+      <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface empty:hidden">
         {attachments.map((att) => (
           <li key={att.id} className="flex items-center gap-2 px-3 py-2 text-sm">
             <span className="min-w-0 flex-1 truncate">📎 {att.file_name}</span>
@@ -254,7 +254,7 @@ export function AttachmentsSection({
 
       {canEdit && (
         <div className="flex flex-wrap items-center gap-2">
-          <label className="cursor-pointer rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white">
+          <label className="btn-quiet h-7 px-2.5cursor-pointer ">
             {uploading ? t("uploading") : `⬆ ${t("upload")}`}
             <input
               type="file"

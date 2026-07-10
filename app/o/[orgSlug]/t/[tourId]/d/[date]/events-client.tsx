@@ -61,7 +61,7 @@ export function EventsSection({
         {canEdit && !adding && (
           <button
             onClick={() => setAdding(true)}
-            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
+            className="btn-quiet h-7 px-2.5"
           >
             + {t("addEvent")}
           </button>
@@ -72,7 +72,7 @@ export function EventsSection({
         <p className="text-sm text-tertiary">{t("noEvents")}</p>
       )}
 
-      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
+      <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface empty:hidden">
         {events.map((event) => (
           <li key={event.id} className="flex items-center gap-2 px-3 py-2 hover:bg-subtle">
             <Link
@@ -88,7 +88,7 @@ export function EventsSection({
               <Link
                 href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${event.id}/costs`}
                 title="Costs & profit"
-                className="shrink-0 rounded-md border border-hairline bg-surface px-2 py-1 text-xs shadow-xs transition-colors hover:bg-accent-subtle"
+                className="shrink-0 rounded-md border border-hairline bg-surface px-2 py-1 text-xs transition-colors hover:bg-accent-subtle"
               >
                 💸 P&L
               </Link>
@@ -98,7 +98,7 @@ export function EventsSection({
       </ul>
 
       {adding && (
-        <div className="space-y-3 rounded-lg border border-hairline bg-surface shadow-xs p-3">
+        <div className="space-y-3 rounded-[12px] border border-hairline bg-surface p-3">
           {!manual ? (
             <>
               <input
@@ -180,7 +180,7 @@ export function EventsSection({
               <button
                 disabled={pending || !newVenue.name.trim()}
                 onClick={() => attach({ dayId, newVenue })}
-                className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+                className="btn-quiet h-7 px-2.5 disabled:opacity-40"
               >
                 {tc("save")}
               </button>
@@ -224,7 +224,7 @@ export function EventsSection({
               <button
                 disabled={pending}
                 onClick={() => attach({ dayId, newVenue, ignoreDuplicates: true })}
-                className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
+                className="btn-quiet h-7 px-2.5"
               >
                 {t("createNew")}
               </button>

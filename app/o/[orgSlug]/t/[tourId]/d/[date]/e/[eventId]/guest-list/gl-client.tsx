@@ -132,7 +132,7 @@ export function GuestListGrid({
   return (
     <div className="space-y-3">
       {/* Header: cutoff + locked [C-S] */}
-      <div className="flex flex-wrap items-center gap-3 rounded-lg border border-hairline bg-surface shadow-xs px-3 py-2 text-xs">
+      <div className="flex flex-wrap items-center gap-3 rounded-[12px] border border-hairline bg-surface px-3 py-2 text-xs">
         <label className="flex items-center gap-2 font-semibold uppercase tracking-wide text-secondary">
           {t("cutoff")}
           <input
@@ -223,7 +223,7 @@ export function GuestListGrid({
       )}
 
       <div className="flex gap-4">
-        <div className="min-w-0 flex-1 overflow-x-auto rounded-lg border border-hairline bg-surface shadow-xs">
+        <div className="min-w-0 flex-1 overflow-x-auto rounded-[12px] border border-hairline bg-surface">
           <table className="w-full text-xs">
             <thead className="bg-subtle text-left uppercase text-secondary">
               <tr>
@@ -350,7 +350,7 @@ export function GuestListGrid({
 
         {/* Panou detaliu cu APPROVE [C-S] */}
         {detail && (
-          <aside className="w-64 shrink-0 space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3 text-xs">
+          <aside className="w-64 shrink-0 space-y-2 rounded-[12px] border border-hairline bg-surface p-3 text-xs">
             <div className="flex items-center justify-between">
               <span className="font-semibold">{t("detail")}</span>
               <button onClick={() => setDetailId(null)} className="rounded px-1.5 hover:bg-subtle">✕</button>
@@ -767,7 +767,7 @@ export function CrewGlForm({
   return (
     <div className="space-y-4">
       {canSubmit && (
-        <div className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
+        <div className="space-y-2 rounded-[12px] border border-hairline bg-surface p-3">
           <p className="text-sm font-medium">{t("submitRequest")}</p>
           <div className="flex flex-wrap gap-2">
             <input value={draft.lastName} onChange={(e) => setDraft({ ...draft, lastName: e.target.value })} placeholder={t("last")} className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
@@ -784,7 +784,7 @@ export function CrewGlForm({
             <button
               disabled={pending || !draft.lastName.trim()}
               onClick={submit}
-              className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-sm font-medium text-white disabled:opacity-40"
+              className="btn-quiet h-7 px-2.5 disabled:opacity-40"
             >
               {t("submitRequest")}
             </button>
@@ -797,7 +797,7 @@ export function CrewGlForm({
         {rows.length === 0 ? (
           <p className="text-sm text-tertiary">{t("noRequests")}</p>
         ) : (
-          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs text-sm">
+          <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface text-sm">
             {rows.map((row) => (
               <li key={row.id} className="flex items-center justify-between px-3 py-2">
                 <span>

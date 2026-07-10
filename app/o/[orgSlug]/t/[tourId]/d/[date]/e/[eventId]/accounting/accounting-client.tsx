@@ -146,7 +146,7 @@ export function AccountingClient({
             <button
               key={tb}
               onClick={() => setTab(tb)}
-              className={`rounded px-3 py-1.5 font-medium ${tab === tb ? "bg-accent hover:bg-accent-hover text-white" : "bg-inset text-secondary"}`}
+              className={`h-[26px] rounded-[6px] px-3 font-display text-[12px] font-medium transition-colors ${tab === tb ? "bg-fill-segment-active text-primary" : "text-secondary hover:text-primary"}`}
             >
               {t(`tab_${tb}`)}
             </button>
@@ -384,7 +384,7 @@ function TicketsGrid({
                       return r;
                     })
                   }
-                  className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-xs text-white disabled:opacity-40"
+                  className="btn-quiet h-7 px-2.5"
                 >
                   +
                 </button>
@@ -434,7 +434,7 @@ function ExpensesGrid({
         const rows = expenses.filter((e) => e.stage === stage);
         const sum = rows.reduce((s, e) => s + num(e.amount), 0);
         return (
-          <section key={stage} className="rounded-lg border border-hairline bg-surface shadow-xs">
+          <section key={stage} className="rounded-[12px] border border-hairline bg-surface">
             <header className="flex items-center justify-between border-b border-hairline bg-subtle px-3 py-1.5">
               <span className="text-xs font-bold uppercase tracking-wide">
                 {idx + 1}. {t(`stage_${stage}`)}
@@ -506,7 +506,7 @@ function ExpensesGrid({
                 return r;
               })
             }
-            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+            className="btn-quiet h-7 px-2.5 disabled:opacity-40"
           >
             +
           </button>
@@ -585,7 +585,7 @@ function LineItemsGrid({
                       return r;
                     })
                   }
-                  className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-xs text-white disabled:opacity-40"
+                  className="btn-quiet h-7 px-2.5"
                 >
                   +
                 </button>

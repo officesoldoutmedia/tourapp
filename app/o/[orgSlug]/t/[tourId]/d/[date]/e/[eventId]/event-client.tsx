@@ -335,7 +335,7 @@ function LaborCallGrid({
                       return r;
                     })
                   }
-                  className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-xs text-white disabled:opacity-40"
+                  className="btn-quiet h-7 px-2.5"
                 >
                   +
                 </button>

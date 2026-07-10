@@ -60,7 +60,7 @@ export default async function SongsPage({
       {(songs ?? []).length === 0 ? (
         <p className="text-sm text-secondary">{t("empty")}</p>
       ) : (
-        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+        <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
           {(songs ?? []).map((song) => (
             <li key={song.id} className="px-4 py-2">
               {/* editare inline: modificarea se propagă în toate set lists [C] */}
@@ -71,7 +71,7 @@ export default async function SongsPage({
                 <input name="bpm" defaultValue={song.bpm ?? ""} placeholder={t("bpm")} className={`${inputCls} w-16`} />
                 <input name="key" defaultValue={song.song_key ?? ""} placeholder={t("key")} className={`${inputCls} w-16`} />
                 <input name="techNotes" defaultValue={song.tech_notes ?? ""} placeholder={t("techNotes")} className={`${inputCls} min-w-32 flex-1`} />
-                <button className="rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs font-medium text-white">{tc("save")}</button>
+                <button className="btn-quiet h-7 px-2.5">{tc("save")}</button>
                 <button formAction={removeSong} className="rounded px-2 py-1 text-xs text-danger hover:bg-danger-subtle">🗑</button>
               </form>
             </li>
@@ -79,13 +79,13 @@ export default async function SongsPage({
         </ul>
       )}
 
-      <form action={saveSong} className="flex flex-wrap gap-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
+      <form action={saveSong} className="flex flex-wrap gap-2 rounded-[12px] border border-hairline bg-surface p-3">
         <input name="title" required placeholder={t("songTitle")} className={`${inputCls} min-w-40 flex-1`} />
         <input name="length" placeholder={t("length")} className={`${inputCls} w-20`} />
         <input name="bpm" placeholder={t("bpm")} className={`${inputCls} w-16`} />
         <input name="key" placeholder={t("key")} className={`${inputCls} w-16`} />
         <input name="techNotes" placeholder={t("techNotes")} className={`${inputCls} min-w-32 flex-1`} />
-        <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1.5 text-sm font-medium text-white">
+        <button className="btn-quiet h-7 px-2.5">
           + {t("add")}
         </button>
       </form>

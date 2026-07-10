@@ -158,7 +158,7 @@ export function DayFocus({
               <span className="min-w-0 pr-4">
                 <span
                   className={`block truncate text-[13px] font-medium ${
-                    status === "done" ? "text-[#B9BCC1]" : "text-primary"
+                    status === "done" ? "text-done" : "text-primary"
                   }`}
                 >
                   {item.title}

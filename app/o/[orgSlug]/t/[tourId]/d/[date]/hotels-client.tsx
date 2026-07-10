@@ -90,7 +90,7 @@ export function HotelsSection({
         {canEdit && !adding && (
           <button
             onClick={() => setAdding(true)}
-            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
+            className="btn-quiet h-7 px-2.5"
           >
             + {t("add")}
           </button>
@@ -98,7 +98,7 @@ export function HotelsSection({
       </div>
 
       {extending && (
-        <div className="space-y-1 rounded-lg border border-hairline bg-surface shadow-xs p-3 text-sm">
+        <div className="space-y-1 rounded-[12px] border border-hairline bg-surface p-3 text-sm">
           <p className="text-xs font-semibold text-secondary">{t("extendFrom")}</p>
           {prevDayHotels.map((hotel) => (
             <button
@@ -207,7 +207,7 @@ function HotelCard({
   }
 
   return (
-    <div className="rounded-lg border border-hairline bg-surface shadow-xs">
+    <div className="rounded-[12px] border border-hairline bg-surface">
       <div className="flex flex-wrap items-center gap-2 px-3 py-2">
         <span className="min-w-0 flex-1 text-sm font-medium">
           {hotel.party && (
@@ -409,7 +409,7 @@ function RoomListGrid({
                       return r;
                     })
                   }
-                  className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-white disabled:opacity-40"
+                  className="btn-quiet h-7 px-2.5"
                 >
                   +
                 </button>
@@ -472,7 +472,7 @@ function AddHotelForm({
   }
 
   return (
-    <div className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
+    <div className="space-y-2 rounded-[12px] border border-hairline bg-surface p-3">
       <div className="flex flex-wrap gap-2">
         <input
           autoFocus
@@ -515,7 +515,7 @@ function AddHotelForm({
         <button
           disabled={pending || query.trim().length < 2}
           onClick={() => add()}
-          className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+          className="btn-quiet h-7 px-2.5 disabled:opacity-40"
         >
           {t("createManually")}
         </button>

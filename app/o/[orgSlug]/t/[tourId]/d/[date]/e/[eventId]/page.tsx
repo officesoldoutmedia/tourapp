@@ -112,7 +112,7 @@ export default async function EventPage({
         />
       )}
 
-      <section className="flex items-center justify-between rounded-lg border border-hairline bg-surface shadow-xs px-4 py-3">
+      <section className="flex items-center justify-between rounded-[12px] border border-hairline bg-surface px-4 py-3">
         <span className="text-sm font-medium">
           {statusIcon} {t("advances")}{" "}
           <span className="text-xs text-secondary">
@@ -123,7 +123,7 @@ export default async function EventPage({
           {can({ tier, permission }, "view_accounting") && (
             <Link
               href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/costs`}
-              className="rounded-md border border-hairline bg-surface px-3 py-1.5 text-sm shadow-xs transition-colors hover:bg-subtle"
+              className="rounded-md border border-hairline bg-surface px-3 py-1.5 text-sm transition-colors hover:bg-subtle"
             >
               💸 Costs & profit
             </Link>
@@ -150,7 +150,7 @@ export default async function EventPage({
           </Link>
           <Link
             href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/advance`}
-            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
+            className="btn-quiet h-7 px-2.5"
           >
             {ta("title")} →
           </Link>

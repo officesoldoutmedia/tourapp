@@ -78,19 +78,19 @@ export default async function TourSettingsPage({
     <main className="mx-auto w-full max-w-2xl space-y-6 p-6">
       <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
 
-      <form action={rename} className="space-y-2 rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <form action={rename} className="space-y-2 rounded-[12px] border border-hairline bg-surface p-4">
         <label className="block text-xs font-semibold uppercase tracking-wider text-secondary">
           {t("tourName")}
         </label>
         <div className="flex gap-2">
           <input name="name" defaultValue={tour.name} required className="flex-1 rounded border border-hairline px-3 py-2 text-sm" />
-          <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
+          <button className="btn-primary h-9">
             {tc("save")}
           </button>
         </div>
       </form>
 
-      <div className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+      <div className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
         {toggles.map(([field, label, value]) => (
           <div key={field} className="flex items-center justify-between px-4 py-3">
             <span className="text-sm">{label}</span>
@@ -99,14 +99,14 @@ export default async function TourSettingsPage({
               <button
                 name="value"
                 value="true"
-                className={`rounded-full px-3 py-1 transition-colors ${value ? "bg-surface text-primary shadow-xs" : "text-tertiary hover:text-secondary"}`}
+                className={`rounded-full px-3 py-1 transition-colors ${value ? "bg-surface text-primary" : "text-tertiary hover:text-secondary"}`}
               >
                 {tc("yes")}
               </button>
               <button
                 name="value"
                 value="false"
-                className={`rounded-full px-3 py-1 transition-colors ${!value ? "bg-surface text-primary shadow-xs" : "text-tertiary hover:text-secondary"}`}
+                className={`rounded-full px-3 py-1 transition-colors ${!value ? "bg-surface text-primary" : "text-tertiary hover:text-secondary"}`}
               >
                 {tc("no")}
               </button>
@@ -117,7 +117,7 @@ export default async function TourSettingsPage({
 
       <Link
         href={`/o/${orgSlug}/t/${tourId}/personnel`}
-        className="flex items-center justify-between rounded-lg border border-hairline bg-surface px-4 py-3 shadow-xs transition-colors hover:bg-subtle"
+        className="flex items-center justify-between rounded-lg border border-hairline bg-surface px-4 py-3 transition-colors hover:bg-subtle"
       >
         <span className="flex items-center gap-2.5 text-sm">
           <Users size={18} strokeWidth={1.5} className="text-secondary" />
@@ -129,7 +129,7 @@ export default async function TourSettingsPage({
         <ChevronRight size={16} className="text-tertiary" />
       </Link>
 
-      <form action={saveBooking} className="space-y-2 rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <form action={saveBooking} className="space-y-2 rounded-[12px] border border-hairline bg-surface p-4">
         <label className="block text-xs font-semibold uppercase tracking-wider text-secondary">
           {t("bookingPercent")}
         </label>
@@ -144,7 +144,7 @@ export default async function TourSettingsPage({
             defaultValue={tour.booking_percent ?? ""}
             className="w-32 rounded border border-hairline px-3 py-2 font-mono text-sm"
           />
-          <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
+          <button className="btn-primary h-9">
             {tc("save")}
           </button>
         </div>

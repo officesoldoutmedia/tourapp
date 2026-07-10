@@ -64,11 +64,11 @@ export default async function NotificationsPage({
       <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
 
       {canSend && (
-        <form action={compose} className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
+        <form action={compose} className="space-y-2 rounded-[12px] border border-hairline bg-surface p-3">
           <p className="text-sm font-medium">{t("compose")} — {t("toAll")}</p>
           <input name="title" placeholder={t("subject")} className="w-full rounded border border-hairline px-3 py-2 text-sm" />
           <textarea name="body" rows={2} placeholder={t("body")} className="w-full rounded border border-hairline px-3 py-2 text-sm" />
-          <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
+          <button className="btn-primary h-9">
             {t("send")}
           </button>
         </form>
@@ -77,7 +77,7 @@ export default async function NotificationsPage({
       {(notifications ?? []).length === 0 ? (
         <p className="text-sm text-secondary">{t("empty")}</p>
       ) : (
-        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+        <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
           {(notifications ?? []).map((n) => (
             <li key={n.id} className={`flex items-start gap-3 px-4 py-3 ${n.read_at ? "opacity-60" : ""}`}>
               <span className="mt-1 text-xs">{n.read_at ? "○" : "●"}</span>

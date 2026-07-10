@@ -33,7 +33,7 @@ export default async function TourAttachmentsPage({
       <h1 className="font-display text-xl font-semibold tracking-tight">
         Tour files <span className="font-normal text-tertiary">· {tour.name}</span>
       </h1>
-      <div className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <div className="rounded-[12px] border border-hairline bg-surface p-4">
         <AttachmentsSection
           orgSlug={orgSlug}
           tourId={tourId}

@@ -55,7 +55,7 @@ export default async function TourPassesPage({
       {(passes ?? []).length === 0 ? (
         <p className="text-sm text-secondary">{t("empty")}</p>
       ) : (
-        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+        <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
           {(passes ?? []).map((pass) => (
             <li key={pass.id} className="flex items-center justify-between px-4 py-2">
               <span>
@@ -78,7 +78,7 @@ export default async function TourPassesPage({
       <form action={addPass} className="flex flex-wrap gap-2">
         <input name="name" required placeholder={t("name")} className="w-40 rounded border border-hairline px-3 py-2 text-sm" />
         <input name="description" placeholder={t("description")} className="min-w-48 flex-1 rounded border border-hairline px-3 py-2 text-sm" />
-        <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
+        <button className="btn-primary h-9">
           + {t("add")}
         </button>
       </form>

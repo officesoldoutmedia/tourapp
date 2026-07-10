@@ -195,7 +195,7 @@ export default async function ShowCostsPage({
         <a
           href={`/api/pdf/costsheet/${eventId}`}
           target="_blank"
-          className="flex items-center gap-1.5 rounded-md border border-hairline bg-surface px-3 py-1.5 text-sm shadow-xs transition-colors hover:bg-subtle"
+          className="flex items-center gap-1.5 rounded-md border border-hairline bg-surface px-3 py-1.5 text-sm transition-colors hover:bg-subtle"
         >
           <Printer size={15} strokeWidth={1.5} /> {t("costSheetPdf")}
         </a>
@@ -204,7 +204,7 @@ export default async function ShowCostsPage({
       {/* fee + booking % */}
       <form
         action={saveFinance}
-        className="flex flex-wrap items-end gap-3 rounded-lg border border-hairline bg-surface p-4 shadow-xs"
+        className="flex flex-wrap items-end gap-3 rounded-[12px] border border-hairline bg-surface p-4"
       >
         <label className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
           {t("fee")}
@@ -254,7 +254,7 @@ export default async function ShowCostsPage({
           </label>
         ))}
         {canEdit && (
-          <button className="rounded bg-accent hover:bg-accent-hover px-4 py-1.5 text-sm font-medium text-white">
+          <button className="btn-primary">
             {tc("save")}
           </button>
         )}
@@ -266,7 +266,7 @@ export default async function ShowCostsPage({
       </form>
 
       {/* echipa show-ului: selectezi cine merge la ACEST show */}
-      <section className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <section className="rounded-[12px] border border-hairline bg-surface p-4">
         <h2 className="mb-1 font-display text-lg font-semibold tracking-tight">{t("crewTitle")}</h2>
         <p className="mb-3 text-xs text-tertiary">{t("crewHint")}</p>
         {(crew ?? []).length === 0 ? (
@@ -310,7 +310,7 @@ export default async function ShowCostsPage({
       </section>
 
       {/* liniile de cost */}
-      <section className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <section className="rounded-[12px] border border-hairline bg-surface p-4">
         <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">{t("costsTitle")}</h2>
         {(costs ?? []).length === 0 && (
           <p className="text-sm text-tertiary">{t("noCosts")}</p>
@@ -385,7 +385,7 @@ export default async function ShowCostsPage({
               <input type="checkbox" name="toBooker" defaultChecked className="accent-[var(--accent)]" />
               {t("toBooker")}
             </label>
-            <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-sm font-medium text-white">
+            <button className="btn-quiet h-7 px-2.5">
               + {t("addExtra")}
             </button>
           </form>
@@ -393,7 +393,7 @@ export default async function ShowCostsPage({
       </section>
 
       {/* totaluri + profit */}
-      <section className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+      <section className="rounded-[12px] border border-hairline bg-surface p-4">
         <dl className="space-y-1.5 text-sm">
           <div className="flex justify-between">
             <dt className="text-secondary">{t("fee")}</dt>

@@ -52,7 +52,7 @@ export default async function InvitePage({
               >
                 <button
                   type="submit"
-                  className="rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
+                  className="btn-primary h-9"
                 >
                   {t("accept")}
                 </button>
@@ -64,7 +64,7 @@ export default async function InvitePage({
                 </p>
                 <Link
                   href={`/login?next=${encodeURIComponent(`/invite/${token}`)}`}
-                  className="inline-block rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
+                  className="btn-primary h-9inline-block "
                 >
                   {t("accept")}
                 </Link>

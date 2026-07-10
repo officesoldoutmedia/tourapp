@@ -12,6 +12,7 @@ export default async function TourCalendarPage({
   const { orgSlug, tourId } = await params;
   const { supabase } = await requireOrg(orgSlug);
   const t = await getTranslations("tourCalendar");
+  const td = await getTranslations("dayTypes");
   const locale = await getLocale();
 
   const [{ data: tour }, { data: days }] = await Promise.all([
@@ -52,11 +53,20 @@ export default async function TourCalendarPage({
     ),
   );
 
+  const DOT: Record<string, string> = {
+    show: "var(--accent)",
+    travel: "var(--warning)",
+    day_off: "var(--text-disabled)",
+  };
+
   return (
-    <main className="mx-auto w-full max-w-5xl space-y-8 p-6">
-      <h1 className="font-display text-xl font-semibold tracking-tight">
-        {t("title")} <span className="font-normal text-tertiary">· {tour.name}</span>
-      </h1>
+    <main className="w-full px-8 pb-11">
+      <header className="border-b border-hairline pb-5 pt-[26px]">
+        <p className="text-[11.5px] text-secondary">{tour.name}</p>
+        <h1 className="page-title mt-1">{t("title")}</h1>
+      </header>
+
+      <div className="space-y-8 pt-6">
 
       {months.map((month) => {
         const monthStart = new Date(`${month}-01T00:00:00Z`);
@@ -77,43 +87,65 @@ export default async function TourCalendarPage({
         while (cells.length % 7 !== 0) cells.push(null);
 
         return (
-          <section key={month} className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-xs">
-            <h2 className="border-b border-hairline px-4 py-2 font-display text-lg font-semibold capitalize tracking-tight">
-              {label}
-            </h2>
-            <div className="grid grid-cols-7 border-b border-hairline bg-subtle text-center text-[11px] font-semibold uppercase tracking-wider text-tertiary">
+          <section key={month}>
+            <div className="flex items-baseline justify-between pb-2">
+              <h2 className="font-display text-[14px] font-semibold capitalize text-primary">
+                {label}
+              </h2>
+            </div>
+            <div className="grid grid-cols-7 px-3 pb-2">
               {weekdays.map((wd) => (
-                <span key={wd} className="py-1.5">
+                <span key={wd} className="eyebrow" style={{ letterSpacing: "0.08em" }}>
                   {wd}
                 </span>
               ))}
             </div>
-            <div className="grid grid-cols-7">
+            <div className="grid grid-cols-7 overflow-hidden rounded-[12px] border border-hairline bg-calendar-grid">
               {cells.map((date, i) => {
+                const isLastCol = i % 7 === 6;
+                const isLastRow = i >= cells.length - 7;
+                const cellBorder = `${isLastCol ? "" : "border-r "}${isLastRow ? "" : "border-b "}border-faint`;
                 if (!date)
-                  return <div key={i} className="min-h-20 border-b border-r border-hairline bg-subtle/40 [&:nth-child(7n)]:border-r-0" />;
+                  return <div key={i} className={`min-h-24 px-3 py-2.5 ${cellBorder}`} />;
                 const day = byDate.get(date);
-                const dayNum = Number(date.slice(8));
+                const dayNum = date.slice(8);
                 const isToday = date === todayKey;
                 const inner = (
                   <>
-                    <span
-                      className={`text-xs font-mono ${isToday ? "rounded-full bg-accent px-1.5 py-0.5 font-bold text-white" : day ? "text-primary" : "text-disabled"}`}
-                    >
-                      {dayNum}
+                    <span className="flex items-center gap-1.5">
+                      <span
+                        className={`font-mono text-[12px] ${isToday ? "font-semibold text-accent" : day ? "text-secondary" : "text-disabled"}`}
+                      >
+                        {dayNum}
+                      </span>
+                      {isToday && (
+                        <span
+                          className="font-display text-[8.5px] font-semibold uppercase text-accent"
+                          style={{ letterSpacing: "0.07em" }}
+                        >
+                          {t("todayTag")}
+                        </span>
+                      )}
                     </span>
-                    {day?.day_type === "show" && (
-                      <span className="mt-1 block rounded bg-accent-subtle px-1 py-0.5 text-center text-[9px] font-bold uppercase tracking-wider text-accent">
-                        {t("showDay")}
+                    {day && (day.events.length > 0 || day.city || day.day_type !== "new") && (
+                      <span className="mt-2.5 block">
+                        <span className="flex items-center gap-1.5">
+                          <span
+                            className="h-1.5 w-1.5 shrink-0 rounded-full"
+                            style={{ background: DOT[day.day_type] ?? "var(--text-disabled)" }}
+                          />
+                          <span
+                            className={`truncate text-[11.5px] font-medium ${day.day_type === "show" ? "text-primary" : "text-secondary"}`}
+                          >
+                            {day.events[0]?.title ?? day.events[0]?.venues?.name ?? day.city ?? td(day.day_type)}
+                          </span>
+                        </span>
+                        {(day.events.length > 0 || day.city) && (
+                          <span className="block truncate pl-3 font-mono text-[10px] text-tertiary">
+                            {day.events.length > 0 ? (day.city ?? "") : td(day.day_type)}
+                          </span>
+                        )}
                       </span>
-                    )}
-                    {day?.events.map((e) => (
-                      <span key={e.id} className="mt-0.5 block truncate text-[11px] font-medium leading-tight">
-                        {e.title ?? e.venues?.name}
-                      </span>
-                    ))}
-                    {day?.city && (
-                      <span className="block truncate text-[10px] text-tertiary">{day.city}</span>
                     )}
                   </>
                 );
@@ -121,12 +153,12 @@ export default async function TourCalendarPage({
                   <Link
                     key={i}
                     href={`/o/${orgSlug}/t/${tourId}/d/${date}`}
-                    className="min-h-20 border-b border-r border-hairline p-1.5 transition-colors hover:bg-subtle [&:nth-child(7n)]:border-r-0"
+                    className={`min-h-24 px-3 py-2.5 transition-colors hover:bg-fill-row-hover ${cellBorder}`}
                   >
                     {inner}
                   </Link>
                 ) : (
-                  <div key={i} className="min-h-20 border-b border-r border-hairline p-1.5 [&:nth-child(7n)]:border-r-0">
+                  <div key={i} className={`min-h-24 px-3 py-2.5 ${cellBorder}`}>
                     {inner}
                   </div>
                 );
@@ -135,6 +167,23 @@ export default async function TourCalendarPage({
           </section>
         );
       })}
+
+      {/* legenda */}
+      <div className="flex items-center gap-5 pt-1">
+        {(
+          [
+            ["show", t("legendShow")],
+            ["travel", t("legendTravel")],
+            ["day_off", t("legendDayOff")],
+          ] as const
+        ).map(([key, label]) => (
+          <span key={key} className="flex items-center gap-1.5 text-[10.5px] text-tertiary">
+            <span className="h-1.5 w-1.5 rounded-full" style={{ background: DOT[key] }} />
+            {label}
+          </span>
+        ))}
+      </div>
+      </div>
     </main>
   );
 }

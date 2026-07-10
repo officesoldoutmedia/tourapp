@@ -24,7 +24,8 @@
     "orSeparator": "sau",
     "invalidCredentials": "Email sau parolă incorecte.",
     "firstName": "Prenume",
-    "lastName": "Nume"
+    "lastName": "Nume",
+    "heading": "Autentificare"
   },
   "invite": {
     "title": "Invitație în organizație",
@@ -599,7 +600,7 @@
     "billingSave": "Salvează"
   },
   "personnel": {
-    "title": "Personal tur",
+    "title": "Personal",
     "last": "Nume",
     "first": "Prenume",
     "role": "Rol",
@@ -608,13 +609,20 @@
     "phone": "Telefon",
     "email": "Email",
     "party": "Party",
-    "empty": "Niciun membru încă — adaugă primul rând mai jos.",
+    "empty": "Niciun membru încă — adaugă prima persoană mai jos.",
     "addExistingContact": "Adaugă din contacte…",
     "costPerShow": "Cost/show",
     "paymentType": "Plată",
     "individual": "Pers. fizică",
     "currency": "Monedă",
-    "profile": "Profil & plăți"
+    "profile": "Profil & plăți",
+    "identityTitle": "Identitate & contact",
+    "firstName": "Prenume",
+    "lastName": "Nume",
+    "companyLabel": "Companie",
+    "countLine": "{count, plural, one {# persoană în crew} other {# persoane în crew}}",
+    "addPerson": "Adaugă persoană",
+    "addHint": "După adăugare, deschide profilul pentru poza, contactul, costurile și datele de plată."
   },
   "tourSettings": {
     "title": "Setări tur",
@@ -688,7 +696,11 @@
   },
   "tourCalendar": {
     "title": "Calendar",
-    "showDay": "Show Day"
+    "showDay": "Show Day",
+    "todayTag": "Azi",
+    "legendShow": "Show",
+    "legendTravel": "Deplasare",
+    "legendDayOff": "Zi liberă"
   },
   "crewProfile": {
     "backToPersonnel": "Înapoi la Personnel",

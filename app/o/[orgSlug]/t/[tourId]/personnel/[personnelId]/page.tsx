@@ -7,6 +7,7 @@ import { can } from "@/lib/permissions";
 import { formatMoney } from "@/lib/showFinance";
 import { PersonnelPhoto } from "./photo-client";
 import {
+  saveIdentity,
   saveBillingDetails,
   createAnnex,
   toggleAnnexPaid,
@@ -114,6 +115,7 @@ export default async function CrewProfilePage({
     }).format(new Date(`${date}T00:00:00Z`));
   const input = "rounded border border-hairline px-2 py-1 text-sm";
 
+  const saveIdent = saveIdentity.bind(null, orgSlug, tourId, personnelId);
   const saveBilling = saveBillingDetails.bind(null, orgSlug, tourId, personnelId);
   const makeAnnex = createAnnex.bind(null, orgSlug, tourId, personnelId);
   const togglePaid = toggleAnnexPaid.bind(null, orgSlug, tourId, personnelId);
@@ -156,7 +158,7 @@ export default async function CrewProfilePage({
       )}
 
       {/* header: poză + identitate */}
-      <header className="flex flex-wrap items-center gap-5 rounded-lg border border-hairline bg-surface p-5 shadow-xs">
+      <header className="flex flex-wrap items-center gap-5 rounded-lg border border-hairline bg-surface p-5">
         <PersonnelPhoto
           orgSlug={orgSlug}
           orgId={org.id}
@@ -215,9 +217,40 @@ export default async function CrewProfilePage({
         )}
       </header>
 
+      {/* identitate & contact — editarea completă trăiește în profil */}
+      {canEdit && (
+        <section className="rounded-[12px] border border-hairline bg-surface p-4">
+          <h2 className="section-title mb-3">{t("identityTitle")}</h2>
+          <form action={saveIdent} className="flex flex-wrap items-end gap-2">
+            {(
+              [
+                ["first", t("firstName"), person.first_name],
+                ["last", t("lastName"), person.last_name],
+                ["role", t("role"), person.role],
+                ["title", t("jobTitle"), person.title],
+                ["company", t("companyLabel"), person.company],
+                ["party", t("party"), person.party],
+                ["phone", t("phone"), (person.phones as { number?: string }[])?.[0]?.number],
+                ["email", t("email"), (person.emails as { email?: string }[])?.[0]?.email],
+              ] as const
+            ).map(([key, label, value]) => (
+              <label key={key} className="min-w-36 flex-1 space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+                {label}
+                <input
+                  name={key}
+                  defaultValue={value ?? ""}
+                  className={`${input} block w-full ${key === "phone" ? "font-mono" : ""}`}
+                />
+              </label>
+            ))}
+            <button className="btn-quiet">{t("save")}</button>
+          </form>
+        </section>
+      )}
+
       {/* datele de facturare */}
       {canAccounting && (
-        <section className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <section className="rounded-[12px] border border-hairline bg-surface p-4">
           <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">
             {t("billingTitle")}
           </h2>
@@ -246,7 +279,7 @@ export default async function CrewProfilePage({
               </label>
             ))}
             {canEditAccounting && (
-              <button className="rounded bg-accent hover:bg-accent-hover px-4 py-1.5 text-sm font-medium text-white">
+              <button className="btn-primary">
                 {t("save")}
               </button>
             )}
@@ -257,7 +290,7 @@ export default async function CrewProfilePage({
 
       {/* situația per show + creare anexă */}
       {canAccounting && (
-        <section className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <section className="rounded-[12px] border border-hairline bg-surface p-4">
           <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">
             {t("showsTitle")}
           </h2>
@@ -329,7 +362,7 @@ export default async function CrewProfilePage({
                     {t("fxRate")}
                     <input name="fxRate" type="number" step="0.0001" min="0" placeholder={t("fxRatePlaceholder")} className={`${input} block w-28 font-mono`} />
                   </label>
-                  <button className="rounded bg-accent hover:bg-accent-hover px-4 py-1.5 text-sm font-medium text-white">
+                  <button className="btn-primary">
                     <FileText size={14} strokeWidth={1.5} className="mr-1 inline" />
                     {t("createAnnex")}
                   </button>
@@ -343,7 +376,7 @@ export default async function CrewProfilePage({
 
       {/* anexele emise */}
       {canAccounting && (annexes ?? []).length > 0 && (
-        <section className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
+        <section className="rounded-[12px] border border-hairline bg-surface p-4">
           <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">
             {t("annexesTitle")}
           </h2>
@@ -373,7 +406,7 @@ export default async function CrewProfilePage({
                 <a
                   href={`/api/pdf/annex/${annex.id}`}
                   target="_blank"
-                  className="flex items-center gap-1 rounded-md border border-hairline bg-surface px-2 py-1 text-xs shadow-xs transition-colors hover:bg-subtle"
+                  className="flex items-center gap-1 rounded-md border border-hairline bg-surface px-2 py-1 text-xs transition-colors hover:bg-subtle"
                 >
                   <Printer size={13} strokeWidth={1.5} /> PDF
                 </a>

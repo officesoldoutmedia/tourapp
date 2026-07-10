@@ -51,7 +51,7 @@ export function VenueSection({
   }
 
   return (
-    <section className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs px-4 py-3">
+    <section className="space-y-2 rounded-[12px] border border-hairline bg-surface px-4 py-3">
       <div className="flex flex-wrap items-center gap-2">
         <span className="mr-auto text-sm font-medium">
           {t("venue")}: {venue.name}
@@ -120,7 +120,7 @@ export function VenueSection({
                   }),
                 )
               }
-              className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+              className="btn-quiet h-7 px-2.5 disabled:opacity-40"
             >
               {tc("save")}
             </button>

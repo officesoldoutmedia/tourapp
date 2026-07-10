@@ -42,9 +42,19 @@ function SignupForm() {
   }
 
   return (
-    <main className="flex min-h-screen items-center justify-center p-4">
-      <div className="w-full max-w-sm space-y-6">
-        <h1 className="font-display text-2xl font-semibold tracking-tight">{tc("appName")}</h1>
+    <main className="flex min-h-screen items-center justify-center bg-canvas p-4">
+      <div className="w-[360px] space-y-5 rounded-[16px] border border-hairline bg-surface p-7 shadow-panel">
+        <div className="flex items-center gap-2.5">
+          <span className="flex h-6 w-6 items-center justify-center rounded-[7px] border border-strong bg-raised font-display text-[11px] font-semibold text-primary">
+            T
+          </span>
+          <span className="font-display text-[13px] font-semibold tracking-[-0.01em] text-primary">
+            {tc("appName")}
+          </span>
+        </div>
+        <h1 className="font-display text-[20px] font-semibold tracking-tight text-primary">
+          {t("heading")}
+        </h1>
 
         {message ? (
           <p className="rounded-md border border-success bg-success-subtle p-3 text-sm text-success">
@@ -54,39 +64,39 @@ function SignupForm() {
           <form onSubmit={signUp} className="space-y-4">
             <div className="grid grid-cols-2 gap-3">
               <label className="block space-y-1">
-                <span className="text-sm font-medium">{t("firstName")}</span>
+                <span className="text-[11.5px] font-medium text-secondary">{t("firstName")}</span>
                 <input
                   required
                   autoComplete="given-name"
                   value={firstName}
                   onChange={(e) => setFirstName(e.target.value)}
-                  className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
+                  className="h-9 w-full rounded-[8px] border border-hairline px-3 text-[13px]"
                 />
               </label>
               <label className="block space-y-1">
-                <span className="text-sm font-medium">{t("lastName")}</span>
+                <span className="text-[11.5px] font-medium text-secondary">{t("lastName")}</span>
                 <input
                   required
                   autoComplete="family-name"
                   value={lastName}
                   onChange={(e) => setLastName(e.target.value)}
-                  className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
+                  className="h-9 w-full rounded-[8px] border border-hairline px-3 text-[13px]"
                 />
               </label>
             </div>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">{t("email")}</span>
+              <span className="text-[11.5px] font-medium text-secondary">{t("email")}</span>
               <input
                 type="email"
                 required
                 autoComplete="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
+                className="h-9 w-full rounded-[8px] border border-hairline px-3 text-[13px]"
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-sm font-medium">{t("password")}</span>
+              <span className="text-[11.5px] font-medium text-secondary">{t("password")}</span>
               <input
                 type="password"
                 required
@@ -94,7 +104,7 @@ function SignupForm() {
                 autoComplete="new-password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
+                className="h-9 w-full rounded-[8px] border border-hairline px-3 text-[13px]"
               />
             </label>
 
@@ -103,7 +113,7 @@ function SignupForm() {
             <button
               type="submit"
               disabled={pending}
-              className="w-full rounded-md bg-accent hover:bg-accent-hover px-3 py-2 text-sm font-medium text-white disabled:opacity-50"
+              className="btn-primary h-9 w-full"
             >
               {t("signUp")}
             </button>

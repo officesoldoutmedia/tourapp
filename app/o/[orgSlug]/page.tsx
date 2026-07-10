@@ -31,7 +31,7 @@ export default async function OrgDashboard({
         {canManage && (
           <Link
             href={`/o/${org.slug}/tours/new`}
-            className="rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white"
+            className="btn-primary h-9"
           >
             {t("newTour")}
           </Link>
@@ -41,7 +41,7 @@ export default async function OrgDashboard({
       {active.length === 0 ? (
         <p className="text-sm text-secondary">{t("empty")}</p>
       ) : (
-        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+        <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
           {active.map((tour) => (
             <li key={tour.id}>
               <Link
@@ -63,7 +63,7 @@ export default async function OrgDashboard({
           <h2 className="text-sm font-medium text-secondary">
             {t("archived")}
           </h2>
-          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs opacity-60">
+          <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface opacity-60">
             {archived.map((tour) => (
               <li key={tour.id}>
                 <Link

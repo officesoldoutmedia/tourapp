@@ -117,7 +117,7 @@ function PlaceInput({
         className="w-full rounded border border-hairline px-2 py-1 text-sm"
       />
       {items.length > 0 && (
-        <ul className="absolute left-0 top-full z-20 mt-1 w-max min-w-full max-w-[28rem] overflow-hidden rounded-md border border-hairline bg-surface shadow-md">
+        <ul className="absolute left-0 top-full z-20 mt-1 w-max min-w-full max-w-[28rem] overflow-hidden rounded-md border border-hairline bg-surface shadow-popover">
           {items.map((sug) => (
             <li key={sug}>
               <button
@@ -184,7 +184,7 @@ export function TravelSection({
         {canEdit && !adding && !editing && (
           <button
             onClick={() => setAdding(true)}
-            className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
+            className="btn-quiet h-7 px-2.5"
           >
             + {t("add")}
           </button>
@@ -195,7 +195,7 @@ export function TravelSection({
         <p className="text-sm text-tertiary">{t("noItems")}</p>
       )}
 
-      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
+      <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface empty:hidden">
         {items.map((item) => (
           <li key={item.id} className="px-3 py-2">
             <div className="flex items-center gap-2">
@@ -431,14 +431,14 @@ function TravelForm({
   }
 
   return (
-    <div className="space-y-3 rounded-lg border border-hairline bg-surface shadow-xs p-3">
+    <div className="space-y-3 rounded-[12px] border border-hairline bg-surface p-3">
       {/* tabs GROUND|AIR|RAIL|SEA [C-S] */}
       <div className="flex gap-1">
         {(Object.keys(TYPE_ICON) as TravelType[]).map((tt) => (
           <button
             key={tt}
             onClick={() => setType(tt)}
-            className={`rounded px-3 py-1 text-xs font-semibold uppercase ${type === tt ? "bg-accent hover:bg-accent-hover text-white" : "bg-inset text-secondary"}`}
+            className={`h-[26px] rounded-[6px] px-3 font-display text-[12px] font-medium transition-colors ${type === tt ? "bg-fill-segment-active text-primary" : "text-secondary hover:text-primary"}`}
           >
             {t(tt)}
           </button>
@@ -538,7 +538,7 @@ function TravelForm({
                       setDepart(toHhmm(suggestion!.departMin));
                       setArrive(toHhmm(suggestion!.arriveMin));
                     }}
-                    className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 font-mono text-xs font-medium text-white"
+                    className="btn-quiet h-7 px-2.5"
                   >
                     {t("leaveAt")} {toHhmm(suggestion.departMin)} → {toHhmm(suggestion.arriveMin)}
                   </button>
@@ -584,13 +584,13 @@ function TravelForm({
         <span className="flex rounded-full bg-inset p-0.5 text-xs font-semibold">
           <button
             onClick={() => setAutoTitle(true)}
-            className={`rounded-full px-3 py-1 transition-colors ${autoTitle ? "bg-surface text-primary shadow-xs" : "text-tertiary hover:text-secondary"}`}
+            className={`rounded-full px-3 py-1 transition-colors ${autoTitle ? "bg-surface text-primary" : "text-tertiary hover:text-secondary"}`}
           >
             {t("autoTitle")}
           </button>
           <button
             onClick={() => setAutoTitle(false)}
-            className={`rounded-full px-3 py-1 transition-colors ${!autoTitle ? "bg-surface text-primary shadow-xs" : "text-tertiary hover:text-secondary"}`}
+            className={`rounded-full px-3 py-1 transition-colors ${!autoTitle ? "bg-surface text-primary" : "text-tertiary hover:text-secondary"}`}
           >
             {t("customTitle")}
           </button>
@@ -626,7 +626,7 @@ function TravelForm({
         <button
           disabled={pending}
           onClick={() => save(false)}
-          className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+          className="btn-quiet h-7 px-2.5 disabled:opacity-40"
         >
           {tc("save")}
         </button>
@@ -731,7 +731,7 @@ function FlightLegs({
                 return r;
               })
             }
-            className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-white disabled:opacity-40"
+            className="btn-quiet h-7 px-2.5"
           >
             + {t("addLeg")}
           </button>
@@ -784,7 +784,7 @@ function PassengerPicker({
           <button
             disabled={pending}
             onClick={() => onSave([...selected])}
-            className="rounded bg-accent hover:bg-accent-hover px-2 py-0.5 text-white"
+            className="btn-quiet h-7 px-2.5"
           >
             ✓
           </button>

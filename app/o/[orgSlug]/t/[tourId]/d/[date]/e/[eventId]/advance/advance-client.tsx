@@ -102,7 +102,7 @@ export function AdvanceEditor({
     <div className="grid gap-6 md:grid-cols-[16rem_1fr]">
       {/* Sidebar advances [C] */}
       <aside className="space-y-3">
-        <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
+        <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface empty:hidden">
           {advances.map((advance) => (
             <li key={advance.id}>
               <button
@@ -119,7 +119,7 @@ export function AdvanceEditor({
           <p className="text-sm text-tertiary">{t("noAdvances")}</p>
         )}
         {canEdit && (
-          <div className="space-y-2 rounded-lg border border-hairline bg-surface shadow-xs p-3">
+          <div className="space-y-2 rounded-[12px] border border-hairline bg-surface p-3">
             <input
               value={newTitle}
               onChange={(e) => setNewTitle(e.target.value)}
@@ -149,7 +149,7 @@ export function AdvanceEditor({
                   return r;
                 })
               }
-              className="w-full rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs font-medium text-white disabled:opacity-40"
+              className="btn-quiet h-7 px-2.5w-full  disabled:opacity-40"
             >
               + {t("addAdvance")}
             </button>
@@ -188,7 +188,7 @@ export function AdvanceEditor({
                     <button
                       key={m}
                       onClick={() => setMode(m)}
-                      className={`rounded-full px-3 py-1 transition-colors ${mode === m ? "bg-surface text-primary shadow-xs" : "text-tertiary hover:text-secondary"}`}
+                      className={`rounded-full px-3 py-1 transition-colors ${mode === m ? "bg-surface text-primary" : "text-tertiary hover:text-secondary"}`}
                     >
                       {t(`${m}Mode`)}
                     </button>
@@ -375,7 +375,7 @@ function ScheduleRowEditor({
         <button
           disabled={pending}
           onClick={() => onSave({ title, start, end, confirmed })}
-          className="rounded bg-accent hover:bg-accent-hover px-2 py-1 text-xs text-white"
+          className="btn-quiet h-7 px-2.5"
         >
           ✓
         </button>
@@ -450,7 +450,7 @@ function DesignMode({
         </button>
       </div>
 
-      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
+      <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface empty:hidden">
         {layout.map((item, idx) => (
           <li key={idx} className="flex items-center gap-2 px-3 py-2 text-sm">
             <span className="cursor-default text-disabled">⠿</span>

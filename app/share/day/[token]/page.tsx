@@ -59,7 +59,7 @@ export default async function SharedDayPage({
       {day.schedule.length > 0 && (
         <section>
           <h2 className="mb-1 text-xs font-semibold uppercase tracking-wide text-tertiary">Schedule</h2>
-          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+          <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
             {day.schedule.map((item, i) => (
               <li key={i} className="flex gap-3 px-3 py-2 text-sm">
                 <span className="w-24 shrink-0 font-mono text-xs text-secondary">
@@ -88,7 +88,7 @@ export default async function SharedDayPage({
       {day.travel.length > 0 && (
         <section>
           <h2 className="mb-1 text-xs font-semibold uppercase tracking-wide text-tertiary">Travel</h2>
-          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+          <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
             {day.travel.map((item, i) => (
               <li key={i} className="flex gap-3 px-3 py-2 text-sm">
                 <span className="w-24 shrink-0 font-mono text-xs text-secondary">

@@ -87,7 +87,7 @@ export default async function ContactsPage({
         {(companies ?? []).length === 0 ? (
           <p className="text-sm text-secondary">{t("emptyCompanies")}</p>
         ) : (
-          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+          <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
             {(companies ?? []).map((company) => (
               <li key={company.id} className="flex items-center gap-2 px-4 py-2 text-sm">
                 <span className="min-w-0 flex-1">
@@ -113,7 +113,7 @@ export default async function ContactsPage({
             <input name="kind" placeholder={t("kind")} className={`${inputCls} w-32`} />
             <input name="phone" placeholder="Tel" className={`${inputCls} w-28`} />
             <input name="email" placeholder="Email" className={`${inputCls} w-40`} />
-            <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1.5 text-sm font-medium text-white">+ {t("addCompany")}</button>
+            <button className="btn-quiet h-7 px-2.5">+ {t("addCompany")}</button>
           </form>
         )}
       </section>
@@ -123,7 +123,7 @@ export default async function ContactsPage({
         {(contacts ?? []).length === 0 ? (
           <p className="text-sm text-secondary">{t("emptyContacts")}</p>
         ) : (
-          <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs">
+          <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
             {(contacts ?? []).map((contact) => (
               <li key={contact.id} className="flex items-center gap-2 px-4 py-2 text-sm">
                 <span className="min-w-0 flex-1">
@@ -161,7 +161,7 @@ export default async function ContactsPage({
             </select>
             <input name="phone" placeholder="Tel" className={`${inputCls} w-28`} />
             <input name="email" placeholder="Email" className={`${inputCls} w-40`} />
-            <button className="rounded bg-accent hover:bg-accent-hover px-3 py-1.5 text-sm font-medium text-white">+ {t("addContact")}</button>
+            <button className="btn-quiet h-7 px-2.5">+ {t("addContact")}</button>
           </form>
         )}
       </section>

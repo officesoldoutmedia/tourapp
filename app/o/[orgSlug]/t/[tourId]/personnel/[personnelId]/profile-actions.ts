@@ -33,6 +33,31 @@ export async function setPersonnelPhoto(
   return {};
 }
 
+export async function saveIdentity(
+  orgSlug: string,
+  tourId: string,
+  personnelId: string,
+  formData: FormData,
+): Promise<void> {
+  const { supabase } = await requireOrg(orgSlug);
+  const phone = String(formData.get("phone") ?? "").trim();
+  const email = String(formData.get("email") ?? "").trim();
+  await supabase
+    .from("tour_personnel")
+    .update({
+      first_name: String(formData.get("first") ?? "").trim() || null,
+      last_name: String(formData.get("last") ?? "").trim() || null,
+      role: String(formData.get("role") ?? "").trim() || null,
+      title: String(formData.get("title") ?? "").trim() || null,
+      company: String(formData.get("company") ?? "").trim() || null,
+      party: String(formData.get("party") ?? "").trim() || null,
+      phones: phone ? [{ number: phone }] : [],
+      emails: email ? [{ email }] : [],
+    })
+    .eq("id", personnelId);
+  revalidatePath(profilePath(orgSlug, tourId, personnelId));
+}
+
 export async function saveBillingDetails(
   orgSlug: string,
   tourId: string,

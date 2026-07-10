@@ -135,7 +135,7 @@ export function TourWizard({
       {days.length > 0 && (
         <section className="space-y-3">
           <h2 className="font-display text-lg font-semibold tracking-tight">{t("wizardDays")}</h2>
-          <div className="overflow-x-auto rounded-lg border border-hairline bg-surface shadow-xs">
+          <div className="overflow-x-auto rounded-[12px] border border-hairline bg-surface">
             <table className="w-full text-sm">
               <thead className="bg-subtle text-left text-xs uppercase text-secondary">
                 <tr>
@@ -229,7 +229,7 @@ export function TourWizard({
       <button
         onClick={submit}
         disabled={pending || !name.trim() || days.length === 0}
-        className="rounded-md bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white disabled:opacity-50"
+        className="btn-primary h-9 disabled:opacity-50"
       >
         {t("createTour")}
       </button>

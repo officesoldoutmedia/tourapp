@@ -154,7 +154,7 @@ export function ScheduleSection({
             </button>
             <button
               onClick={() => setAdding(true)}
-              className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white"
+              className="btn-quiet h-7 px-2.5"
             >
               + {t("add")}
             </button>
@@ -166,7 +166,7 @@ export function ScheduleSection({
         <p className="text-sm text-tertiary">{t("noItems")}</p>
       )}
 
-      <ul className="divide-y divide-hairline rounded-lg border border-hairline bg-surface shadow-xs empty:hidden">
+      <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface empty:hidden">
         {items.map((item) =>
           editing?.id === item.id ? (
             <li key={item.id} className="p-3">
@@ -267,7 +267,7 @@ export function ScheduleSection({
       </ul>
 
       {adding && (
-        <div className="rounded-lg border border-hairline bg-surface shadow-xs p-3">
+        <div className="rounded-[12px] border border-hairline bg-surface p-3">
           <ItemForm
             initial={null}
             day={day}
@@ -394,7 +394,7 @@ function ItemForm({
               tz: day.timezone,
             })
           }
-          className="rounded bg-accent hover:bg-accent-hover px-3 py-1 text-xs font-medium text-white disabled:opacity-40"
+          className="btn-quiet h-7 px-2.5 disabled:opacity-40"
         >
           {tc("save")}
         </button>

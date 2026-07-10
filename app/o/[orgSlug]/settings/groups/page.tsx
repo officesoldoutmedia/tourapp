@@ -90,7 +90,7 @@ export default async function GroupsSettingsPage({
           ((group.group_members ?? []) as { user_id: string }[]).map((m) => m.user_id),
         );
         return (
-          <section key={group.id} className="rounded-lg border border-hairline bg-surface shadow-xs">
+          <section key={group.id} className="rounded-[12px] border border-hairline bg-surface">
             <header className="flex items-center justify-between border-b border-hairline bg-subtle px-4 py-2">
               <b className="text-sm">{group.name}</b>
               <form action={removeGroup}>
@@ -107,7 +107,7 @@ export default async function GroupsSettingsPage({
                     <input type="hidden" name="userId" value={userId} />
                     <input type="hidden" name="inGroup" value={active ? "1" : "0"} />
                     <button
-                      className={`rounded-full px-3 py-1 text-xs ${active ? "bg-accent hover:bg-accent-hover font-medium text-white" : "border border-hairline text-secondary"}`}
+                      className={`rounded-full px-3 py-1 text-xs transition-colors ${active ? "bg-accent-subtle font-medium text-accent-soft" : "border border-hairline text-secondary hover:bg-fill-control"}`}
                     >
                       {nameOf(userId)}
                     </button>
@@ -121,7 +121,7 @@ export default async function GroupsSettingsPage({
 
       <form action={addGroup} className="flex gap-2">
         <input name="name" required placeholder={t("groupName")} className="min-w-40 flex-1 rounded border border-hairline px-3 py-2 text-sm" />
-        <button className="rounded bg-accent hover:bg-accent-hover px-4 py-2 text-sm font-medium text-white">
+        <button className="btn-primary h-9">
           + {t("addGroup")}
         </button>
       </form>

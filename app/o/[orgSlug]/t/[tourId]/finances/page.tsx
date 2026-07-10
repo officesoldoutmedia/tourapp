@@ -112,7 +112,7 @@ export default async function TourFinancesPage({
       {shows.length === 0 ? (
         <p className="text-sm text-tertiary">{t("empty")}</p>
       ) : (
-        <div className="overflow-hidden rounded-lg border border-hairline bg-surface shadow-xs">
+        <div className="overflow-hidden rounded-[12px] border border-hairline bg-surface">
           <div className="grid grid-cols-[4.5rem_1fr_6.5rem_6.5rem_6.5rem_7rem] gap-2 border-b border-hairline bg-subtle px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-secondary">
             <span>{t("date")}</span>
             <span>{t("show")}</span>
@@ -147,7 +147,7 @@ export default async function TourFinancesPage({
               </span>
               <Link
                 href={`/o/${orgSlug}/t/${tourId}/d/${show.date}/e/${show.id}/costs`}
-                className="justify-self-end rounded-md border border-hairline bg-surface px-2 py-1 text-xs shadow-xs transition-colors hover:bg-subtle"
+                className="justify-self-end rounded-md border border-hairline bg-surface px-2 py-1 text-xs transition-colors hover:bg-subtle"
               >
                 {t("open")}
               </Link>
