@@ -502,7 +502,14 @@
     "download": "Download",
     "empty": "No files.",
     "uploading": "Uploading…",
-    "needsStack": "Upload requires the Supabase stack (storage)."
+    "needsStack": "Upload requires the Supabase stack (storage).",
+    "pageTitle": "Documents",
+    "search": "Search files…",
+    "allTags": "All",
+    "noMatches": "No files match the filters.",
+    "uploadedToast": "File uploaded",
+    "deletedToast": "File deleted",
+    "deleteFile": "Delete"
   },
   "contacts": {
     "title": "Companies & Contacts",

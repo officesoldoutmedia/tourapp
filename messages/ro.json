@@ -502,7 +502,14 @@
     "download": "Descarcă",
     "empty": "Niciun fișier.",
     "uploading": "Se încarcă…",
-    "needsStack": "Upload-ul cere stack-ul Supabase (storage)."
+    "needsStack": "Upload-ul cere stack-ul Supabase (storage).",
+    "pageTitle": "Documente",
+    "search": "Caută fișiere…",
+    "allTags": "Toate",
+    "noMatches": "Niciun fișier nu se potrivește filtrelor.",
+    "uploadedToast": "Fișier încărcat",
+    "deletedToast": "Fișier șters",
+    "deleteFile": "Șterge"
   },
   "contacts": {
     "title": "Companies & Contacts",
