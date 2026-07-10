@@ -1,11 +1,9 @@
-import Link from "next/link";
 import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
-import { getTranslations } from "next-intl/server";
-import { ChevronRight } from "lucide-react";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { formatMoney } from "@/lib/showFinance";
+import { PersonnelClient, type PersonRow } from "./personnel-client";
 
 /**
  * Personnel — listă Graphite (README §9): rânduri h56 cu avatar,
@@ -20,7 +18,6 @@ export default async function PersonnelPage({
 }) {
   const { orgSlug, tourId } = await params;
   const { supabase, permission, tier } = await requireOrg(orgSlug);
-  const t = await getTranslations("personnel");
   const canEdit = can({ tier, permission }, "edit_tour_content");
   const canSeeCosts = can({ tier, permission }, "view_accounting");
 
@@ -71,80 +68,28 @@ export default async function PersonnelPage({
   };
   const rows = (people ?? []) as Person[];
 
-  const input =
-    "h-8 rounded-[8px] border border-hairline px-2.5 text-[12.5px] text-primary placeholder:text-tertiary";
+  const listRows: PersonRow[] = rows.map((person) => ({
+    id: person.id,
+    name: [person.first_name, person.last_name].filter(Boolean).join(" ") || "—",
+    initials:
+      [person.first_name?.[0], person.last_name?.[0]].filter(Boolean).join("").toUpperCase() ||
+      "?",
+    sub: [person.role, person.company].filter(Boolean).join(" · ") || "—",
+    party: person.party,
+    phone: person.phones?.[0]?.number ?? null,
+    cost:
+      canSeeCosts && person.cost_per_show != null
+        ? formatMoney(Number(person.cost_per_show), person.cost_currency ?? "RON")
+        : null,
+  }));
 
   return (
-    <main className="w-full px-8 pb-11">
-      <header className="border-b border-hairline pb-5 pt-[26px]">
-        <p className="text-[11.5px] text-secondary">
-          {t("countLine", { count: rows.length })}
-        </p>
-        <h1 className="page-title mt-1">{t("title")}</h1>
-      </header>
-
-      <div className="mx-auto w-full max-w-[960px] pt-6">
-        {rows.length === 0 && (
-          <p className="py-6 text-[12.5px] text-tertiary">{t("empty")}</p>
-        )}
-
-        <ul>
-          {rows.map((person) => {
-            const name =
-              [person.first_name, person.last_name].filter(Boolean).join(" ") || "—";
-            const initials =
-              [person.first_name?.[0], person.last_name?.[0]]
-                .filter(Boolean)
-                .join("")
-                .toUpperCase() || "?";
-            const phone = person.phones?.[0]?.number ?? null;
-            return (
-              <li key={person.id}>
-                <Link
-                  href={`/o/${orgSlug}/t/${tourId}/personnel/${person.id}`}
-                  className="grid h-14 grid-cols-[44px_1.3fr_90px_150px_140px_20px] items-center border-b border-faint transition-colors hover:bg-fill-row-hover"
-                >
-                  <span className="flex h-8 w-8 items-center justify-center rounded-full bg-avatar font-display text-[9px] font-semibold text-secondary">
-                    {initials}
-                  </span>
-                  <span className="min-w-0 pr-3">
-                    <span className="block truncate text-[13px] font-medium text-primary">
-                      {name}
-                    </span>
-                    <span className="block truncate text-[11px] text-secondary">
-                      {[person.role, person.company].filter(Boolean).join(" · ") || "—"}
-                    </span>
-                  </span>
-                  <span>
-                    {person.party && (
-                      <span className="rounded-full border border-hairline bg-fill-control px-2 py-[3px] text-[10px] font-medium text-secondary">
-                        {person.party}
-                      </span>
-                    )}
-                  </span>
-                  <span className="font-mono text-[11.5px] text-tertiary">{phone ?? "—"}</span>
-                  <span className="font-mono text-[11.5px] text-secondary">
-                    {canSeeCosts && person.cost_per_show != null
-                      ? formatMoney(Number(person.cost_per_show), person.cost_currency ?? "RON")
-                      : ""}
-                  </span>
-                  <ChevronRight size={14} strokeWidth={1.75} className="text-disabled" />
-                </Link>
-              </li>
-            );
-          })}
-        </ul>
-
-        {canEdit && (
-          <form action={addPerson} className="flex flex-wrap items-center gap-2 pt-4">
-            <input name="first" placeholder={t("first")} className={`${input} w-36`} />
-            <input name="last" placeholder={t("last")} className={`${input} w-36`} />
-            <input name="role" placeholder={t("role")} className={`${input} w-44`} />
-            <button className="btn-quiet">+ {t("addPerson")}</button>
-            <p className="w-full text-[10.5px] text-tertiary">{t("addHint")}</p>
-          </form>
-        )}
-      </div>
-    </main>
+    <PersonnelClient
+      orgSlug={orgSlug}
+      tourId={tourId}
+      rows={listRows}
+      canEdit={canEdit}
+      addAction={addPerson}
+    />
   );
 }

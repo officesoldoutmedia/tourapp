@@ -638,7 +638,9 @@
     "companyLabel": "Companie",
     "countLine": "{count, plural, one {# persoană în crew} other {# persoane în crew}}",
     "addPerson": "Adaugă persoană",
-    "addHint": "După adăugare, deschide profilul pentru poza, contactul, costurile și datele de plată."
+    "addHint": "După adăugare, deschide profilul pentru poza, contactul, costurile și datele de plată.",
+    "filter": "Filtrează persoane…",
+    "noMatches": "Nicio persoană nu se potrivește filtrului."
   },
   "tourSettings": {
     "title": "Setări tur",
@@ -656,7 +658,14 @@
     "logoUpload": "Încarcă logo",
     "logoRemove": "Șterge",
     "logoUploaded": "Logo salvat",
-    "logoHint": "Apare pe antetul PDF-urilor de day sheet și tour book. Merge cel mai bine un PNG cu fundal transparent."
+    "logoHint": "Apare pe antetul PDF-urilor de day sheet și tour book. Merge cel mai bine un PNG cu fundal transparent.",
+    "detailsSection": "Detaliile turului",
+    "prefsSection": "Preferințe",
+    "visibleMobileHint": "Echipa vede turul în aplicația mobilă.",
+    "archiveTitle": "Arhivează turul",
+    "archiveHint": "Ascunde turul din workspace. Datele se păstrează.",
+    "archive": "Arhivează",
+    "unarchive": "Dezarhivează"
   },
   "showCosts": {
     "title": "Costuri & profit",

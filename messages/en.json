@@ -638,7 +638,9 @@
     "companyLabel": "Company",
     "countLine": "{count, plural, one {# person on the crew} other {# people on the crew}}",
     "addPerson": "Add person",
-    "addHint": "After adding, open the profile to set the photo, contact, costs and payment details."
+    "addHint": "After adding, open the profile to set the photo, contact, costs and payment details.",
+    "filter": "Filter people…",
+    "noMatches": "No people match the filter."
   },
   "tourSettings": {
     "title": "Tour settings",
@@ -656,7 +658,14 @@
     "logoUpload": "Upload logo",
     "logoRemove": "Remove",
     "logoUploaded": "Logo saved",
-    "logoHint": "Shown on the day sheet and tour book PDF headers. PNG with transparent background works best."
+    "logoHint": "Shown on the day sheet and tour book PDF headers. PNG with transparent background works best.",
+    "detailsSection": "Tour details",
+    "prefsSection": "Preferences",
+    "visibleMobileHint": "Crew sees this tour in the mobile app.",
+    "archiveTitle": "Archive this tour",
+    "archiveHint": "Hides the tour from the workspace. Data is preserved.",
+    "archive": "Archive",
+    "unarchive": "Unarchive"
   },
   "showCosts": {
     "title": "Costs & profit",

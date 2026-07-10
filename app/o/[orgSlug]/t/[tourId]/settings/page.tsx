@@ -5,9 +5,10 @@ import Link from "next/link";
 import { Users, ChevronRight } from "lucide-react";
 import { requireOrg } from "@/lib/org";
 import { hasMinPermission } from "@/lib/permissions";
+import { PageHeader } from "@/components/ui/PageHeader";
 import { TourLogo } from "./logo-client";
 
-/** Tour Settings — nume, logo, arhivare, vizibilitate mobil, ștergere [C-S MT]. */
+/** Tour Settings (prototip Graphite): Tour details / Preferences / Archive. */
 export default async function TourSettingsPage({
   params,
 }: {
@@ -75,124 +76,153 @@ export default async function TourSettingsPage({
     redirect(`/o/${orgSlug}`);
   }
 
-  const toggles: [string, string, boolean][] = [
-    ["is_archived", t("archived"), tour.is_archived],
-    ["visible_on_mobile", t("visibleMobile"), tour.visible_on_mobile],
-  ];
+  const label = "block text-[11.5px] font-medium text-secondary";
+  const input =
+    "h-9 w-full rounded-[8px] border border-hairline bg-inset px-3 text-[13px] text-primary outline-none";
 
   return (
-    <main className="mx-auto w-full max-w-2xl space-y-6 p-6">
-      <h1 className="font-display text-xl font-semibold tracking-tight">{t("title")}</h1>
+    <main className="w-full pb-11">
+      <PageHeader eyebrow={tour.name} title={t("title")} />
 
-      <form action={rename} className="space-y-2 rounded-[12px] border border-hairline bg-surface p-4">
-        <label className="block text-xs font-semibold uppercase tracking-wider text-secondary">
-          {t("tourName")}
-        </label>
-        <div className="flex gap-2">
-          <input name="name" defaultValue={tour.name} required className="flex-1 rounded border border-hairline px-3 py-2 text-sm" />
-          <button className="btn-primary h-9">
-            {tc("save")}
-          </button>
+      <div className="max-w-[640px] px-8 pt-7">
+        {/* ── Tour details ── */}
+        <h2 className="mb-4 font-display text-[13px] font-semibold text-primary">
+          {t("detailsSection")}
+        </h2>
+        <div className="grid gap-4">
+          <form action={rename}>
+            <label className={label} htmlFor="tour-name">
+              {t("tourName")}
+            </label>
+            <div className="mt-1.5 flex gap-2">
+              <input id="tour-name" name="name" defaultValue={tour.name} required className={input} />
+              <button className="btn-quiet h-9 shrink-0">{tc("save")}</button>
+            </div>
+          </form>
+
+          <div>
+            <span className={label}>{t("logoTitle")}</span>
+            <div className="mt-1.5">
+              <TourLogo
+                orgSlug={orgSlug}
+                orgId={org.id}
+                tourId={tourId}
+                logoUrl={logoUrl}
+                labels={{
+                  upload: t("logoUpload"),
+                  remove: t("logoRemove"),
+                  uploaded: t("logoUploaded"),
+                  hint: t("logoHint"),
+                }}
+              />
+            </div>
+          </div>
+
+          <form action={saveBooking}>
+            <label className={label} htmlFor="booking-pct">
+              {t("bookingPercent")}
+            </label>
+            <p className="mt-0.5 text-[11px] text-tertiary">{t("bookingPercentHint")}</p>
+            <div className="mt-1.5 flex gap-2">
+              <input
+                id="booking-pct"
+                name="bookingPercent"
+                type="number"
+                step="0.1"
+                min="0"
+                max="100"
+                defaultValue={tour.booking_percent ?? ""}
+                className={`${input} !w-32 font-mono`}
+              />
+              <button className="btn-quiet h-9 shrink-0">{tc("save")}</button>
+            </div>
+          </form>
         </div>
-      </form>
 
-      <div className="space-y-2 rounded-[12px] border border-hairline bg-surface p-4">
-        <label className="block text-xs font-semibold uppercase tracking-wider text-secondary">
-          {t("logoTitle")}
-        </label>
-        <TourLogo
-          orgSlug={orgSlug}
-          orgId={org.id}
-          tourId={tourId}
-          logoUrl={logoUrl}
-          labels={{
-            upload: t("logoUpload"),
-            remove: t("logoRemove"),
-            uploaded: t("logoUploaded"),
-            hint: t("logoHint"),
-          }}
-        />
-      </div>
-
-      <div className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
-        {toggles.map(([field, label, value]) => (
-          <div key={field} className="flex items-center justify-between px-4 py-3">
-            <span className="text-sm">{label}</span>
-            <form action={toggle} className="flex rounded-full bg-inset p-0.5 text-xs font-semibold">
-              <input type="hidden" name="field" value={field} />
+        {/* ── Preferences ── */}
+        <h2 className="mb-1 mt-[34px] font-display text-[13px] font-semibold text-primary">
+          {t("prefsSection")}
+        </h2>
+        <div className="border-t border-faint">
+          <div className="flex min-h-[52px] items-center justify-between gap-4 border-b border-faint py-2">
+            <div>
+              <p className="text-[12.5px] font-medium text-primary">{t("visibleMobile")}</p>
+              <p className="mt-0.5 text-[11px] text-tertiary">{t("visibleMobileHint")}</p>
+            </div>
+            <form action={toggle} className="shrink-0">
+              <input type="hidden" name="field" value="visible_on_mobile" />
               <button
                 name="value"
-                value="true"
-                className={`rounded-full px-3 py-1 transition-colors ${value ? "bg-surface text-primary" : "text-tertiary hover:text-secondary"}`}
+                value={String(!tour.visible_on_mobile)}
+                role="switch"
+                aria-checked={tour.visible_on_mobile}
+                className="relative h-5 w-[34px] rounded-full transition-colors"
+                style={{
+                  background: tour.visible_on_mobile ? "var(--accent)" : "var(--switch-off)",
+                }}
               >
-                {tc("yes")}
-              </button>
-              <button
-                name="value"
-                value="false"
-                className={`rounded-full px-3 py-1 transition-colors ${!value ? "bg-surface text-primary" : "text-tertiary hover:text-secondary"}`}
-              >
-                {tc("no")}
+                <i
+                  className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform"
+                  style={{
+                    transform: tour.visible_on_mobile ? "translateX(14px)" : "translateX(0)",
+                  }}
+                />
               </button>
             </form>
           </div>
-        ))}
-      </div>
+        </div>
 
-      <Link
-        href={`/o/${orgSlug}/t/${tourId}/personnel`}
-        className="flex items-center justify-between rounded-lg border border-hairline bg-surface px-4 py-3 transition-colors hover:bg-subtle"
-      >
-        <span className="flex items-center gap-2.5 text-sm">
-          <Users size={18} strokeWidth={1.5} className="text-secondary" />
-          <span>
-            <span className="block font-medium">{t("crewLink")}</span>
-            <span className="text-xs text-secondary">{t("crewLinkHint")}</span>
+        <Link
+          href={`/o/${orgSlug}/t/${tourId}/personnel`}
+          className="mt-[26px] flex items-center justify-between rounded-[12px] border border-hairline bg-surface px-4 py-3 transition-colors hover:bg-subtle"
+        >
+          <span className="flex items-center gap-2.5">
+            <Users size={17} strokeWidth={1.5} className="text-secondary" />
+            <span>
+              <span className="block text-[12.5px] font-medium text-primary">{t("crewLink")}</span>
+              <span className="text-[11px] text-tertiary">{t("crewLinkHint")}</span>
+            </span>
           </span>
-        </span>
-        <ChevronRight size={16} className="text-tertiary" />
-      </Link>
+          <ChevronRight size={15} className="text-tertiary" />
+        </Link>
 
-      <form action={saveBooking} className="space-y-2 rounded-[12px] border border-hairline bg-surface p-4">
-        <label className="block text-xs font-semibold uppercase tracking-wider text-secondary">
-          {t("bookingPercent")}
-        </label>
-        <p className="text-xs text-tertiary">{t("bookingPercentHint")}</p>
-        <div className="flex gap-2">
-          <input
-            name="bookingPercent"
-            type="number"
-            step="0.1"
-            min="0"
-            max="100"
-            defaultValue={tour.booking_percent ?? ""}
-            className="w-32 rounded border border-hairline px-3 py-2 font-mono text-sm"
-          />
-          <button className="btn-primary h-9">
-            {tc("save")}
-          </button>
+        {/* ── Archive (prototip: card cu bordură danger soft) ── */}
+        <div
+          className="mt-[34px] flex items-center justify-between gap-4 rounded-[12px] px-[18px] py-4"
+          style={{ border: "1px solid rgba(237,106,103,.25)" }}
+        >
+          <div>
+            <p className="text-[12.5px] font-medium text-primary">{t("archiveTitle")}</p>
+            <p className="mt-0.5 text-[11.5px] text-secondary">{t("archiveHint")}</p>
+          </div>
+          <form action={toggle}>
+            <input type="hidden" name="field" value="is_archived" />
+            <button name="value" value={String(!tour.is_archived)} className="btn-danger h-8">
+              {tour.is_archived ? t("unarchive") : t("archive")}
+            </button>
+          </form>
         </div>
-      </form>
 
-      <form
-        action={removeTour}
-        className="space-y-2 rounded-lg border border-danger bg-danger-subtle/40 p-4"
-      >
-        <p className="text-sm font-medium text-danger">{t("deleteTitle")}</p>
-        <p className="text-xs text-secondary">{t("deleteHint")}</p>
-        <div className="flex gap-2">
-          <input
-            name="confirm"
-            required
-            pattern="DELETE"
-            placeholder={t("deletePlaceholder")}
-            className="flex-1 rounded border border-hairline px-3 py-2 text-sm"
-          />
-          <button className="rounded bg-danger px-4 py-2 text-sm font-medium text-white hover:opacity-90">
-            {tc("delete")}
-          </button>
-        </div>
-      </form>
+        {/* ── Delete ── */}
+        <form
+          action={removeTour}
+          className="mt-4 space-y-2 rounded-[12px] px-[18px] py-4"
+          style={{ border: "1px solid rgba(237,106,103,.25)" }}
+        >
+          <p className="text-[12.5px] font-medium text-danger">{t("deleteTitle")}</p>
+          <p className="text-[11.5px] text-secondary">{t("deleteHint")}</p>
+          <div className="flex gap-2 pt-1">
+            <input
+              name="confirm"
+              required
+              pattern="DELETE"
+              placeholder={t("deletePlaceholder")}
+              className={input}
+            />
+            <button className="btn-danger h-9 shrink-0">{tc("delete")}</button>
+          </div>
+        </form>
+      </div>
     </main>
   );
 }

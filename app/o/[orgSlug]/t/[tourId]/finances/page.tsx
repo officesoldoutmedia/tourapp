@@ -4,6 +4,7 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { computeShowProfit, convertCostLines, formatMoney } from "@/lib/showFinance";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 /** Finanțe tur — P&L-ul tuturor show-urilor + totaluri pe monedă. */
 export default async function TourFinancesPage({
@@ -104,76 +105,115 @@ export default async function TourFinancesPage({
   const money = (n: number, ccy: string) => formatMoney(Math.round(n * 100) / 100, ccy);
 
   return (
-    <main className="mx-auto w-full max-w-4xl space-y-6 p-6">
-      <h1 className="font-display text-xl font-semibold tracking-tight">
-        {t("title")} <span className="font-normal text-tertiary">· {tour.name}</span>
-      </h1>
+    <main className="w-full pb-11">
+      <PageHeader eyebrow={tour.name} title={t("title")} />
 
-      {shows.length === 0 ? (
-        <p className="text-sm text-tertiary">{t("empty")}</p>
-      ) : (
-        <div className="overflow-hidden rounded-[12px] border border-hairline bg-surface">
-          <div className="grid grid-cols-[4.5rem_1fr_6.5rem_6.5rem_6.5rem_7rem] gap-2 border-b border-hairline bg-subtle px-4 py-2 text-[11px] font-semibold uppercase tracking-wider text-secondary">
-            <span>{t("date")}</span>
-            <span>{t("show")}</span>
-            <span className="text-right">{t("fee")}</span>
-            <span className="text-right">{t("costs")}</span>
-            <span className="text-right">{t("profit")}</span>
-            <span />
-          </div>
-          {shows.map((show) => (
+      <div className="max-w-[960px] px-8 pt-6">
+        {shows.length === 0 ? (
+          <p className="py-10 text-center text-[12.5px] text-tertiary">{t("empty")}</p>
+        ) : (
+          <>
+            {/* strip de totaluri pe monedă (prototip: 3 celule cu hairline) */}
             <div
-              key={show.id}
-              className="grid grid-cols-[4.5rem_1fr_6.5rem_6.5rem_6.5rem_7rem] items-center gap-2 border-b border-hairline px-4 py-2 text-sm last:border-0"
+              className="grid rounded-[12px] border border-hairline"
+              style={{
+                background: "rgba(255,255,255,.02)",
+                gridTemplateColumns: `repeat(${Math.max(totals.size * 3, 3)}, 1fr)`,
+              }}
             >
-              <span className="font-mono text-xs text-secondary">{fmtDay(show.date)}</span>
-              <span className="min-w-0 truncate">
-                <span className="font-medium">{show.name}</span>
-                {show.city && <span className="ml-1.5 text-xs text-secondary">{show.city}</span>}
-                {show.fxMissing && (
-                  <span className="ml-1.5 text-xs font-semibold text-warning" title={t("fxMissing")}>
-                    FX!
-                  </span>
-                )}
-              </span>
-              <span className="text-right font-mono text-xs">{money(show.result.fee, show.currency)}</span>
-              <span className="text-right font-mono text-xs text-danger">
-                −{money(show.result.totalCosts, show.currency)}
-              </span>
-              <span
-                className={`text-right font-mono text-xs font-semibold ${show.result.profit < 0 ? "text-danger" : "text-success"}`}
-              >
-                {money(show.result.profit, show.currency)}
-              </span>
-              <Link
-                href={`/o/${orgSlug}/t/${tourId}/d/${show.date}/e/${show.id}/costs`}
-                className="justify-self-end rounded-md border border-hairline bg-surface px-2 py-1 text-xs transition-colors hover:bg-subtle"
-              >
-                {t("open")}
-              </Link>
+              {[...totals.entries()].flatMap(([ccy, sums], i) => [
+                <div key={ccy + "f"} className={`px-[18px] py-3.5 ${i > 0 ? "border-l border-hairline" : ""}`}>
+                  <p className="eyebrow">{t("fee")} {ccy}</p>
+                  <p className="mt-1.5 font-display text-[18px] font-semibold tabular-nums text-primary">
+                    {money(sums.fee, ccy)}
+                  </p>
+                </div>,
+                <div key={ccy + "c"} className="border-l border-hairline px-[18px] py-3.5">
+                  <p className="eyebrow">{t("costs")} {ccy}</p>
+                  <p className="mt-1.5 font-display text-[18px] font-semibold tabular-nums text-primary">
+                    {money(sums.costs, ccy)}
+                  </p>
+                </div>,
+                <div key={ccy + "p"} className="border-l border-hairline px-[18px] py-3.5">
+                  <p className="eyebrow">{t("profit")} {ccy}</p>
+                  <p className={`mt-1.5 font-display text-[18px] font-semibold tabular-nums ${sums.profit < 0 ? "text-danger" : "text-success"}`}>
+                    {money(sums.profit, ccy)}
+                  </p>
+                </div>,
+              ])}
             </div>
-          ))}
-          {[...totals.entries()].map(([ccy, sums]) => (
-            <div
-              key={ccy}
-              className="grid grid-cols-[4.5rem_1fr_6.5rem_6.5rem_6.5rem_7rem] items-center gap-2 bg-subtle px-4 py-2 text-sm font-medium"
-            >
-              <span />
-              <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-                {t("total")} {ccy}
-              </span>
-              <span className="text-right font-mono text-xs">{money(sums.fee, ccy)}</span>
-              <span className="text-right font-mono text-xs text-danger">−{money(sums.costs, ccy)}</span>
-              <span
-                className={`text-right font-mono text-xs font-bold ${sums.profit < 0 ? "text-danger" : "text-success"}`}
-              >
-                {money(sums.profit, ccy)}
-              </span>
+
+            {/* tabel per show (prototip: capete eyebrow, rânduri 42px, mono dreapta) */}
+            <div className="mt-[26px] grid h-8 grid-cols-[64px_minmax(0,1.5fr)_110px_110px_110px_70px] items-center border-b border-hairline">
+              <span className="eyebrow">{t("date")}</span>
+              <span className="eyebrow">{t("show")}</span>
+              <span className="eyebrow text-right">{t("fee")}</span>
+              <span className="eyebrow text-right">{t("costs")}</span>
+              <span className="eyebrow text-right">{t("profit")}</span>
               <span />
             </div>
-          ))}
-        </div>
-      )}
+            {shows.map((show) => (
+              <div
+                key={show.id}
+                className="grid h-[42px] grid-cols-[64px_minmax(0,1.5fr)_110px_110px_110px_70px] items-center border-b border-faint transition-colors hover:bg-fill-row-hover"
+              >
+                <span className="font-mono text-[11px] text-tertiary">{fmtDay(show.date)}</span>
+                <span className="min-w-0 truncate pr-3 text-[12.5px] font-medium text-primary">
+                  {show.name}
+                  {show.city && <span className="ml-1.5 font-normal text-tertiary">{show.city}</span>}
+                  {show.fxMissing && (
+                    <span className="ml-1.5 text-[10px] font-semibold text-warning" title={t("fxMissing")}>
+                      FX!
+                    </span>
+                  )}
+                </span>
+                <span className="text-right font-mono text-[12px] tabular-nums text-secondary">
+                  {money(show.result.fee, show.currency)}
+                </span>
+                <span className="text-right font-mono text-[12px] tabular-nums text-primary">
+                  −{money(show.result.totalCosts, show.currency)}
+                </span>
+                <span
+                  className={`text-right font-mono text-[11.5px] tabular-nums ${show.result.profit < 0 ? "text-danger" : "text-success"}`}
+                >
+                  {money(show.result.profit, show.currency)}
+                </span>
+                <Link
+                  href={`/o/${orgSlug}/t/${tourId}/d/${show.date}/e/${show.id}/costs`}
+                  className="justify-self-end text-[11.5px] text-secondary transition-colors hover:text-primary"
+                >
+                  {t("open")}
+                </Link>
+              </div>
+            ))}
+
+            {/* Total pe monedă (prototip: bordură top mai puternică) */}
+            {[...totals.entries()].map(([ccy, sums]) => (
+              <div
+                key={ccy}
+                className="grid h-[46px] grid-cols-[64px_minmax(0,1.5fr)_110px_110px_110px_70px] items-center border-t border-strong"
+              >
+                <span />
+                <span className="font-display text-[12.5px] font-semibold text-primary">
+                  {t("total")} {ccy}
+                </span>
+                <span className="text-right font-mono text-[12px] font-medium tabular-nums text-secondary">
+                  {money(sums.fee, ccy)}
+                </span>
+                <span className="text-right font-mono text-[12px] font-medium tabular-nums text-primary">
+                  −{money(sums.costs, ccy)}
+                </span>
+                <span
+                  className={`text-right font-mono text-[14px] font-semibold tabular-nums ${sums.profit < 0 ? "text-danger" : "text-success"}`}
+                >
+                  {money(sums.profit, ccy)}
+                </span>
+                <span />
+              </div>
+            ))}
+          </>
+        )}
+      </div>
     </main>
   );
 }
