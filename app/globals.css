@@ -1,83 +1,106 @@
 @import "tailwindcss";
 
 /* ═══════════════════════════════════════════════════════════════════
-   TOURAPP DESIGN SYSTEM — tokens (TOURAPP_DESIGN_SYSTEM.md §2, §4)
+   TOURAPP — GRAPHITE (design handoff aprobat, 2026-07-10)
+   Sursa: design_handoff_tourapp_graphite/README.md + graphite-tokens.css.
    Regula: nimic hardcodat în componente; totul vine de aici.
+   PDF-urile NU folosesc aceste tokens — rămân light/print-safe.
    ═══════════════════════════════════════════════════════════════════ */
 
-:root {
-  /* §2.1 Neutrale — reci, ușor albăstrui */
-  --bg-canvas: #fbfcfd;
-  --bg-surface: #ffffff;
-  --bg-subtle: #f4f6f8;
-  --bg-inset: #eef1f4;
-
-  --border-hairline: #e6eaee;
-  --border-strong: #d4dae0;
-
-  --text-primary: #0b1215;
-  --text-secondary: #4a555e;
-  --text-tertiary: #8a959e;
-  --text-disabled: #b8c0c7;
-
-  /* §2.2 Accent — albastru-electric, rar și intenționat */
-  --accent: #1f6feb;
-  --accent-hover: #1a5fd0;
-  --accent-active: #164fb0;
-  --accent-subtle: #e8f0fe;
-  --accent-border: #b9d2fb;
-
-  /* §2.3 Semantice de stare */
-  --success: #1a7f52;
-  --success-subtle: #e4f5ec;
-  --warning: #b25e09;
-  --warning-subtle: #fbefe0;
-  --danger: #c4372b;
-  --danger-subtle: #fbeae8;
-
-  /* §2.4 Party colors */
-  --party-1: #1f6feb;
-  --party-2: #7a4dd1;
-  --party-3: #1a7f52;
-  --party-4: #b25e09;
-  --party-5: #0e7c86;
-  --party-6: #b33b78;
-}
-
-/* §2.5 Dark — tokenii există de la început; UI-ul se activează ulterior */
+:root,
 [data-theme="dark"] {
-  --bg-canvas: #0b0f12;
-  --bg-surface: #12181d;
-  --bg-subtle: #1a222a;
-  --bg-inset: #0e141a;
-  --border-hairline: #232c34;
-  --border-strong: #323d47;
-  --text-primary: #eef2f5;
-  --text-secondary: #a7b2bc;
-  --text-tertiary: #6b7680;
-  --text-disabled: #48525b;
-  --accent: #4f8df7;
-  --accent-hover: #68a0fa;
-  --accent-active: #3a7be0;
-  --accent-subtle: #16263f;
-  --accent-border: #274b7e;
+  /* suprafețe */
+  --bg-canvas: #181a1e;
+  --bg-chrome: #1f2126;
+  --bg-sidebar: #202227;
+  --bg-surface: #23262b;
+  --bg-surface-raised: #292c32;
+  --bg-subtle: #202328;
+  --bg-inset: #17191d;
+  --bg-calendar-grid: #191b20;
+  --bg-track: #34363c;
+  --bg-switch-off: #3a3d44;
+  --bg-avatar: #34373c;
+  --bg-avatar-chrome: #555a62;
 
-  --success: #3fbf7f;
-  --success-subtle: #0e2a1d;
-  --warning: #d98e33;
-  --warning-subtle: #2e2113;
-  --danger: #e5695c;
-  --danger-subtle: #331512;
+  /* borduri */
+  --border-hairline: rgba(255, 255, 255, 0.08);
+  --border-strong: rgba(255, 255, 255, 0.14);
+  --border-faint: rgba(255, 255, 255, 0.06);
+
+  /* text */
+  --text-primary: #f5f6f7;
+  --text-secondary: #9a9da4;
+  --text-tertiary: #686c73;
+  --text-disabled: #50545b;
+
+  /* accent — DOAR activ/selectat/focus/link */
+  --accent: #4793f2;
+  --accent-hover: #5da1f5;
+  --accent-active: #367fda;
+  --accent-subtle: rgba(71, 147, 242, 0.12);
+  --accent-border: rgba(71, 147, 242, 0.35);
+  --accent-text-soft: #7fb4f6;
+
+  /* semantice */
+  --success: #52bd82;
+  --success-subtle: rgba(82, 189, 130, 0.12);
+  --warning: #e2a14a;
+  --warning-subtle: rgba(226, 161, 74, 0.12);
+  --danger: #ed6a67;
+  --danger-subtle: rgba(237, 106, 103, 0.12);
+
+  /* fills de interacțiune (alpha pe alb) */
+  --fill-row-hover: rgba(255, 255, 255, 0.02);
+  --fill-control: rgba(255, 255, 255, 0.04);
+  --fill-control-hover: rgba(255, 255, 255, 0.07);
+  --fill-nav-active: rgba(255, 255, 255, 0.08);
+  --fill-segment-active: rgba(255, 255, 255, 0.09);
+  --fill-menu-hover: rgba(255, 255, 255, 0.06);
+
+  /* fills de selecție (alpha pe accent) */
+  --sel-row: rgba(71, 147, 242, 0.08);
+  --sel-table-row: rgba(71, 147, 242, 0.06);
+  --sel-bulk: rgba(71, 147, 242, 0.1);
+  --sel-bulk-border: rgba(71, 147, 242, 0.25);
+  --sel-palette: rgba(71, 147, 242, 0.12);
+  --sel-capsule: rgba(71, 147, 242, 0.14);
+  --focus-halo: rgba(71, 147, 242, 0.16);
+
+  /* party colors (badge-uri de grup — recalibrate pentru graphite) */
+  --party-1: #4793f2;
+  --party-2: #9a7ce8;
+  --party-3: #52bd82;
+  --party-4: #e2a14a;
+  --party-5: #4db6c6;
+  --party-6: #d878ac;
+
+  /* geometrie */
+  --radius-control: 8px;
+  --radius-popover: 12px;
+  --radius-panel: 16px;
+
+  /* umbre — DOAR focus panels, popovers, overlays */
+  --shadow-panel: 0 1px 3px rgba(0, 0, 0, 0.22);
+  --shadow-popover: 0 16px 48px rgba(0, 0, 0, 0.42);
+  --shadow-focus: 0 0 0 3px var(--focus-halo), 0 0 0 1px var(--accent);
 }
 
 @theme inline {
-  /* culori → utilitare bg- / text- / border- */
   --color-canvas: var(--bg-canvas);
+  --color-chrome: var(--bg-chrome);
+  --color-sidebar: var(--bg-sidebar);
   --color-surface: var(--bg-surface);
+  --color-raised: var(--bg-surface-raised);
   --color-subtle: var(--bg-subtle);
   --color-inset: var(--bg-inset);
+  --color-calendar-grid: var(--bg-calendar-grid);
+  --color-track: var(--bg-track);
+  --color-switch-off: var(--bg-switch-off);
+  --color-avatar: var(--bg-avatar);
   --color-hairline: var(--border-hairline);
   --color-strong: var(--border-strong);
+  --color-faint: var(--border-faint);
   --color-primary: var(--text-primary);
   --color-secondary: var(--text-secondary);
   --color-tertiary: var(--text-tertiary);
@@ -87,6 +110,7 @@
   --color-accent-active: var(--accent-active);
   --color-accent-subtle: var(--accent-subtle);
   --color-accent-border: var(--accent-border);
+  --color-accent-soft: var(--accent-text-soft);
   --color-success: var(--success);
   --color-success-subtle: var(--success-subtle);
   --color-warning: var(--warning);
@@ -100,67 +124,199 @@
   --color-party-5: var(--party-5);
   --color-party-6: var(--party-6);
 
-  /* §3 tipografie */
+  --color-fill-row-hover: var(--fill-row-hover);
+  --color-fill-control: var(--fill-control);
+  --color-fill-control-hover: var(--fill-control-hover);
+  --color-fill-nav-active: var(--fill-nav-active);
+  --color-fill-segment-active: var(--fill-segment-active);
+  --color-fill-menu-hover: var(--fill-menu-hover);
+  --color-sel-row: var(--sel-row);
+  --color-sel-table-row: var(--sel-table-row);
+
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
   --font-display: var(--font-general-sans), var(--font-inter), sans-serif;
   --font-mono: var(--font-jetbrains), ui-monospace, monospace;
 
-  /* §4.3 shadows — elevație prin lumină */
-  --shadow-2xs: 0 1px 2px rgba(11, 18, 21, 0.04);
-  --shadow-xs: 0 1px 2px rgba(11, 18, 21, 0.04);
-  --shadow-sm: 0 1px 3px rgba(11, 18, 21, 0.06), 0 1px 2px rgba(11, 18, 21, 0.04);
-  --shadow-md: 0 4px 12px rgba(11, 18, 21, 0.08), 0 2px 4px rgba(11, 18, 21, 0.04);
-  --shadow-lg: 0 12px 32px rgba(11, 18, 21, 0.12), 0 4px 8px rgba(11, 18, 21, 0.06);
-  --shadow-focus: 0 0 0 3px var(--accent-subtle), 0 0 0 1px var(--accent);
+  --shadow-panel: var(--shadow-panel);
+  --shadow-popover: var(--shadow-popover);
+  --shadow-focus: var(--shadow-focus);
 }
 
-/* color-scheme urmează tema; "only" = opt-out din Chrome Auto Dark Mode. */
 html {
-  color-scheme: only light;
-}
-html[data-theme="dark"] {
-  color-scheme: only dark;
+  color-scheme: dark;
 }
 
 body {
   background: var(--bg-canvas);
   color: var(--text-primary);
   font-family: var(--font-sans);
-  font-size: 14px; /* §3.2 — bază 14, densitate Linear */
+  font-size: 13px; /* baza Graphite */
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
 }
 
-/* Cifrele sunt conținutul (§3.1): tot ce e mono → tabular */
-.font-mono {
-  font-variant-numeric: tabular-nums;
+/* ── Rețete tipografice (README §Typography) ── */
+@utility page-title {
+  font-family: var(--font-display);
+  font-size: 26px;
+  line-height: 1.2;
+  font-weight: 600;
+  letter-spacing: -0.035em;
+  color: var(--text-primary);
+}
+@utility section-title {
+  font-family: var(--font-display);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+@utility eyebrow {
+  font-family: var(--font-display);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--text-tertiary);
 }
 
-/* Focus vizibil pe tot ce e interactiv (§5, checklist) */
-:where(button, a, [role="button"]):focus-visible {
-  outline: none;
-  box-shadow: var(--shadow-focus);
-  border-radius: 6px;
+/* ── Rețete de butoane (README: chrome/quiet/ghost-danger) ── */
+@utility btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 13px;
+  border-radius: var(--radius-control);
+  background: #f1f2f3;
+  color: #16181b;
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 600;
+  white-space: nowrap;
+  transition: background 140ms ease-out;
+  &:hover {
+    background: #ffffff;
+  }
+  &:active {
+    background: #e3e5e7;
+  }
+  &:disabled {
+    background: var(--bg-track);
+    color: var(--text-disabled);
+  }
 }
-:where(input, select, textarea):focus-visible {
-  outline: none;
-  border-color: var(--accent);
-  box-shadow: var(--shadow-focus);
+@utility btn-quiet {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+  border: 1px solid var(--border-hairline);
+  background: var(--fill-control);
+  color: var(--text-secondary);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 140ms ease-out, color 140ms ease-out;
+  &:hover {
+    background: var(--fill-control-hover);
+    color: var(--text-primary);
+  }
+  &:active {
+    background: rgba(255, 255, 255, 0.05);
+  }
+}
+@utility btn-danger {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 32px;
+  padding: 0 12px;
+  border-radius: var(--radius-control);
+  border: 1px solid rgba(237, 106, 103, 0.35);
+  background: transparent;
+  color: var(--danger);
+  font-family: var(--font-display);
+  font-size: 12px;
+  font-weight: 500;
+  white-space: nowrap;
+  transition: background 140ms ease-out;
+  &:hover {
+    background: rgba(237, 106, 103, 0.1);
+  }
 }
 
-/* Controale de formular — §5.3 */
+/* ── Controale de formular (README §12) ── */
 :where(input, select, textarea) {
-  background: var(--bg-surface);
-  transition: border-color 120ms ease-out, box-shadow 120ms ease-out;
+  background: var(--bg-inset);
+  border-radius: var(--radius-control);
+  transition: border-color 140ms ease-out, box-shadow 140ms ease-out;
 }
 ::placeholder {
   color: var(--text-tertiary);
 }
+:where(input, select, textarea):focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--focus-halo);
+}
+:where(button, a, [role="button"]):focus-visible {
+  outline: none;
+  box-shadow: var(--shadow-focus);
+  border-radius: var(--radius-control);
+}
 
-/* §7 Motion — discret; reduced-motion → instant */
-:where(button, a, input, select) {
-  transition: background-color 120ms ease-out, color 120ms ease-out,
-    border-color 120ms ease-out;
+/* Cifrele tehnice sunt mono tabular */
+.font-mono {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ── Selecție, scrollbar (README §tokens) ── */
+::selection {
+  background: rgba(71, 147, 242, 0.28);
+}
+* {
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255, 255, 255, 0.12) transparent;
+}
+*::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+*::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.12);
+  border-radius: 4px;
+}
+*::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.22);
+}
+
+/* ── Motion (README §Depth & motion) ── */
+:where(button, a) {
+  transition: background-color 140ms ease-out, color 140ms ease-out,
+    border-color 140ms ease-out;
+}
+@keyframes nowPulse {
+  0%,
+  100% {
+    box-shadow: 0 0 0 4px rgba(71, 147, 242, 0.16);
+  }
+  50% {
+    box-shadow: 0 0 0 8px rgba(71, 147, 242, 0.05);
+  }
+}
+@keyframes barIn {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
 }
 @media (prefers-reduced-motion: reduce) {
   *,

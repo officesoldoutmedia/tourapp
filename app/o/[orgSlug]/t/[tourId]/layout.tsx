@@ -1,22 +1,15 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
-import { getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
-import { aggregateAdvanceStatus, type AdvanceStatus } from "@/lib/advance";
-import { MiniCalendar } from "@/components/MiniCalendar";
-import { ModuleNav } from "@/components/ModuleNav";
+import { PrimarySidebar, type SidebarSection } from "@/components/ui/PrimarySidebar";
+import { BreadcrumbTail } from "@/components/ui/BreadcrumbTail";
 
-function monthKey(date: string, locale: string): string {
-  return new Intl.DateTimeFormat(locale, {
-    month: "long",
-    year: "numeric",
-    timeZone: "UTC",
-  })
-    .format(new Date(`${date}T00:00:00Z`))
-    .toUpperCase();
-}
-
+/**
+ * Shell-ul turului (Graphite): sidebar 236px cu secțiunile
+ * TOUR / MANAGEMENT / ORGANIZATION. Navigarea pe zile se face din
+ * Calendar + săgețile prev/next din headerul zilei (rail-ul de date
+ * din dreapta a fost înlocuit de inspector, conform designului aprobat).
+ */
 export default async function TourLayout({
   children,
   params,
@@ -26,7 +19,6 @@ export default async function TourLayout({
 }) {
   const { orgSlug, tourId } = await params;
   const { supabase, permission, tier } = await requireOrg(orgSlug);
-  const locale = await getLocale();
 
   const [{ data: tour }, { data: days }] = await Promise.all([
     supabase
@@ -37,108 +29,65 @@ export default async function TourLayout({
       .maybeSingle(),
     supabase
       .from("days")
-      .select("id, date, day_type, city, events(advances(status, deleted_at))")
+      .select("date, day_type")
       .eq("tour_id", tourId)
       .is("deleted_at", null)
       .order("date"),
   ]);
-
   if (!tour) notFound();
 
-  type DayRow = {
-    id: string;
-    date: string;
-    day_type: string;
-    city: string | null;
-    advanceStatus: AdvanceStatus;
-  };
-
-  const groups = new Map<string, DayRow[]>();
-  for (const day of days ?? []) {
-    // [C §6.6] status agregat pe Tour Date: pie dacă unele în lucru,
-    // check dacă TOATE advance-urile zilei sunt done
-    const statuses = (
-      (day.events ?? []) as { advances: { status: string; deleted_at: string | null }[] | null }[]
-    ).flatMap((event) =>
-      (event.advances ?? [])
-        .filter((a) => a.deleted_at === null)
-        .map((a) => a.status as AdvanceStatus),
-    );
-    const key = monthKey(day.date, locale);
-    if (!groups.has(key)) groups.set(key, []);
-    groups.get(key)!.push({
-      id: day.id,
-      date: day.date,
-      day_type: day.day_type,
-      city: day.city,
-      advanceStatus: aggregateAdvanceStatus(statuses),
-    });
-  }
-
   const allDates = (days ?? []).map((d) => d.date);
+  const showCount = (days ?? []).filter((d) => d.day_type === "show").length;
   const todayKey = new Date().toISOString().slice(0, 10);
   const defaultDate = allDates.includes(todayKey)
     ? todayKey
-    : (allDates.find((d) => d >= todayKey) ?? allDates.at(-1) ?? null);
+    : (allDates.find((d) => d >= todayKey) ?? allDates.at(-1) ?? todayKey);
+
+  const base = `/o/${orgSlug}/t/${tourId}`;
+  const dayBase = `${base}/d/${defaultDate}`;
+  const canAccounting = can({ tier, permission }, "view_accounting");
+
+  const sections: SidebarSection[] = [
+    {
+      label: "Tour",
+      items: [
+        { label: "Overview", href: dayBase, match: "/d/" },
+        { label: "Calendar", href: `${base}/calendar`, match: "/calendar" },
+        { label: "Schedule", href: `${dayBase}#schedule` },
+        { label: "Travel", href: `${dayBase}#travel` },
+        { label: "Hotels", href: `${dayBase}#hotels` },
+        { label: "Documents", href: `${base}/attachments`, match: "/attachments" },
+      ],
+    },
+    {
+      label: "Management",
+      items: [
+        { label: "Personnel", href: `${base}/personnel`, match: "/personnel" },
+        ...(canAccounting
+          ? [{ label: "Finances", href: `${base}/finances`, match: "/finances" }]
+          : []),
+        { label: "Tour passes", href: `${base}/passes`, match: "/passes" },
+        { label: "Tour settings", href: `${base}/settings`, match: `/t/${tourId}/settings` },
+      ],
+    },
+    {
+      label: "Organization",
+      items: [
+        { label: "Route map", href: `${base}/dashboard`, match: "/dashboard" },
+        { label: "Contacts", href: `/o/${orgSlug}/contacts` },
+      ],
+    },
+  ];
 
   return (
-    <div className="flex min-h-0 flex-1">
-      <ModuleNav
-        tourBase={`/o/${orgSlug}/t/${tourId}`}
-        defaultDate={defaultDate}
-        canAccounting={can({ tier, permission }, "view_accounting")}
+    <div className="flex h-full overflow-hidden">
+      <BreadcrumbTail label={tour.name} />
+      <PrimarySidebar
+        tourName={tour.name}
+        tourMeta={`${showCount} shows · ${allDates.length} days`}
+        sections={sections}
       />
-      <div className="min-w-0 flex-1">{children}</div>
-
-      {/* Sidebar zile — dreapta, mereu vizibil [A.2] */}
-      <aside className="hidden w-[280px] shrink-0 overflow-y-auto border-l border-hairline bg-canvas lg:flex lg:flex-col">
-        <div className="border-b border-hairline px-3 py-2">
-          <span className="text-sm font-semibold">{tour.name}</span>
-        </div>
-        <div className="min-h-0 flex-1 overflow-y-auto">
-        {[...groups.entries()].map(([month, monthDays]) => (
-          <div key={month}>
-            <div className="sticky top-0 z-10 bg-subtle px-3 py-1 text-[11px] font-semibold uppercase tracking-wider text-tertiary">
-              {month}
-            </div>
-            <ul>
-              {monthDays.map((day) => {
-                const [, mm, dd] = day.date.split("-");
-                const isOff = day.day_type === "day_off";
-                return (
-                  <li key={day.id}>
-                    <Link
-                      href={`/o/${orgSlug}/t/${tourId}/d/${day.date}`}
-                      className="flex items-baseline gap-2.5 border-l-2 border-transparent px-3 py-2 text-sm transition-colors hover:bg-subtle"
-                    >
-                      <span className="font-mono text-xs text-tertiary">
-                        {dd}/{mm}
-                      </span>
-                      <span
-                        className={`truncate ${isOff ? "italic text-tertiary" : ""}`}
-                      >
-                        {day.city || "—"}
-                      </span>
-                      {day.advanceStatus === "in_progress" && (
-                        <span className="ml-auto h-2 w-2 shrink-0 self-center rounded-full bg-warning" title="Advance in progress" />
-                      )}
-                      {day.advanceStatus === "done" && (
-                        <span className="ml-auto h-2 w-2 shrink-0 self-center rounded-full bg-success" title="Advance done" />
-                      )}
-                    </Link>
-                  </li>
-                );
-              })}
-            </ul>
-          </div>
-        ))}
-        </div>
-        <MiniCalendar
-          baseHref={`/o/${orgSlug}/t/${tourId}/d`}
-          dates={(days ?? []).map((d) => d.date)}
-          locale={locale}
-        />
-      </aside>
+      <div className="min-w-0 flex-1 overflow-y-auto">{children}</div>
     </div>
   );
 }

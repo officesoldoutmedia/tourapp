@@ -21,17 +21,12 @@ import {
   type TaskData,
 } from "./extras-client";
 import { formatTimeInZone, dayInstant, dayKeyInZone } from "@/lib/datetime";
-import { TimeRail, type RailBlock } from "@/components/TimeRail";
-import {
-  WeatherCard,
-  MapCard,
-  VenuesCard,
-  HotelsCard,
-  KeyContactsCard,
-  type MapPinLink,
-  type VenueCardData,
-  type HotelCardData,
-} from "@/components/DayDashboardCards";
+import { DayFocus, type FocusItem } from "@/components/ui/DayFocus";
+import { MetricStrip, type Metric } from "@/components/ui/MetricStrip";
+import { HeaderClock } from "@/components/ui/HeaderClock";
+import { ChevronLeft, ChevronRight, ExternalLink } from "lucide-react";
+import Link from "next/link";
+import type { VenueCardData } from "@/components/DayDashboardCards";
 import { getWeather } from "@/lib/weather";
 import { isGoogleEnabled, searchGooglePlaces } from "@/lib/googlePlaces";
 
@@ -78,7 +73,7 @@ export default async function DayPage({
       .order("name"),
     supabase
       .from("events")
-      .select("id, title, venues(name, address_line1, city, postal_code, country, urls, phones)")
+      .select("id, title, venues(name, address_line1, city, postal_code, country, urls, phones), advances(status, deleted_at)")
       .eq("day_id", day.id)
       .is("deleted_at", null)
       .order("created_at"),
@@ -254,6 +249,15 @@ export default async function DayPage({
     x.setUTCDate(x.getUTCDate() + n);
     return x.toISOString().slice(0, 10);
   }
+  type RailBlock = {
+    id: string;
+    kind: "schedule" | "publicity" | "ground" | "air" | "rail" | "sea";
+    title: string;
+    startAt: string;
+    endAt: string | null;
+    confirmed: boolean;
+    party?: string | null;
+  };
   const railBlocks: RailBlock[] = [
     ...(items ?? [])
       .filter((i) => i.start_at)
@@ -318,8 +322,6 @@ export default async function DayPage({
     dayLat !== null && dayLng !== null
       ? await getWeather(dayLat, dayLng, weatherStart, tz, 4).catch(() => null)
       : null;
-  const weatherHighlight =
-    weather?.some((w) => w.date === date) ? date : todayKey;
 
   // cardurile Venues / Hotels / Key contacts (dashboard MT)
   type VenueJoin = {
@@ -346,15 +348,6 @@ export default async function DayPage({
       url: firstUrl,
     }];
   });
-  const hotelCards: HotelCardData[] = hotelData.map((h) => ({
-    name: h.name,
-    address: [
-      (h as { address_line1?: string | null }).address_line1,
-      h.city,
-      (h as { country?: string | null }).country,
-    ].filter(Boolean).join(", "),
-    phone: ((h as { phones?: { number?: string }[] }).phones ?? [])[0]?.number ?? null,
-  }));
   const { data: contactValues } = (events ?? []).length
     ? await supabase
         .from("event_field_values")
@@ -374,71 +367,154 @@ export default async function DayPage({
     ? { time: formatTimeInZone(new Date(firstTimed.start_at as string), tz), title: firstTimed.title }
     : null;
 
-  const mapPins: MapPinLink[] = [
-    ...(events ?? []).flatMap((e) => {
-      const v = e.venues as unknown as {
-        name: string;
-        address_line1: string | null;
-        city: string | null;
-      } | null;
-      if (!v) return [];
-      return [{
-        kind: "venue" as const,
-        name: v.name,
-        query: [v.name, v.address_line1, v.city].filter(Boolean).join(", "),
-      }];
-    }),
-    ...hotelData.map((h) => ({
-      kind: "hotel" as const,
-      name: h.name,
-      query: [h.name, h.city].filter(Boolean).join(", "),
-    })),
+
+  // ── Graphite day workspace: hero + timeline + metric strip + inspector ──
+  const isToday = date === todayKey;
+  const isPast = date < todayKey;
+
+  const focusItems: FocusItem[] = railBlocks
+    .map((block) => ({
+      id: block.id,
+      time: formatTimeInZone(new Date(block.startAt), tz),
+      title: block.title,
+      sub: block.party ?? null,
+      confirmed: block.confirmed,
+      startMs: Date.parse(block.startAt),
+      endMs: block.endAt ? Date.parse(block.endAt) : Date.parse(block.startAt) + 45 * 60_000,
+    }))
+    .sort((a, b) => a.startMs - b.startMs);
+  const confirmedCount = focusItems.filter((i) => i.confirmed).length;
+
+  const advanceStatuses = (events ?? []).flatMap((e) =>
+    ((e as unknown as { advances?: { status: string; deleted_at: string | null }[] }).advances ?? [])
+      .filter((a) => a.deleted_at === null)
+      .map((a) => a.status),
+  );
+  const advanceTotal = advanceStatuses.length;
+  const advanceDone = advanceStatuses.filter((st) => st === "done").length;
+  const advancePct = advanceTotal > 0 ? Math.round((advanceDone / advanceTotal) * 100) : null;
+
+  const firstVenue = venueCards[0] ?? null;
+  const firstEvent = (events ?? [])[0] ?? null;
+  const travelCount = travelData.length;
+  const firstDepart = travelData
+    .filter((t) => t.depart_time)
+    .map((t) => (t.depart_time as string).slice(0, 5))
+    .sort()[0];
+
+  const metrics: Metric[] = [
+    {
+      label: t("metricSchedule"),
+      value: `${focusItems.length}`,
+      sub: t("metricConfirmed", { count: confirmedCount }),
+    },
+    ...(advancePct !== null
+      ? [{
+          label: t("metricAdvance"),
+          value: `${advancePct}%`,
+          sub: t("metricAdvanceSub", { done: advanceDone, total: advanceTotal }),
+        }]
+      : []),
+    ...(travelCount > 0
+      ? [{
+          label: t("metricTravel"),
+          value: firstDepart ?? `${travelCount}`,
+          sub: t("metricTravelSub", { count: travelCount }),
+        }]
+      : []),
   ];
 
+  const gmtLabel = new Intl.DateTimeFormat("en-US", { timeZone: tz, timeZoneName: "shortOffset" })
+    .formatToParts(new Date())
+    .find((part) => part.type === "timeZoneName")?.value ?? tz;
+  const [, mmNav, ddNav] = date.split("-");
+  void mmNav;
+  void ddNav;
+  const allDatesRes = await supabase
+    .from("days")
+    .select("date")
+    .eq("tour_id", tourId)
+    .is("deleted_at", null)
+    .order("date");
+  const tourDates = (allDatesRes.data ?? []).map((d) => d.date);
+  const dateIdx = tourDates.indexOf(date);
+  const prevDate = dateIdx > 0 ? tourDates[dateIdx - 1] : null;
+  const nextDate = dateIdx >= 0 && dateIdx < tourDates.length - 1 ? tourDates[dateIdx + 1] : null;
+
+  const contactLines = keyContactsText
+    .split(/\n+/)
+    .map((line) => line.trim())
+    .filter(Boolean)
+    .slice(0, 4);
+
+  const navBtn =
+    "flex h-[30px] w-[30px] items-center justify-center rounded-[8px] border border-hairline bg-fill-control text-secondary transition-colors hover:bg-fill-control-hover hover:text-primary";
+
   return (
-    <main className="mx-auto w-full max-w-3xl space-y-8 p-6">
-      <header className="space-y-1">
-        <div className="flex items-baseline justify-between gap-4">
-          <h1 className="font-display text-xl font-semibold tracking-tight">{location || "—"}</h1>
-          <span className="rounded-full bg-inset px-3 py-1 text-xs font-semibold">
-            {td(day.day_type)}
-          </span>
-        </div>
-        <p className="text-sm text-secondary">
-          {formatDayHeader(day.date, tz, locale)}
-        </p>
-        <DayActionsBar orgSlug={orgSlug} dayId={day.id} canEdit={canEdit} />
-        {isDstTransitionDay(day.date, tz) && (
-          <p className="rounded-md border border-warning bg-warning-subtle px-3 py-1.5 text-xs text-warning">
-            {t("dstNotice")}
+    <div className="flex min-h-full">
+    <main className="min-w-0 flex-1 px-8 pb-11">
+      <header className="flex items-end justify-between gap-6 border-b border-hairline pb-5 pt-[26px]">
+        <div className="min-w-0">
+          <p className="text-[11.5px] text-secondary">
+            {formatDayHeader(day.date, tz, locale)}
+            {" · "}
+            <span className={day.day_type === "show" ? "text-success" : "text-secondary"}>
+              {td(day.day_type)}
+            </span>
           </p>
-        )}
+          <h1 className="page-title mt-1 truncate">
+            {location || "—"}
+            {firstVenue && ` — ${firstVenue.name}`}
+          </h1>
+        </div>
+        <div className="flex shrink-0 items-end gap-4">
+          <span className="flex items-center gap-1.5 pb-1">
+            {prevDate ? (
+              <Link href={`/o/${orgSlug}/t/${tourId}/d/${prevDate}`} title={prevDate} className={navBtn}>
+                <ChevronLeft size={14} strokeWidth={1.75} />
+              </Link>
+            ) : (
+              <span className={`${navBtn} pointer-events-none opacity-40`}>
+                <ChevronLeft size={14} strokeWidth={1.75} />
+              </span>
+            )}
+            {nextDate ? (
+              <Link href={`/o/${orgSlug}/t/${tourId}/d/${nextDate}`} title={nextDate} className={navBtn}>
+                <ChevronRight size={14} strokeWidth={1.75} />
+              </Link>
+            ) : (
+              <span className={`${navBtn} pointer-events-none opacity-40`}>
+                <ChevronRight size={14} strokeWidth={1.75} />
+              </span>
+            )}
+          </span>
+          <HeaderClock tz={tz} subLabel={`${t("localTime")} · ${gmtLabel}`} />
+        </div>
       </header>
 
-      {(weather || dayLat !== null) && (
-        <div className="grid gap-4 md:grid-cols-2">
-          {weather && (
-            <WeatherCard
-              days={weather}
-              highlight={weatherHighlight}
-              tz={tz}
-              locale={locale}
-              locationLabel={day.city ?? ""}
-            />
-          )}
-          {dayLat !== null && dayLng !== null && (
-            <MapCard lat={dayLat} lng={dayLng} pins={mapPins} />
-          )}
-        </div>
+      <div className="mx-auto w-full max-w-[960px] space-y-7 pt-6">
+      <DayActionsBar orgSlug={orgSlug} dayId={day.id} canEdit={canEdit} />
+      {isDstTransitionDay(day.date, tz) && (
+        <p className="rounded-md border border-warning bg-warning-subtle px-3 py-1.5 text-xs text-warning">
+          {t("dstNotice")}
+        </p>
       )}
 
-      {(venueCards.length > 0 || hotelCards.length > 0) && (
-        <div className="grid gap-4 md:grid-cols-2">
-          <VenuesCard venues={venueCards} />
-          <HotelsCard hotels={hotelCards} />
-        </div>
-      )}
-      <KeyContactsCard text={keyContactsText} />
+      <DayFocus
+        items={focusItems}
+        isToday={isToday}
+        isPast={isPast}
+        labels={{
+          upNext: t("upNext"),
+          today: t("today"),
+          scheduledItems: t("scheduledItems", { count: focusItems.length }),
+          complete: t("complete"),
+          onSchedule: t("onSchedule"),
+          unconfirmed: t("unconfirmedState"),
+        }}
+      />
+
+      <MetricStrip metrics={metrics} />
 
       <div id="notes" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs">
         <NotesSection
@@ -469,7 +545,6 @@ export default async function DayPage({
       )}
 
       <div id="schedule" className="rounded-lg border border-hairline bg-surface p-4 shadow-xs space-y-4">
-        <TimeRail date={date} tz={tz} blocks={railBlocks} />
         <ScheduleSection
           orgSlug={orgSlug}
           tourId={tourId}
@@ -530,6 +605,135 @@ export default async function DayPage({
           canEdit={canEdit}
         />
       </div>
+      </div>
     </main>
+
+    {/* ── Context inspector (Graphite README §2) ── */}
+    <aside className="sticky top-0 hidden h-[calc(100vh-52px)] w-[280px] shrink-0 self-start overflow-y-auto border-l border-hairline bg-surface px-5 xl:block">
+      <div className="border-b border-hairline pb-4 pt-5">
+        <p className="eyebrow">{t("inspDetails")}</p>
+        {firstVenue ? (
+          <>
+            <p className="mt-1.5 font-display text-[14px] font-semibold text-primary">
+              {firstVenue.name}
+            </p>
+            <p className="mt-0.5 text-[11px] leading-relaxed text-secondary">{firstVenue.address}</p>
+          </>
+        ) : (
+          <p className="mt-1.5 text-[12px] text-secondary">{location || "—"}</p>
+        )}
+        {dayLat !== null && dayLng !== null && (
+          <a
+            href={`https://www.google.com/maps/search/?api=1&query=${dayLat},${dayLng}`}
+            target="_blank"
+            rel="noreferrer"
+            className="mt-2 inline-flex items-center gap-1 text-[11px] text-accent hover:text-accent-hover"
+          >
+            {t("inspOpenMaps")} <ExternalLink size={11} strokeWidth={1.75} />
+          </a>
+        )}
+      </div>
+
+      {weather && weather.length > 0 && (
+        <div className="border-b border-hairline py-[18px]">
+          <p className="eyebrow">{t("inspConditions")}</p>
+          <div className="mt-2 flex items-start justify-between">
+            <p className="font-display text-[30px] font-medium leading-none text-primary">
+              {(weather.find((w) => w.date === date) ?? weather[0]).tMax}°
+            </p>
+            <div className="text-right text-[10px] leading-[1.7] text-secondary">
+              {(() => {
+                const w = weather.find((x) => x.date === date) ?? weather[0];
+                return (
+                  <>
+                    {w.precipProb != null && <p>{t("inspPrecip", { pct: w.precipProb })}</p>}
+                    <p>{t("inspWind", { kmh: w.windMax })}</p>
+                    <p>{w.sunrise} – {w.sunset}</p>
+                  </>
+                );
+              })()}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {advancePct !== null && (
+        <div className="border-b border-hairline py-[18px]">
+          <p className="eyebrow">{t("inspAdvance")}</p>
+          <div className="mt-2 flex items-end justify-between">
+            <p className="font-display text-[26px] font-medium leading-none text-primary">
+              {advancePct}%
+            </p>
+            <p className="font-mono text-[11px] text-secondary">
+              {advanceDone} / {advanceTotal}
+            </p>
+          </div>
+          <div className="mt-2.5 h-1 overflow-hidden rounded-[2px] bg-track">
+            <div
+              className="h-full origin-left rounded-[2px] bg-accent motion-safe:[animation:barIn_700ms_ease-out]"
+              style={{ width: `${advancePct}%` }}
+            />
+          </div>
+          {firstEvent && (
+            <Link
+              href={`/o/${orgSlug}/t/${tourId}/d/${date}/e/${firstEvent.id}/advance`}
+              className="mt-2.5 inline-block text-[11px] text-accent hover:text-accent-hover"
+            >
+              {t("inspOpenAdvance")} →
+            </Link>
+          )}
+        </div>
+      )}
+
+      {contactLines.length > 0 && (
+        <div className="border-b border-hairline py-[18px]">
+          <p className="eyebrow">{t("inspContacts")}</p>
+          <ul className="mt-1">
+            {contactLines.map((line, i) => {
+              const phone = line.match(/\+?[\d][\d\s().-]{6,}\d/)?.[0];
+              const nameText = line
+                .replace(phone ?? "", "")
+                .replace(/[\w.+-]+@[\w.-]+\.\w+/, "")
+                .replace(/[-–,;·]+\s*$/, "")
+                .trim();
+              const initials = nameText
+                .split(/\s+/)
+                .slice(0, 2)
+                .map((word) => word[0])
+                .join("")
+                .toUpperCase();
+              return (
+                <li key={i} className="flex items-center gap-2.5 py-2">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-avatar font-display text-[9px] font-semibold text-secondary">
+                    {initials || "?"}
+                  </span>
+                  <span className="min-w-0 flex-1 truncate text-[12px] font-medium text-primary">
+                    {nameText || line}
+                  </span>
+                  {phone && (
+                    <a
+                      href={`tel:${phone.replace(/[\s().-]/g, "")}`}
+                      className="shrink-0 text-[11px] text-accent hover:underline"
+                    >
+                      {t("inspCall")}
+                    </a>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      )}
+
+      {day.general_notes && (
+        <div className="py-[18px]">
+          <p className="eyebrow">{t("inspNote")}</p>
+          <p className="mt-1.5 whitespace-pre-line text-[11.5px] leading-[1.55] text-secondary">
+            {day.general_notes}
+          </p>
+        </div>
+      )}
+    </aside>
+    </div>
   );
 }
