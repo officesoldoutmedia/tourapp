@@ -846,5 +846,9 @@
     "noRooms": "Încă nu e room list.",
     "nights": "{count, plural, one {# noapte} few {# nopți} other {# de nopți}}",
     "rooms": "{count, plural, one {# cameră} few {# camere} other {# de camere}}"
+  },
+  "version": {
+    "newVersion": "E disponibilă o versiune nouă a aplicației.",
+    "reload": "Reîncarcă"
   }
 }

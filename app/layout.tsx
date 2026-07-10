@@ -4,6 +4,7 @@ import localFont from "next/font/local";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale } from "next-intl/server";
 import "./globals.css";
+import { VersionWatcher } from "@/components/ui/VersionWatcher";
 
 // §3.1: display = General Sans (Fontshare, self-hosted), body = Inter,
 // data = JetBrains Mono. next/font self-hostează totul la build.
@@ -44,7 +45,10 @@ export default async function RootLayout({
       className={`${generalSans.variable} ${inter.variable} ${jetbrainsMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col">
-        <NextIntlClientProvider>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider>
+          {children}
+          <VersionWatcher />
+        </NextIntlClientProvider>
       </body>
     </html>
   );

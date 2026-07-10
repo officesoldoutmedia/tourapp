@@ -846,5 +846,9 @@
     "noRooms": "No room list yet.",
     "nights": "{count, plural, one {# night} other {# nights}}",
     "rooms": "{count, plural, one {# room} other {# rooms}}"
+  },
+  "version": {
+    "newVersion": "A new version of the app is available.",
+    "reload": "Reload"
   }
 }
