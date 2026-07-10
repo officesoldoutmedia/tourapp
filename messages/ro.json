@@ -744,6 +744,15 @@
     "paymentCurrency": "Plata în",
     "sameCurrency": "aceeași monedă",
     "fxRate": "Curs (1 EUR = ? RON)",
-    "fxRatePlaceholder": "ex. 5.05"
+    "fxRatePlaceholder": "ex. 5.05",
+    "identityTitle": "Identitate & contact",
+    "firstName": "Prenume",
+    "lastName": "Nume",
+    "role": "Rol",
+    "jobTitle": "Titlu",
+    "companyLabel": "Companie",
+    "party": "Party",
+    "phone": "Telefon",
+    "email": "Email"
   }
 }
