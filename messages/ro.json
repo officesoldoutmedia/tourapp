@@ -819,5 +819,22 @@
     "pending": "De plată",
     "pendingSub": "{amount} rest de plată",
     "allPaid": "totul plătit"
+  },
+  "tourTravel": {
+    "title": "Travel",
+    "countLine": "{count, plural, one {# segment} few {# segmente} other {# de segmente}} pe tot turul",
+    "empty": "Niciun segment de travel încă — se adaugă din secțiunea Travel a fiecărei zile.",
+    "addHint": "Adaugă dintr-o zi",
+    "confirmed": "Confirmat",
+    "pending": "În așteptare"
+  },
+  "tourHotels": {
+    "title": "Hoteluri",
+    "countLine": "{properties, plural, one {# proprietate} few {# proprietăți} other {# de proprietăți}} · {roomNights} nopți-cameră",
+    "empty": "Niciun hotel încă — se adaugă din secțiunea Hotels a fiecărei zile.",
+    "addHint": "Adaugă dintr-o zi",
+    "noRooms": "Încă nu e room list.",
+    "nights": "{count, plural, one {# noapte} few {# nopți} other {# de nopți}}",
+    "rooms": "{count, plural, one {# cameră} few {# camere} other {# de camere}}"
   }
 }

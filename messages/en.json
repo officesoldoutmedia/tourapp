@@ -819,5 +819,22 @@
     "pending": "Pending",
     "pendingSub": "{amount} outstanding",
     "allPaid": "all paid"
+  },
+  "tourTravel": {
+    "title": "Travel",
+    "countLine": "{count, plural, one {# leg} other {# legs}} across the tour",
+    "empty": "No travel legs yet — add them from each day's Travel section.",
+    "addHint": "Add legs from a day",
+    "confirmed": "Confirmed",
+    "pending": "Pending"
+  },
+  "tourHotels": {
+    "title": "Hotels",
+    "countLine": "{properties, plural, one {# property} other {# properties}} · {roomNights} room-nights",
+    "empty": "No hotels yet — add them from each day's Hotels section.",
+    "addHint": "Add from a day",
+    "noRooms": "No room list yet.",
+    "nights": "{count, plural, one {# night} other {# nights}}",
+    "rooms": "{count, plural, one {# room} other {# rooms}}"
   }
 }
