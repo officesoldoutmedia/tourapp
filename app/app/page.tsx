@@ -20,9 +20,13 @@ export default async function AppPage({
     .maybeSingle();
   const isPro = profile?.user_tier === "pro";
 
+  // RLS lasă orice membru să vadă TOATE membership-urile organizației
+  // (members_select_orgmate), deci fără filtrul pe user organizația ar
+  // apărea o dată pentru fiecare coleg.
   const { data: memberships } = await supabase
     .from("organization_members")
     .select("permission, organizations(id, name, slug, org_type)")
+    .eq("user_id", user.id)
     .order("created_at", { ascending: true });
 
   const orgs = (memberships ?? []).flatMap((m) => {
