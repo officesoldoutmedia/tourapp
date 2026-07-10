@@ -1,13 +1,13 @@
 import { Font } from "@react-pdf/renderer";
+import { inter400, inter500, inter700 } from "./fonts-data";
 
 /**
  * Font unic pentru toate PDF-urile: Inter cu latin-ext — Helvetica
  * built-in NU are diacritice românești (ă/ș/ț cădeau din documente).
- * Fișierele stau în public/ și se încarcă prin URL (merge și pe
- * Cloudflare Workers, unde nu există filesystem).
+ * Fonturile sunt înglobate în bundle ca data-URI base64: pe Cloudflare
+ * Workers un fetch către propriul domeniu ocolește layerul de assets
+ * (răspundea 404), iar așa PDF-urile nu depind deloc de rețea.
  */
-const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-
 let registered = false;
 export function ensurePdfFonts() {
   if (registered) return;
@@ -15,9 +15,9 @@ export function ensurePdfFonts() {
   Font.register({
     family: "Inter",
     fonts: [
-      { src: `${base}/pdf-fonts/Inter-400.ttf`, fontWeight: 400 },
-      { src: `${base}/pdf-fonts/Inter-500.ttf`, fontWeight: 500 },
-      { src: `${base}/pdf-fonts/Inter-700.ttf`, fontWeight: 700 },
+      { src: `data:font/ttf;base64,${inter400}`, fontWeight: 400 },
+      { src: `data:font/ttf;base64,${inter500}`, fontWeight: 500 },
+      { src: `data:font/ttf;base64,${inter700}`, fontWeight: 700 },
     ],
   });
   // fără despărțire în silabe — datele tehnice nu se rup
