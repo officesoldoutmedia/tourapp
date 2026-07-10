@@ -255,6 +255,31 @@ export default async function CrewProfilePage({
             {t("billingTitle")}
           </h2>
           <form action={saveBilling} className="flex flex-wrap items-end gap-2">
+            <label className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+              {t("costPerShow")}
+              <input
+                name="costPerShow"
+                type="number"
+                step="0.01"
+                min="0"
+                defaultValue={person.cost_per_show ?? ""}
+                disabled={!canEditAccounting}
+                className={`${input} block w-28 text-right font-mono`}
+              />
+            </label>
+            <label className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+              {t("currency")}
+              <select
+                name="costCurrency"
+                defaultValue={person.cost_currency ?? "RON"}
+                disabled={!canEditAccounting}
+                className={`${input} block font-mono`}
+              >
+                {["RON", "EUR", "USD", "GBP"].map((c) => (
+                  <option key={c} value={c}>{c}</option>
+                ))}
+              </select>
+            </label>
             <label className="w-full max-w-44 space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
               {t("paymentType")}
               <select

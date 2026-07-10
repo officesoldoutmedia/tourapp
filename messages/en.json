@@ -753,6 +753,8 @@
     "companyLabel": "Company",
     "party": "Party",
     "phone": "Phone",
-    "email": "Email"
+    "email": "Email",
+    "costPerShow": "Cost / show",
+    "currency": "Currency"
   }
 }

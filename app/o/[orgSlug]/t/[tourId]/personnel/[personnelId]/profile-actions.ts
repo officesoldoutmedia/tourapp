@@ -86,6 +86,8 @@ export async function saveBillingDetails(
     .update({
       billing_details: billing,
       payment_type: String(formData.get("paymentType") ?? "") || null,
+      cost_per_show: Number(formData.get("costPerShow")) || null,
+      cost_currency: String(formData.get("costCurrency") ?? "RON") || "RON",
     })
     .eq("id", personnelId);
   revalidatePath(profilePath(orgSlug, tourId, personnelId));

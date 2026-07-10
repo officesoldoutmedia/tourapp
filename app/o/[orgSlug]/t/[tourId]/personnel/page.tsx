@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { ChevronRight } from "lucide-react";
@@ -42,13 +42,19 @@ export default async function PersonnelPage({
     const last = String(formData.get("last") ?? "").trim();
     const role = String(formData.get("role") ?? "").trim();
     if (!first && !last) return;
-    await ctx.supabase.from("tour_personnel").insert({
-      tour_id: tourId,
-      first_name: first || null,
-      last_name: last || null,
-      role: role || null,
-    });
+    const { data: person } = await ctx.supabase
+      .from("tour_personnel")
+      .insert({
+        tour_id: tourId,
+        first_name: first || null,
+        last_name: last || null,
+        role: role || null,
+      })
+      .select("id")
+      .single();
     revalidatePath(`/o/${orgSlug}/t/${tourId}/personnel`);
+    // direct pe profil — acolo se setează prețul, datele, poza [cererea userului]
+    if (person) redirect(`/o/${orgSlug}/t/${tourId}/personnel/${person.id}`);
   }
 
   type Person = {
