@@ -460,7 +460,11 @@
     "add": "Adaugă pass",
     "name": "Nume (ex. AAA)",
     "description": "Descriere",
-    "empty": "Niciun pass definit pe tur. Pass-urile apar drept coloane în guest list."
+    "empty": "Niciun pass definit pe tur. Pass-urile apar drept coloane în guest list.",
+    "photoHint": "Adaugă design-ul laminate-ului pentru fiecare tip de pass — click pe miniatură ca să urci poza.",
+    "photoSaved": "Poză salvată",
+    "uploadPhoto": "Încarcă poza",
+    "removePhoto": "Șterge poza"
   },
   "songs": {
     "title": "Song Library",

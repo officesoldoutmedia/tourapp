@@ -460,7 +460,11 @@
     "add": "Add pass",
     "name": "Name (e.g. AAA)",
     "description": "Description",
-    "empty": "No passes defined on this tour. Passes show up as guest list columns."
+    "empty": "No passes defined on this tour. Passes show up as guest list columns.",
+    "photoHint": "Add the laminate artwork for each pass type — click the thumbnail to upload.",
+    "photoSaved": "Pass photo saved",
+    "uploadPhoto": "Upload photo",
+    "removePhoto": "Remove photo"
   },
   "songs": {
     "title": "Song Library",
