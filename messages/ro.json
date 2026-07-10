@@ -448,7 +448,12 @@
     "myRequests": "Requesturile mele",
     "submitRequest": "Trimite request",
     "noAccess": "Nu ai acces la guest list pe acest event.",
-    "delete": "Șterge selecția"
+    "delete": "Șterge selecția",
+    "selectedCount": "{count, plural, one {# selectat} other {# selectați}}",
+    "bulkApproved": "{count, plural, one {# invitat aprobat} other {# invitați aprobați}}",
+    "bulkDeclined": "{count, plural, one {# invitat respins} other {# invitați respinși}}",
+    "bulkRemoved": "{count, plural, one {# invitat șters} other {# invitați șterși}}",
+    "clearSelection": "Deselectează"
   },
   "passes": {
     "title": "Tour Passes",

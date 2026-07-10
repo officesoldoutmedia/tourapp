@@ -112,9 +112,16 @@ export default async function OrgSettingsPage({
             <span className="text-xs text-secondary">{t("glEmailsHint")}</span>
           </span>
           <button
-            className={`rounded-full px-4 py-1 text-xs font-bold ${glEmailsOn ? "bg-success text-white" : "border border-hairline text-secondary"}`}
+            role="switch"
+            aria-checked={glEmailsOn}
+            aria-label={t("glEmails")}
+            className="relative h-5 w-[34px] rounded-full transition-colors duration-160"
+            style={{ background: glEmailsOn ? "var(--accent)" : "var(--bg-switch-off)" }}
           >
-            {glEmailsOn ? "ON" : "OFF"}
+            <span
+              className="absolute left-0.5 top-0.5 h-4 w-4 rounded-full bg-white transition-transform duration-160"
+              style={{ transform: glEmailsOn ? "translateX(14px)" : "translateX(0)" }}
+            />
           </button>
         </form>
       )}

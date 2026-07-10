@@ -448,7 +448,12 @@
     "myRequests": "My requests",
     "submitRequest": "Submit request",
     "noAccess": "You don't have guest list access on this event.",
-    "delete": "Delete selection"
+    "delete": "Delete selection",
+    "selectedCount": "{count} selected",
+    "bulkApproved": "{count, plural, one {# guest approved} other {# guests approved}}",
+    "bulkDeclined": "{count, plural, one {# guest declined} other {# guests declined}}",
+    "bulkRemoved": "{count, plural, one {# guest removed} other {# guests removed}}",
+    "clearSelection": "Clear"
   },
   "passes": {
     "title": "Tour Passes",

@@ -2,6 +2,7 @@
 
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
+import { toast } from "@/components/ui/Toaster";
 import {
   deleteGuestRequests,
   setGuestStatus,
@@ -182,50 +183,92 @@ export function GuestListGrid({
         </span>
       </div>
 
-      {/* bulk pe selecție [C] */}
+      {/* bara de bulk (Graphite README §11) */}
       {canManage && selected.size > 0 && (
-        <div className="flex items-center gap-2 text-xs">
-          <span className="font-medium">{selected.size} ✓</span>
-          <select
-            value=""
-            onChange={(e) => {
-              if (!e.target.value) return;
-              run(async () => {
-                const r = await setGuestStatus(
-                  ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId,
-                  [...selected], e.target.value as "pending" | "approved" | "declined",
-                );
-                if (!r.error) setSelected(new Set());
-                return r;
-              });
-            }}
-            className="rounded border border-hairline px-2 py-1"
-          >
-            <option value="">{t("bulkStatus")}…</option>
-            {(["approved", "declined", "pending"] as const).map((s) => (
-              <option key={s} value={s}>{t(s)}</option>
-            ))}
-          </select>
-          <button
-            disabled={pending}
-            onClick={() =>
-              run(async () => {
-                const r = await deleteGuestRequests(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, [...selected]);
-                if (!r.error) setSelected(new Set());
-                return r;
-              })
-            }
-            className="rounded px-2 py-1 text-danger hover:bg-danger-subtle"
-          >
-            🗑 {t("delete")}
-          </button>
+        <div
+          className="flex h-10 items-center gap-4 rounded-[10px] px-3.5"
+          style={{
+            background: "var(--sel-bulk)",
+            border: "1px solid var(--sel-bulk-border)",
+            animation: "toastIn 160ms ease-out",
+          }}
+        >
+          <span className="text-[12px] font-medium text-primary">
+            {t("selectedCount", { count: selected.size })}
+          </span>
+          <span className="ml-auto flex items-center gap-4 text-[12px]">
+            <button
+              disabled={pending}
+              onClick={() =>
+                run(async () => {
+                  const count = selected.size;
+                  const r = await setGuestStatus(
+                    ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId,
+                    [...selected], "approved",
+                  );
+                  if (!r.error) {
+                    setSelected(new Set());
+                    toast(t("bulkApproved", { count }));
+                  }
+                  return r;
+                })
+              }
+              className="font-medium text-accent transition-colors hover:text-accent-hover"
+            >
+              {t("approved")}
+            </button>
+            <button
+              disabled={pending}
+              onClick={() =>
+                run(async () => {
+                  const count = selected.size;
+                  const r = await setGuestStatus(
+                    ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId,
+                    [...selected], "declined",
+                  );
+                  if (!r.error) {
+                    setSelected(new Set());
+                    toast(t("bulkDeclined", { count }), "warning");
+                  }
+                  return r;
+                })
+              }
+              className="font-medium text-warning transition-colors hover:text-primary"
+            >
+              {t("declined")}
+            </button>
+            <button
+              disabled={pending}
+              onClick={() =>
+                run(async () => {
+                  const count = selected.size;
+                  const r = await deleteGuestRequests(ctx.orgSlug, ctx.tourId, ctx.date, ctx.eventId, [...selected]);
+                  if (!r.error) {
+                    setSelected(new Set());
+                    toast(t("bulkRemoved", { count }), "danger");
+                  }
+                  return r;
+                })
+              }
+              className="font-medium text-danger transition-colors hover:text-primary"
+            >
+              {t("delete")}
+            </button>
+            <button
+              onClick={() => setSelected(new Set())}
+              className="text-secondary transition-colors hover:text-primary"
+            >
+              {t("clearSelection")}
+            </button>
+          </span>
+          <style>{`@keyframes toastIn { from { opacity: 0; transform: translateY(4px); } to { opacity: 1; transform: translateY(0); } }`}</style>
         </div>
       )}
 
       <div className="flex gap-4">
         <div className="min-w-0 flex-1 overflow-x-auto rounded-[12px] border border-hairline bg-surface">
           <table className="w-full text-xs">
-            <thead className="bg-subtle text-left uppercase text-secondary">
+            <thead className="sticky top-0 z-[2] bg-canvas text-left font-display text-[10px] font-semibold uppercase tracking-[0.07em] text-tertiary">
               <tr>
                 <th className="px-2 py-1.5">
                   <input

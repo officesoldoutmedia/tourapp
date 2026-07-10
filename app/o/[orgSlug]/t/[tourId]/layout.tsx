@@ -3,6 +3,7 @@ import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { PrimarySidebar, type SidebarSection } from "@/components/ui/PrimarySidebar";
 import { BreadcrumbTail } from "@/components/ui/BreadcrumbTail";
+import { CommandPalette, type PaletteItem } from "@/components/ui/CommandPalette";
 
 /**
  * Shell-ul turului (Graphite): sidebar 236px cu secțiunile
@@ -79,9 +80,18 @@ export default async function TourLayout({
     },
   ];
 
+  const paletteItems: PaletteItem[] = sections.flatMap((section) =>
+    section.items.map((item) => ({
+      label: item.label,
+      href: item.href,
+      kind: "Screen",
+    })),
+  );
+
   return (
     <div className="flex h-full overflow-hidden">
       <BreadcrumbTail label={tour.name} />
+      <CommandPalette items={paletteItems} />
       <PrimarySidebar
         tourName={tour.name}
         tourMeta={`${showCount} shows · ${allDates.length} days`}

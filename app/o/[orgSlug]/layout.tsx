@@ -4,6 +4,8 @@ import { Bell } from "lucide-react";
 import { requireOrg } from "@/lib/org";
 import { createServerSupabase } from "@/lib/supabase/server";
 import { AvatarMenu } from "@/components/ui/AvatarMenu";
+import { SearchButton } from "@/components/ui/SearchButton";
+import { Toaster } from "@/components/ui/Toaster";
 
 /**
  * Shell-ul global — chrome 52px (Graphite README §1).
@@ -73,6 +75,7 @@ export default async function OrgLayout({
 
         {/* cluster dreapta */}
         <span className="ml-auto flex shrink-0 items-center gap-2">
+          <SearchButton />
           <Link
             href={`/o/${org.slug}/notifications`}
             title="Notifications"
@@ -103,6 +106,7 @@ export default async function OrgLayout({
       </header>
 
       <div className="min-h-0 flex-1 overflow-hidden">{children}</div>
+      <Toaster />
     </div>
   );
 }
