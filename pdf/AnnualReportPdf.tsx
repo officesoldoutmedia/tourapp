@@ -19,8 +19,8 @@ ensurePdfFonts();
 const styles = StyleSheet.create({
   page: { padding: 44, fontFamily: "Inter", fontSize: 9, lineHeight: 1.45 },
   org: { fontSize: 9, color: "#666" },
-  title: { fontSize: 16, fontWeight: 700, marginBottom: 2 },
-  subtitle: { fontSize: 9, color: "#444", marginBottom: 20 },
+  title: { fontSize: 16, fontWeight: 700, lineHeight: 1.25, marginBottom: 6 },
+  subtitle: { fontSize: 9, color: "#444", marginBottom: 22 },
   person: { marginBottom: 16 },
   personHead: {
     flexDirection: "row",
@@ -41,13 +41,12 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
     borderBottomColor: "#ddd",
   },
-  cNo: { width: 34, color: "#555" },
-  cTour: { flex: 1 },
-  cContract: { width: 120, color: "#555" },
-  cDate: { width: 58, color: "#555" },
-  cFx: { width: 84, textAlign: "right", color: "#555", fontSize: 7.5 },
-  cAmount: { width: 90, textAlign: "right" },
-  cStatus: { width: 52, textAlign: "right" },
+  cNo: { width: 30, color: "#555" },
+  cMain: { flex: 1, paddingRight: 12 },
+  cMainSub: { fontSize: 7.5, color: "#777", marginTop: 1 },
+  cAmount: { width: 110, textAlign: "right" },
+  cAmountSub: { fontSize: 7.5, color: "#777", marginTop: 1 },
+  cStatus: { width: 56, textAlign: "right" },
   paid: { color: "#1a7f4b" },
   pending: { color: "#a86414" },
   footer: {
@@ -132,17 +131,21 @@ export async function buildAnnualReportPdf(
             {person.annexes.map((annex) => (
               <View key={annex.id} style={styles.row}>
                 <Text style={styles.cNo}>#{annex.annexNumber}</Text>
-                <Text style={styles.cTour}>{annex.tourName}</Text>
-                <Text style={styles.cContract}>{annex.contractNumber ?? ""}</Text>
-                <Text style={styles.cDate}>{annex.issueDate}</Text>
-                <Text style={styles.cFx}>
-                  {annex.fxRate != null
-                    ? `${formatMoney(annex.total, annex.currency)} · 1 ${annex.currency} = ${annex.fxRate} ${annex.paymentCurrency}`
-                    : ""}
-                </Text>
-                <Text style={styles.cAmount}>
-                  {formatMoney(annex.paymentTotal, annex.paymentCurrency)}
-                </Text>
+                <View style={styles.cMain}>
+                  <Text>{annex.tourName}</Text>
+                  <Text style={styles.cMainSub}>
+                    {[annex.contractNumber, annex.issueDate].filter(Boolean).join(" · ")}
+                  </Text>
+                </View>
+                <View style={styles.cAmount}>
+                  <Text>{formatMoney(annex.paymentTotal, annex.paymentCurrency)}</Text>
+                  {annex.fxRate != null && (
+                    <Text style={styles.cAmountSub}>
+                      {formatMoney(annex.total, annex.currency)} · 1 {annex.currency} ={" "}
+                      {annex.fxRate} {annex.paymentCurrency}
+                    </Text>
+                  )}
+                </View>
                 <Text style={[styles.cStatus, annex.paid ? styles.paid : styles.pending]}>
                   {annex.paid ? t.paid : t.pending}
                 </Text>
