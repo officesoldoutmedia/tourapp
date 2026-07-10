@@ -640,7 +640,12 @@
     "bookingPercent": "Comision booking (default, %)",
     "bookingPercentHint": "Se aplică la fee-ul fiecărui show; poate fi suprascris per show în Costuri & profit.",
     "crewLink": "Crew-ul turului (roluri, costuri, contacte)",
-    "crewLinkHint": "Tot crew-ul posibil — per show alegi apoi cine vine, în Costs & profit."
+    "crewLinkHint": "Tot crew-ul posibil — per show alegi apoi cine vine, în Costs & profit.",
+    "logoTitle": "Logo artist",
+    "logoUpload": "Încarcă logo",
+    "logoRemove": "Șterge",
+    "logoUploaded": "Logo salvat",
+    "logoHint": "Apare pe antetul PDF-urilor de day sheet și tour book. Merge cel mai bine un PNG cu fundal transparent."
   },
   "showCosts": {
     "title": "Costuri & profit",

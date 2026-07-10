@@ -1,6 +1,7 @@
 /** Day Sheet PDF (§6.17.1–2) — o pagină+ per zi, template curat predefinit [N]. */
 import {
   Document,
+  Image,
   Page,
   StyleSheet,
   Text,
@@ -39,17 +40,33 @@ function clock(t: string | null): string {
   return t ? t.slice(0, 5) : "";
 }
 
-function DaySheetPage({ day, locale }: { day: DaySheetData; locale: string }) {
+function DaySheetPage({
+  day,
+  locale,
+  logoUrl,
+}: {
+  day: DaySheetData;
+  locale: string;
+  logoUrl: string | null;
+}) {
   const tz = day.timezone ?? "UTC";
   return (
     <Page size="A4" style={styles.page}>
-      <Text style={styles.tour}>{day.tour}</Text>
-      <Text style={styles.title}>
-        {[day.city, day.country].filter(Boolean).join(", ") || day.day_type}
-      </Text>
-      <Text style={styles.subtitle}>
-        {formatDayHeader(day.date, tz, locale)} · {day.day_type}
-      </Text>
+      <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "flex-start" }}>
+        <View style={{ flex: 1 }}>
+          <Text style={styles.tour}>{day.tour}</Text>
+          <Text style={styles.title}>
+            {[day.city, day.country].filter(Boolean).join(", ") || day.day_type}
+          </Text>
+          <Text style={styles.subtitle}>
+            {formatDayHeader(day.date, tz, locale)} · {day.day_type}
+          </Text>
+        </View>
+        {logoUrl && (
+          // eslint-disable-next-line jsx-a11y/alt-text
+          <Image src={logoUrl} style={{ maxHeight: 40, maxWidth: 140, objectFit: "contain" }} />
+        )}
+      </View>
 
       {day.general_notes && (
         <View style={styles.section}>
@@ -152,11 +169,12 @@ function DaySheetPage({ day, locale }: { day: DaySheetData; locale: string }) {
 export async function buildDaySheetPdf(
   days: DaySheetData[],
   locale = "ro",
+  logoUrl: string | null = null,
 ): Promise<Buffer> {
   const doc = (
     <Document title={`Day Sheet — ${days[0]?.tour ?? ""}`}>
       {days.map((day) => (
-        <DaySheetPage key={day.date} day={day} locale={locale} />
+        <DaySheetPage key={day.date} day={day} locale={locale} logoUrl={logoUrl} />
       ))}
     </Document>
   );

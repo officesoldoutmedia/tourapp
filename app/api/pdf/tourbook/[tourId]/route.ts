@@ -34,7 +34,16 @@ export async function GET(
     if (sheet) sheets.push(sheet);
   }
 
-  const pdf = await buildDaySheetPdf(sheets, await getLocale());
+  const { data: tourRow } = await supabase
+    .from("tours")
+    .select("logo_path")
+    .eq("id", tourId)
+    .maybeSingle();
+  const logoUrl = tourRow?.logo_path
+    ? ((await supabase.storage.from("attachments").createSignedUrl(tourRow.logo_path, 600)).data
+        ?.signedUrl ?? null)
+    : null;
+  const pdf = await buildDaySheetPdf(sheets, await getLocale(), logoUrl);
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",

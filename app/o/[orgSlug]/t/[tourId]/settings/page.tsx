@@ -5,26 +5,32 @@ import Link from "next/link";
 import { Users, ChevronRight } from "lucide-react";
 import { requireOrg } from "@/lib/org";
 import { hasMinPermission } from "@/lib/permissions";
+import { TourLogo } from "./logo-client";
 
-/** Tour Settings — nume, arhivare, vizibilitate mobil, ștergere [C-S MT]. */
+/** Tour Settings — nume, logo, arhivare, vizibilitate mobil, ștergere [C-S MT]. */
 export default async function TourSettingsPage({
   params,
 }: {
   params: Promise<{ orgSlug: string; tourId: string }>;
 }) {
   const { orgSlug, tourId } = await params;
-  const { supabase, permission } = await requireOrg(orgSlug);
+  const { org, supabase, permission } = await requireOrg(orgSlug);
   const t = await getTranslations("tourSettings");
   const tc = await getTranslations("common");
   if (!hasMinPermission(permission, "manager")) notFound();
 
   const { data: tour } = await supabase
     .from("tours")
-    .select("id, name, is_archived, visible_on_mobile, booking_percent")
+    .select("id, name, is_archived, visible_on_mobile, booking_percent, logo_path")
     .eq("id", tourId)
     .is("deleted_at", null)
     .maybeSingle();
   if (!tour) notFound();
+
+  const logoUrl = tour.logo_path
+    ? ((await supabase.storage.from("attachments").createSignedUrl(tour.logo_path, 3600)).data
+        ?.signedUrl ?? null)
+    : null;
 
   const path = `/o/${orgSlug}/t/${tourId}/settings`;
 
@@ -89,6 +95,24 @@ export default async function TourSettingsPage({
           </button>
         </div>
       </form>
+
+      <div className="space-y-2 rounded-[12px] border border-hairline bg-surface p-4">
+        <label className="block text-xs font-semibold uppercase tracking-wider text-secondary">
+          {t("logoTitle")}
+        </label>
+        <TourLogo
+          orgSlug={orgSlug}
+          orgId={org.id}
+          tourId={tourId}
+          logoUrl={logoUrl}
+          labels={{
+            upload: t("logoUpload"),
+            remove: t("logoRemove"),
+            uploaded: t("logoUploaded"),
+            hint: t("logoHint"),
+          }}
+        />
+      </div>
 
       <div className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
         {toggles.map(([field, label, value]) => (

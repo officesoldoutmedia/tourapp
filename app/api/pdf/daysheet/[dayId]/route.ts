@@ -18,7 +18,18 @@ export async function GET(
   });
   if (!day) return NextResponse.json({ error: "not_found" }, { status: 404 });
 
-  const pdf = await buildDaySheetPdf([day], await getLocale());
+  const { data: dayRow } = await supabase
+    .from("days")
+    .select("tours(logo_path)")
+    .eq("id", dayId)
+    .maybeSingle();
+  const logoPath = (dayRow?.tours as unknown as { logo_path: string | null } | null)?.logo_path;
+  const logoUrl = logoPath
+    ? ((await supabase.storage.from("attachments").createSignedUrl(logoPath, 600)).data
+        ?.signedUrl ?? null)
+    : null;
+
+  const pdf = await buildDaySheetPdf([day], await getLocale(), logoUrl);
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",

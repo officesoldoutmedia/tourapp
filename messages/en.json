@@ -640,7 +640,12 @@
     "bookingPercent": "Booking commission (default, %)",
     "bookingPercentHint": "Applied to each show's fee; can be overridden per show in Costs & profit.",
     "crewLink": "Tour crew (roles, costs, contacts)",
-    "crewLinkHint": "The full roster — per show you then pick who comes, in Costs & profit."
+    "crewLinkHint": "The full roster — per show you then pick who comes, in Costs & profit.",
+    "logoTitle": "Artist logo",
+    "logoUpload": "Upload logo",
+    "logoRemove": "Remove",
+    "logoUploaded": "Logo saved",
+    "logoHint": "Shown on the day sheet and tour book PDF headers. PNG with transparent background works best."
   },
   "showCosts": {
     "title": "Costs & profit",
