@@ -63,9 +63,11 @@ al artistului (artist preselectat prin query `?artist=`). Gate `manage_tours`.
    RLS-scoped); dată validă. Redirect la pagina zilei create.
 
 **Coliziune de zi:** dacă în bucket există deja o zi la data respectivă, acțiunea
-NU creează alta — adaugă event-ul (și restul pasilor 4–6 doar dacă ziua era goală de
-schedule) pe ziua existentă și redirecționează acolo. Două show-uri în același oraș
-în aceeași seară = două event-uri pe aceeași zi, exact ca în modelul existent.
+NU creează alta — adaugă event-ul pe ziua existentă și redirecționează acolo.
+La coliziune: pasul 4 (template de program) rulează DOAR dacă ziua nu are deja
+schedule items (evită duplicarea); pașii 5 (item Show) și 6 (advancing) rulează
+întotdeauna — advancing-ul e per event, iar itemul Show e al show-ului nou. Două
+show-uri în aceeași seară = două event-uri pe aceeași zi, ca în modelul existent.
 
 ## 2. Master Dashboard (pagina de org)
 
@@ -73,8 +75,11 @@ Layout pe două coloane; dreapta sticky la scroll (stil documentul Zolei).
 
 **Stânga:**
 1. **Next Event card:** avatar + culoare artist, numele event-ului (sau venue/oraș),
-   oraș + țară, dată + „în N zile", stage time (primul `schedule_item` cu titlul de
-   show al zilei, dacă există), bara de advancing (procentul agregat existent).
+   oraș + țară, dată + „în N zile", stage time-ul zilei (dacă există) și bara de
+   advancing (procentul agregat existent). Stage time = itemul de program cu titlul
+   exact `SHOW_SLOT_TITLE` — o constantă partajată (`lib/showSlot.ts`, valoare
+   `"Show"`) folosită și de wizard la creare, și de dashboard la afișare; fără
+   match pe stringuri traduse.
    Click → pagina zilei.
 2. **Upcoming:** următoarele 10 zile de show peste toți artiștii vizibili: dată,
    pastilă/avatar artist, event/venue, oraș, țară, procent advancing. Click → ziua.
