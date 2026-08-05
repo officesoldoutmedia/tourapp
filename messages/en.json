@@ -820,7 +820,20 @@
     "newTour": "New tour",
     "noDays": "No scheduled days yet.",
     "noTours": "No tours yet.",
-    "advance": "Advancing"
+    "advance": "Advancing",
+    "profileTitle": "Artist profile",
+    "nameLabel": "Name",
+    "legalNameLabel": "Legal entity",
+    "homeBaseLabel": "Home base",
+    "homeBaseHint": "Starting point for distance calculations",
+    "currencyLabel": "Default currency",
+    "timezoneLabel": "Time zone",
+    "colorLabel": "Calendar color",
+    "linksLabel": "Links",
+    "photoLabel": "Profile photo",
+    "archive": "Archive artist",
+    "unarchive": "Unarchive",
+    "saved": "Saved"
   },
   "gear": {
     "title": "Gear",

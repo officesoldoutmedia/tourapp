@@ -820,7 +820,20 @@
     "newTour": "Tur nou",
     "noDays": "Nicio zi programată încă.",
     "noTours": "Niciun tur încă.",
-    "advance": "Advancing"
+    "advance": "Advancing",
+    "profileTitle": "Profil artist",
+    "nameLabel": "Nume",
+    "legalNameLabel": "Entitate juridică",
+    "homeBaseLabel": "Home base",
+    "homeBaseHint": "Punctul de plecare pentru calculul de km",
+    "currencyLabel": "Valută implicită",
+    "timezoneLabel": "Fus orar",
+    "colorLabel": "Culoare în calendar",
+    "linksLabel": "Linkuri",
+    "photoLabel": "Poză de profil",
+    "archive": "Arhivează artistul",
+    "unarchive": "Dezarhivează",
+    "saved": "Salvat"
   },
   "gear": {
     "title": "Gear",
