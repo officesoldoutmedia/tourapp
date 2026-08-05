@@ -37,11 +37,12 @@ export async function createTour(
     endDate: string;
     days: WizardDay[];
     templateId: string | null;
+    artistId: string;
   },
 ): Promise<{ error?: string }> {
   const { supabase, org, permission, tier, user } = await requireOrg(orgSlug);
   if (!can({ tier, permission }, "manage_tours")) return { error: "forbidden" };
-  if (!payload.name.trim() || payload.days.length === 0)
+  if (!payload.name.trim() || payload.days.length === 0 || !payload.artistId)
     return { error: "invalid" };
 
   const { data: tour, error: tourError } = await supabase
@@ -52,6 +53,7 @@ export async function createTour(
       start_date: payload.startDate,
       end_date: payload.endDate,
       created_by: user.id,
+      artist_id: payload.artistId,
     })
     .select("id")
     .single();

@@ -33,9 +33,13 @@ function datesBetween(from: string, to: string): string[] {
 export function TourWizard({
   orgSlug,
   templates,
+  artists,
+  defaultArtistId,
 }: {
   orgSlug: string;
   templates: { id: string; name: string }[];
+  artists: { id: string; name: string }[];
+  defaultArtistId?: string;
 }) {
   const t = useTranslations("tours");
   const td = useTranslations("dayTypes");
@@ -46,6 +50,9 @@ export function TourWizard({
   const [to, setTo] = useState("");
   const [days, setDays] = useState<WizardDay[]>([]);
   const [templateId, setTemplateId] = useState<string>("");
+  const [artistId, setArtistId] = useState<string>(
+    defaultArtistId ?? (artists.length === 1 ? artists[0].id : ""),
+  );
   const [error, setError] = useState<string | null>(null);
   const [pending, startTransition] = useTransition();
   const timezones = useMemo(() => allTimezones(), []);
@@ -88,6 +95,7 @@ export function TourWizard({
         endDate: to,
         days,
         templateId: templateId || null,
+        artistId,
       });
       if (result?.error) setError(tc("error"));
     });
@@ -97,7 +105,26 @@ export function TourWizard({
     <main className="mx-auto w-full max-w-4xl space-y-8 p-6">
       <h1 className="font-display text-2xl font-semibold tracking-tight">{t("newTour")}</h1>
 
-      <div className="grid gap-4 sm:grid-cols-3">
+      <div className="grid gap-4 sm:grid-cols-4">
+        <label className="block space-y-1 sm:col-span-1">
+          <span className="text-sm font-medium">{t("artistLabel")}</span>
+          <select
+            name="artist"
+            value={artistId}
+            onChange={(e) => setArtistId(e.target.value)}
+            required
+            className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
+          >
+            <option value="" disabled>
+              {t("artistRequired")}
+            </option>
+            {artists.map((a) => (
+              <option key={a.id} value={a.id}>
+                {a.name}
+              </option>
+            ))}
+          </select>
+        </label>
         <label className="block space-y-1 sm:col-span-1">
           <span className="text-sm font-medium">{t("name")}</span>
           <input
@@ -228,7 +255,7 @@ export function TourWizard({
 
       <button
         onClick={submit}
-        disabled={pending || !name.trim() || days.length === 0}
+        disabled={pending || !name.trim() || days.length === 0 || !artistId}
         className="btn-primary h-9 disabled:opacity-50"
       >
         {t("createTour")}

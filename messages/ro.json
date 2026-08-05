@@ -63,6 +63,8 @@
     "newTour": "Tur nou",
     "archived": "Arhivate",
     "empty": "Niciun tur încă. Creează primul.",
+    "artistLabel": "Artist",
+    "artistRequired": "Alege artistul",
     "name": "Numele turului",
     "from": "De la",
     "to": "Până la",

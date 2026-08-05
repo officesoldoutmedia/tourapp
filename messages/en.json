@@ -63,6 +63,8 @@
     "newTour": "New tour",
     "archived": "Archived",
     "empty": "No tours yet. Create the first one.",
+    "artistLabel": "Artist",
+    "artistRequired": "Choose an artist",
     "name": "Tour name",
     "from": "From",
     "to": "To",
