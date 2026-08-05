@@ -9,6 +9,9 @@ import {
   searchGooglePlaces,
   type GooglePlaceResult,
 } from "@/lib/googlePlaces";
+import { normalize, resolveVenue, type VenueHit, type VenueInput } from "./venue-resolve";
+
+export type { VenueHit } from "./venue-resolve";
 
 async function requireEditor(orgSlug: string) {
   const ctx = await requireOrg(orgSlug);
@@ -16,50 +19,6 @@ async function requireEditor(orgSlug: string) {
     throw new Error("forbidden");
   }
   return ctx;
-}
-
-function normalize(s: string): string {
-  return s
-    .normalize("NFD")
-    .replace(/[̀-ͯ]/g, "")
-    .toLowerCase()
-    .trim();
-}
-
-async function findDuplicates(
-  supabase: Awaited<ReturnType<typeof requireOrg>>["supabase"],
-  orgId: string,
-  name: string,
-  city: string,
-): Promise<VenueHit[]> {
-  const { data: candidates } = await supabase
-    .from("venues")
-    .select("id, name, city, country")
-    .eq("organization_id", orgId)
-    .is("deleted_at", null);
-  return (candidates ?? [])
-    .filter(
-      (v) =>
-        normalize(v.name) === normalize(name) &&
-        normalize(v.city ?? "") === normalize(city),
-    )
-    .map((v) => ({
-      id: v.id,
-      name: v.name,
-      city: v.city,
-      country: v.country,
-      source: "org" as const,
-    }));
-}
-
-export interface VenueHit {
-  id: string;
-  name: string;
-  city: string | null;
-  country: string | null;
-  source: "org" | "catalog" | "google";
-  /** doar pt source='google' — payload-ul complet pt creare la selectare */
-  google?: GooglePlaceResult;
 }
 
 /**
@@ -134,76 +93,17 @@ export async function createEvent(
 ): Promise<CreateEventResult> {
   const { supabase, org } = await requireEditor(orgSlug);
 
-  let venueId = input.venueId ?? null;
-  let venueName: string | null = null;
-
-  if (!venueId && input.googleVenue) {
-    const g = input.googleVenue;
-    // duplicate matching [C] se aplică și selecțiilor din Google
-    if (!input.ignoreDuplicates) {
-      const dupes = await findDuplicates(supabase, org.id, g.name, g.city ?? "");
-      if (dupes.length > 0) return { duplicates: dupes };
-    }
-    const { data: venue, error } = await supabase
-      .from("venues")
-      .insert({
-        organization_id: org.id,
-        name: g.name,
-        address_line1: g.addressLine1,
-        city: g.city,
-        state: g.state,
-        country: g.country,
-        postal_code: g.postalCode,
-        lat: g.lat,
-        lng: g.lng,
-        phones: g.phone ? [{ number: g.phone, label: "Main Number" }] : [],
-        urls: g.website ? [g.website] : [],
-        source: "google",
-        google_place_id: g.googlePlaceId,
-      })
-      .select("id, name")
-      .single();
-    if (error || !venue) return { error: error?.message ?? "venue_failed" };
-    venueId = venue.id;
-    venueName = venue.name;
-  }
-
-  if (!venueId && input.newVenue) {
-    const name = input.newVenue.name.trim();
-    if (!name) return { error: "venue_name_required" };
-
-    // Smart duplicate matching [C]: nume normalizat + oraș, în org
-    if (!input.ignoreDuplicates) {
-      const dupes = await findDuplicates(
-        supabase, org.id, name, input.newVenue.city ?? "",
-      );
-      if (dupes.length > 0) return { duplicates: dupes };
-    }
-
-    const { data: venue, error } = await supabase
-      .from("venues")
-      .insert({
-        organization_id: org.id,
-        name,
-        city: input.newVenue.city || null,
-        country: input.newVenue.country || null,
-        source: "manual",
-      })
-      .select("id, name")
-      .single();
-    if (error || !venue) return { error: error?.message ?? "venue_failed" };
-    venueId = venue.id;
-    venueName = venue.name;
-  }
-
-  if (venueId && !venueName) {
-    const { data: v } = await supabase
-      .from("venues")
-      .select("name")
-      .eq("id", venueId)
-      .single();
-    venueName = v?.name ?? null;
-  }
+  const venueInput: VenueInput = {
+    venueId: input.venueId,
+    newVenue: input.newVenue,
+    googleVenue: input.googleVenue,
+    ignoreDuplicates: input.ignoreDuplicates,
+  };
+  const resolved = await resolveVenue(supabase, org.id, venueInput);
+  if (resolved.duplicates) return { duplicates: resolved.duplicates };
+  if (resolved.error) return { error: resolved.error };
+  const venueId = resolved.venueId;
+  const venueName = resolved.venueName;
 
   const { data: event, error } = await supabase
     .from("events")
