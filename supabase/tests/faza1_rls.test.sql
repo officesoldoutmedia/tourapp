@@ -9,8 +9,12 @@ select id as org_id from public.organizations limit 1 \gset
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-00000000000a"}', false);
 set role authenticated;
 
-insert into public.tours (organization_id, name, start_date, end_date, created_by)
-values (:'org_id', 'SxS Summer 2026', '2026-07-17', '2026-07-26',
+insert into public.artists (organization_id, name, slug, created_by)
+values (:'org_id', 'SPEAK', 'speak', 'a0000000-0000-0000-0000-00000000000a')
+returning id as artist_id \gset
+
+insert into public.tours (organization_id, artist_id, name, start_date, end_date, created_by)
+values (:'org_id', :'artist_id', 'SxS Summer 2026', '2026-07-17', '2026-07-26',
         'a0000000-0000-0000-0000-00000000000a')
 returning id as tour_id \gset
 
