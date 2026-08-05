@@ -800,6 +800,16 @@
     "crewSub": "across active tours",
     "reportsLink": "Reports"
   },
+  "roster": {
+    "title": "Roster",
+    "newArtist": "New artist",
+    "nextShow": "Next show",
+    "noShows": "No scheduled shows",
+    "archived": "Archived",
+    "empty": "No artists yet. Create the first one.",
+    "nameLabel": "Artist name",
+    "createTitle": "New artist"
+  },
   "gear": {
     "title": "Gear",
     "hint": "The tour inventory. Open the shows counter on an item to pick which shows it travels to.",

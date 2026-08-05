@@ -800,6 +800,16 @@
     "crewSub": "în tururile active",
     "reportsLink": "Rapoarte"
   },
+  "roster": {
+    "title": "Roster",
+    "newArtist": "Artist nou",
+    "nextShow": "Următorul show",
+    "noShows": "Fără show-uri programate",
+    "archived": "Arhivați",
+    "empty": "Niciun artist încă. Creează primul.",
+    "nameLabel": "Nume artist",
+    "createTitle": "Artist nou"
+  },
   "gear": {
     "title": "Gear",
     "hint": "Inventarul turului. Deschide contorul de show-uri de pe un articol ca să alegi la ce show-uri merge.",
