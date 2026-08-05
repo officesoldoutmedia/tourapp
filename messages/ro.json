@@ -833,7 +833,18 @@
     "photoLabel": "Poză de profil",
     "archive": "Arhivează artistul",
     "unarchive": "Dezarhivează",
-    "saved": "Salvat"
+    "saved": "Salvat",
+    "accessTitle": "Acces",
+    "accessOpen": "Vizibil pentru toată organizația",
+    "accessRestricted": "Restricționat la:",
+    "accessNote": "Administratorii, accounting-ul și managerii văd întotdeauna tot.",
+    "addGroup": "Adaugă grup",
+    "addUser": "Adaugă user",
+    "remove": "Șterge",
+    "filesTitle": "Fișierele artistului",
+    "filesHint": "Rider tehnic, hospitality, press — se vor moșteni în event-uri.",
+    "upload": "Încarcă",
+    "noFiles": "Niciun fișier."
   },
   "gear": {
     "title": "Gear",

@@ -833,7 +833,18 @@
     "photoLabel": "Profile photo",
     "archive": "Archive artist",
     "unarchive": "Unarchive",
-    "saved": "Saved"
+    "saved": "Saved",
+    "accessTitle": "Access",
+    "accessOpen": "Visible to the whole organization",
+    "accessRestricted": "Restricted to:",
+    "accessNote": "Administrators, accounting and managers always see everything.",
+    "addGroup": "Add group",
+    "addUser": "Add user",
+    "remove": "Remove",
+    "filesTitle": "Artist files",
+    "filesHint": "Tech rider, hospitality, press — will be inherited by events.",
+    "upload": "Upload",
+    "noFiles": "No files."
   },
   "gear": {
     "title": "Gear",
