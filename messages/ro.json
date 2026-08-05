@@ -647,6 +647,8 @@
   },
   "tourSettings": {
     "title": "Setări tur",
+    "artistLabel": "Artist",
+    "artistHint": "Mutarea turului la alt artist îi schimbă și vizibilitatea.",
     "tourName": "Numele turului",
     "archived": "Turul e arhivat?",
     "visibleMobile": "Vizibil pentru userii de mobil?",

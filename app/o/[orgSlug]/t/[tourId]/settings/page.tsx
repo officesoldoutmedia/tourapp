@@ -4,9 +4,10 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Users, ChevronRight } from "lucide-react";
 import { requireOrg } from "@/lib/org";
-import { hasMinPermission } from "@/lib/permissions";
+import { can, hasMinPermission } from "@/lib/permissions";
 import { PageHeader } from "@/components/ui/PageHeader";
 import { TourLogo } from "./logo-client";
+import { updateTourArtist } from "./actions";
 
 /** Tour Settings (prototip Graphite): Tour details / Preferences / Archive. */
 export default async function TourSettingsPage({
@@ -15,18 +16,31 @@ export default async function TourSettingsPage({
   params: Promise<{ orgSlug: string; tourId: string }>;
 }) {
   const { orgSlug, tourId } = await params;
-  const { org, supabase, permission } = await requireOrg(orgSlug);
+  const { org, supabase, permission, tier } = await requireOrg(orgSlug);
   const t = await getTranslations("tourSettings");
   const tc = await getTranslations("common");
   if (!hasMinPermission(permission, "manager")) notFound();
+  const canManageTours = can({ tier, permission }, "manage_tours");
 
   const { data: tour } = await supabase
     .from("tours")
-    .select("id, name, is_archived, visible_on_mobile, booking_percent, logo_path")
+    .select("id, name, artist_id, is_archived, visible_on_mobile, booking_percent, logo_path")
     .eq("id", tourId)
     .is("deleted_at", null)
     .maybeSingle();
   if (!tour) notFound();
+
+  const artists = canManageTours
+    ? ((
+        await supabase
+          .from("artists")
+          .select("id, name")
+          .eq("organization_id", org.id)
+          .eq("is_archived", false)
+          .is("deleted_at", null)
+          .order("name")
+      ).data ?? [])
+    : [];
 
   const logoUrl = tour.logo_path
     ? ((await supabase.storage.from("attachments").createSignedUrl(tour.logo_path, 3600)).data
@@ -63,6 +77,11 @@ export default async function TourSettingsPage({
     if (!["is_archived", "visible_on_mobile"].includes(field)) return;
     await supabase.from("tours").update({ [field]: value }).eq("id", tourId);
     revalidatePath(path);
+  }
+
+  async function changeArtist(formData: FormData) {
+    "use server";
+    await updateTourArtist(orgSlug, tourId, String(formData.get("artistId") ?? ""));
   }
 
   async function removeTour(formData: FormData) {
@@ -138,6 +157,31 @@ export default async function TourSettingsPage({
             </div>
           </form>
         </div>
+
+        {/* ── Artist ── */}
+        {canManageTours && (
+          <>
+            <h2 className="mb-1 mt-[34px] font-display text-[13px] font-semibold text-primary">
+              {t("artistLabel")}
+            </h2>
+            <p className="text-[11px] text-tertiary">{t("artistHint")}</p>
+            <form action={changeArtist} className="mt-2 flex gap-2">
+              <select
+                name="artistId"
+                defaultValue={tour.artist_id ?? ""}
+                required
+                className={input}
+              >
+                {artists.map((a) => (
+                  <option key={a.id} value={a.id}>
+                    {a.name}
+                  </option>
+                ))}
+              </select>
+              <button className="btn-quiet h-9 shrink-0">{tc("save")}</button>
+            </form>
+          </>
+        )}
 
         {/* ── Preferences ── */}
         <h2 className="mb-1 mt-[34px] font-display text-[13px] font-semibold text-primary">

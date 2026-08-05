@@ -647,6 +647,8 @@
   },
   "tourSettings": {
     "title": "Tour settings",
+    "artistLabel": "Artist",
+    "artistHint": "Moving the tour to another artist also changes its visibility.",
     "tourName": "Tour name",
     "archived": "Tour is archived?",
     "visibleMobile": "Visible to mobile users?",

@@ -24,7 +24,7 @@ export default async function TourLayout({
   const [{ data: tour }, { data: days }] = await Promise.all([
     supabase
       .from("tours")
-      .select("id, name")
+      .select("id, name, artist_id, artists(name, slug)")
       .eq("id", tourId)
       .is("deleted_at", null)
       .maybeSingle(),
@@ -36,6 +36,9 @@ export default async function TourLayout({
       .order("date"),
   ]);
   if (!tour) notFound();
+
+  // relația many-to-one poate fi tipată ca obiect sau array de supabase-js
+  const artist = tour.artists as unknown as { name: string; slug: string } | null;
 
   const allDates = (days ?? []).map((d) => d.date);
   const showCount = (days ?? []).filter((d) => d.day_type === "show").length;
@@ -75,6 +78,7 @@ export default async function TourLayout({
     {
       label: "Organization",
       items: [
+        { label: "Roster", href: `/o/${orgSlug}` },
         { label: "Route map", href: `${base}/dashboard`, match: "/dashboard" },
         { label: "Contacts", href: `/o/${orgSlug}/contacts` },
       ],
@@ -91,7 +95,12 @@ export default async function TourLayout({
 
   return (
     <div className="flex h-full overflow-hidden">
-      <BreadcrumbTail label={tour.name} />
+      <BreadcrumbTail
+        label={tour.name}
+        parent={
+          artist ? { label: artist.name, href: `/o/${orgSlug}/a/${artist.slug}` } : undefined
+        }
+      />
       <CommandPalette items={paletteItems} />
       <PrimarySidebar
         tourName={tour.name}
