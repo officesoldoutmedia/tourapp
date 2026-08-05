@@ -45,6 +45,14 @@ export async function createTour(
   if (!payload.name.trim() || payload.days.length === 0 || !payload.artistId)
     return { error: "invalid" };
 
+  const { data: artistRow } = await supabase
+    .from("artists")
+    .select("id")
+    .eq("id", payload.artistId)
+    .eq("organization_id", org.id)
+    .maybeSingle();
+  if (!artistRow) return { error: "invalid" };
+
   const { data: tour, error: tourError } = await supabase
     .from("tours")
     .insert({

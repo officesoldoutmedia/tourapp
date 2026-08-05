@@ -10,9 +10,18 @@ export async function updateTourArtist(
   tourId: string,
   artistId: string,
 ): Promise<{ error?: string }> {
-  const { supabase, permission, tier } = await requireOrg(orgSlug);
+  const { supabase, org, permission, tier } = await requireOrg(orgSlug);
   if (!can({ tier, permission }, "manage_tours")) return { error: "forbidden" };
   if (!artistId) return { error: "invalid" };
+
+  const { data: artistRow } = await supabase
+    .from("artists")
+    .select("id")
+    .eq("id", artistId)
+    .eq("organization_id", org.id)
+    .maybeSingle();
+  if (!artistRow) return { error: "invalid" };
+
   const { error } = await supabase
     .from("tours")
     .update({ artist_id: artistId })
