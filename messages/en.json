@@ -649,6 +649,7 @@
     "title": "Tour settings",
     "artistLabel": "Artist",
     "artistHint": "Moving the tour to another artist also changes its visibility.",
+    "artistArchivedSuffix": "(archived)",
     "tourName": "Tour name",
     "archived": "Tour is archived?",
     "visibleMobile": "Visible to mobile users?",

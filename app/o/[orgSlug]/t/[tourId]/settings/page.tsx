@@ -42,6 +42,20 @@ export default async function TourSettingsPage({
       ).data ?? [])
     : [];
 
+  // Artistul curent poate fi arhivat (deci absent din lista activă): îl
+  // includem oricum ca opțiune, altfel browserul ar preselecta primul
+  // artist activ și Save ar reasigna turul pe tăcute.
+  const currentArtist =
+    canManageTours && tour.artist_id && !artists.some((a) => a.id === tour.artist_id)
+      ? (
+          await supabase
+            .from("artists")
+            .select("id, name")
+            .eq("id", tour.artist_id)
+            .maybeSingle()
+        ).data
+      : null;
+
   const logoUrl = tour.logo_path
     ? ((await supabase.storage.from("attachments").createSignedUrl(tour.logo_path, 3600)).data
         ?.signedUrl ?? null)
@@ -172,6 +186,11 @@ export default async function TourSettingsPage({
                 required
                 className={input}
               >
+                {currentArtist && (
+                  <option value={currentArtist.id}>
+                    {currentArtist.name} {t("artistArchivedSuffix")}
+                  </option>
+                )}
                 {artists.map((a) => (
                   <option key={a.id} value={a.id}>
                     {a.name}

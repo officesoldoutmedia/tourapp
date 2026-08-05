@@ -19,5 +19,8 @@ export async function updateTourArtist(
     .eq("id", tourId);
   if (error) return { error: error.message };
   revalidatePath(`/o/${orgSlug}/t/${tourId}/settings`);
+  // reasignarea schimbă listele de tururi ale ambilor artiști + crumb-ul
+  // turului, deci lărgim la întregul layout de org (ca `rename` din pagină)
+  revalidatePath(`/o/${orgSlug}`, "layout");
   return {};
 }
