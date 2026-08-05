@@ -821,6 +821,7 @@
     "past": "Past",
     "tours": "Tours",
     "newTour": "New tour",
+    "newShow": "New show",
     "noDays": "No scheduled days yet.",
     "noTours": "No tours yet.",
     "advance": "Advancing",
@@ -848,6 +849,24 @@
     "filesHint": "Tech rider, hospitality, press — will be inherited by events.",
     "upload": "Upload",
     "noFiles": "No files."
+  },
+  "newEvent": {
+    "title": "New show",
+    "artistLabel": "Artist",
+    "dateLabel": "Date",
+    "cityLabel": "City",
+    "countryLabel": "Country",
+    "nameLabel": "Event name (optional)",
+    "stageTimeLabel": "Stage time (optional)",
+    "scheduleTemplateLabel": "Schedule template",
+    "advanceTemplateLabel": "Advancing template",
+    "noTemplate": "—",
+    "venueLabel": "Venue",
+    "venueSearch": "Search venue",
+    "venueNone": "No venue",
+    "venueCreate": "Create \"{name}\"",
+    "create": "Create show",
+    "creating": "Creating…"
   },
   "gear": {
     "title": "Gear",

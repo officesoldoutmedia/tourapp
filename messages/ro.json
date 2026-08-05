@@ -821,6 +821,7 @@
     "past": "Trecute",
     "tours": "Tururi",
     "newTour": "Tur nou",
+    "newShow": "Show nou",
     "noDays": "Nicio zi programată încă.",
     "noTours": "Niciun tur încă.",
     "advance": "Advancing",
@@ -848,6 +849,24 @@
     "filesHint": "Rider tehnic, hospitality, press — se vor moșteni în event-uri.",
     "upload": "Încarcă",
     "noFiles": "Niciun fișier."
+  },
+  "newEvent": {
+    "title": "Show nou",
+    "artistLabel": "Artist",
+    "dateLabel": "Dată",
+    "cityLabel": "Oraș",
+    "countryLabel": "Țară",
+    "nameLabel": "Nume event (opțional)",
+    "stageTimeLabel": "Stage time (opțional)",
+    "scheduleTemplateLabel": "Template program",
+    "advanceTemplateLabel": "Template advancing",
+    "noTemplate": "—",
+    "venueLabel": "Venue",
+    "venueSearch": "Caută venue",
+    "venueNone": "Fără venue",
+    "venueCreate": "Creează „{name}”",
+    "create": "Creează show-ul",
+    "creating": "Se creează…"
   },
   "gear": {
     "title": "Gear",

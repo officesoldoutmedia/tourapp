@@ -156,9 +156,14 @@ export default async function ArtistDatesPage({
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-medium text-secondary">{t("tours")}</h2>
           {canManage && (
-            <Link href={`/o/${orgSlug}/tours/new?artist=${artist.id}`} className="btn-quiet h-8 text-xs">
-              {t("newTour")}
-            </Link>
+            <div className="flex items-center gap-2">
+              <Link href={`/o/${orgSlug}/events/new?artist=${artist.id}`} className="btn-primary h-8 text-xs">
+                {t("newShow")}
+              </Link>
+              <Link href={`/o/${orgSlug}/tours/new?artist=${artist.id}`} className="btn-quiet h-8 text-xs">
+                {t("newTour")}
+              </Link>
+            </div>
           )}
         </div>
         {tourRows.length === 0 ? (
