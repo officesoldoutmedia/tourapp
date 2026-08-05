@@ -810,6 +810,18 @@
     "nameLabel": "Nume artist",
     "createTitle": "Artist nou"
   },
+  "artist": {
+    "tabDates": "Date",
+    "tabProfile": "Profil",
+    "tabAccess": "Acces",
+    "upcoming": "Urmează",
+    "past": "Trecute",
+    "tours": "Tururi",
+    "newTour": "Tur nou",
+    "noDays": "Nicio zi programată încă.",
+    "noTours": "Niciun tur încă.",
+    "advance": "Advancing"
+  },
   "gear": {
     "title": "Gear",
     "hint": "Inventarul turului. Deschide contorul de show-uri de pe un articol ca să alegi la ce show-uri merge.",

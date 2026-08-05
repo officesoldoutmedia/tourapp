@@ -810,6 +810,18 @@
     "nameLabel": "Artist name",
     "createTitle": "New artist"
   },
+  "artist": {
+    "tabDates": "Dates",
+    "tabProfile": "Profile",
+    "tabAccess": "Access",
+    "upcoming": "Upcoming",
+    "past": "Past",
+    "tours": "Tours",
+    "newTour": "New tour",
+    "noDays": "No scheduled days yet.",
+    "noTours": "No tours yet.",
+    "advance": "Advancing"
+  },
   "gear": {
     "title": "Gear",
     "hint": "The tour inventory. Open the shows counter on an item to pick which shows it travels to.",
