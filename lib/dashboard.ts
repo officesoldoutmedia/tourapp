@@ -52,11 +52,16 @@ export function buildUpcoming(input: UpcomingInput): UpcomingShow[] {
   }
 
   return input.days
-    .filter((d) => d.day_type === "show" && d.date >= input.todayKey)
+    .filter(
+      (d) =>
+        d.day_type === "show" &&
+        d.date >= input.todayKey &&
+        input.artistOfTour.has(d.tour_id),
+    )
     .sort((a, b) => a.date.localeCompare(b.date))
     .slice(0, input.limit ?? 10)
     .map((d) => {
-      const artistId = input.artistOfTour.get(d.tour_id);
+      const artistId = input.artistOfTour.get(d.tour_id)!;
       const dayEvents = eventsOfDay.get(d.id) ?? [];
       let advance: { done: number; total: number } | null = null;
       for (const e of dayEvents) {
@@ -71,13 +76,12 @@ export function buildUpcoming(input: UpcomingInput): UpcomingShow[] {
         dayId: d.id,
         date: d.date,
         tourId: d.tour_id,
-        artistId: artistId ?? "",
+        artistId,
         city: d.city,
         country: d.country,
         eventTitle: dayEvents[0]?.title ?? null,
         advance,
         stageTime: slotOfDay.get(d.id) ?? null,
       };
-    })
-    .filter((r) => r.artistId !== "");
+    });
 }

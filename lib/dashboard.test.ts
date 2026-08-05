@@ -37,4 +37,16 @@ describe("buildUpcoming", () => {
     });
     expect(rows).toHaveLength(1);
   });
+  it("ignoră zilele orfane (fără artist) înainte de limit, nu le taie pe cele valide", () => {
+    const orphanDays = [
+      { id: "orphan", date: "2026-09-02", tour_id: "t-unknown", city: null, country: null, day_type: "show" },
+      { id: "d2", date: "2026-09-05", tour_id: "t2", city: "Cluj", country: "România", day_type: "show" },
+    ];
+    const rows = buildUpcoming({
+      days: orphanDays, artistOfTour, events, advances, showSlots,
+      todayKey: "2026-09-01", limit: 1,
+    });
+    expect(rows).toHaveLength(1);
+    expect(rows[0].dayId).toBe("d2");
+  });
 });
