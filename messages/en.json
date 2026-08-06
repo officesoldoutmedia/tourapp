@@ -813,6 +813,17 @@
     "nameLabel": "Artist name",
     "createTitle": "New artist"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "nextEvent": "Next show",
+    "upcoming": "Upcoming",
+    "rosterTitle": "Roster",
+    "newShow": "New show",
+    "inDays": "in {count} days",
+    "today": "today",
+    "noUpcoming": "No upcoming shows.",
+    "advance": "Advancing"
+  },
   "artist": {
     "tabDates": "Dates",
     "tabProfile": "Profile",

@@ -813,6 +813,17 @@
     "nameLabel": "Nume artist",
     "createTitle": "Artist nou"
   },
+  "dashboard": {
+    "title": "Dashboard",
+    "nextEvent": "Următorul show",
+    "upcoming": "Urmează",
+    "rosterTitle": "Roster",
+    "newShow": "Show nou",
+    "inDays": "în {count} zile",
+    "today": "azi",
+    "noUpcoming": "Niciun show programat.",
+    "advance": "Advancing"
+  },
   "artist": {
     "tabDates": "Date",
     "tabProfile": "Profil",
