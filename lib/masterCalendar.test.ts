@@ -12,8 +12,8 @@ describe("monthGrid", () => {
 
 describe("buildCalendarDots", () => {
   const days = [
-    { id: "d1", date: "2026-09-05", tour_id: "t1", city: null, country: null, day_type: "show" },
-    { id: "d2", date: "2026-09-05", tour_id: "t2", city: null, country: null, day_type: "travel" },
+    { id: "d1", date: "2026-09-05", tour_id: "t1", city: null, country: null, day_type: "show", timezone: null },
+    { id: "d2", date: "2026-09-05", tour_id: "t2", city: null, country: null, day_type: "travel", timezone: null },
   ];
   const artistOfTour = new Map([["t1", "a1"], ["t2", "a2"]]);
   it("grupează pe dată cu artistId și isShow", () => {

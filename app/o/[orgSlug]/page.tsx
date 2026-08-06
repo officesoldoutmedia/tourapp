@@ -241,7 +241,7 @@ export default async function OrgDashboard({
     ? await Promise.all([
         supabase
           .from("days")
-          .select("id, date, city, country, tour_id, day_type")
+          .select("id, date, city, country, tour_id, day_type, timezone")
           .in("tour_id", activeIds)
           .is("deleted_at", null)
           .order("date"),
@@ -390,9 +390,11 @@ export default async function OrgDashboard({
       dateLabel,
       relLabel: diff === 0 ? td("today") : td("inDays", { count: diff }),
       stageLabel: show.stageTime
-        ? new Intl.DateTimeFormat(locale, { hour: "2-digit", minute: "2-digit" }).format(
-            new Date(show.stageTime),
-          )
+        ? new Intl.DateTimeFormat(locale, {
+            hour: "2-digit",
+            minute: "2-digit",
+            timeZone: show.timezone ?? "UTC",
+          }).format(new Date(show.stageTime))
         : null,
       advance: show.advance,
       advanceLabel: td("advance"),

@@ -2,10 +2,10 @@ import { describe, expect, it } from "vitest";
 import { buildUpcoming } from "./dashboard";
 
 const days = [
-  { id: "d1", date: "2026-09-10", tour_id: "t1", city: "Bacău", country: "România", day_type: "show" },
-  { id: "d2", date: "2026-09-05", tour_id: "t2", city: "Cluj", country: "România", day_type: "show" },
-  { id: "d3", date: "2026-09-06", tour_id: "t1", city: null, country: null, day_type: "travel" },
-  { id: "d0", date: "2026-08-01", tour_id: "t1", city: "Iași", country: "România", day_type: "show" },
+  { id: "d1", date: "2026-09-10", tour_id: "t1", city: "Bacău", country: "România", day_type: "show", timezone: "Europe/Bucharest" },
+  { id: "d2", date: "2026-09-05", tour_id: "t2", city: "Cluj", country: "România", day_type: "show", timezone: null },
+  { id: "d3", date: "2026-09-06", tour_id: "t1", city: null, country: null, day_type: "travel", timezone: null },
+  { id: "d0", date: "2026-08-01", tour_id: "t1", city: "Iași", country: "România", day_type: "show", timezone: null },
 ];
 const artistOfTour = new Map([["t1", "a1"], ["t2", "a2"]]);
 const events = [{ id: "e1", day_id: "d2", title: "Club X" }];
@@ -26,9 +26,11 @@ describe("buildUpcoming", () => {
       artistId: "a2", eventTitle: "Club X",
       advance: { done: 1, total: 2 },
       stageTime: "2026-09-05T19:30:00.000Z",
+      timezone: null,
     });
     expect(rows[1].advance).toBeNull();
     expect(rows[1].stageTime).toBeNull();
+    expect(rows[1].timezone).toBe("Europe/Bucharest");
   });
   it("respectă limita", () => {
     const rows = buildUpcoming({
@@ -39,8 +41,8 @@ describe("buildUpcoming", () => {
   });
   it("ignoră zilele orfane (fără artist) înainte de limit, nu le taie pe cele valide", () => {
     const orphanDays = [
-      { id: "orphan", date: "2026-09-02", tour_id: "t-unknown", city: null, country: null, day_type: "show" },
-      { id: "d2", date: "2026-09-05", tour_id: "t2", city: "Cluj", country: "România", day_type: "show" },
+      { id: "orphan", date: "2026-09-02", tour_id: "t-unknown", city: null, country: null, day_type: "show", timezone: null },
+      { id: "d2", date: "2026-09-05", tour_id: "t2", city: "Cluj", country: "România", day_type: "show", timezone: null },
     ];
     const rows = buildUpcoming({
       days: orphanDays, artistOfTour, events, advances, showSlots,

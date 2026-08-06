@@ -7,6 +7,7 @@ export interface DashboardDay {
   city: string | null;
   country: string | null;
   day_type: string;
+  timezone: string | null; // IANA, ex 'Europe/Bucharest' — pt. formatarea stage time-ului
 }
 
 export interface UpcomingShow {
@@ -19,6 +20,7 @@ export interface UpcomingShow {
   eventTitle: string | null;
   advance: { done: number; total: number } | null;
   stageTime: string | null; // ISO start_at al slotului Show
+  timezone: string | null; // IANA al zilei — formatarea stage time-ului în ora locală a locației
 }
 
 export interface UpcomingInput {
@@ -82,6 +84,7 @@ export function buildUpcoming(input: UpcomingInput): UpcomingShow[] {
         eventTitle: dayEvents[0]?.title ?? null,
         advance,
         stageTime: slotOfDay.get(d.id) ?? null,
+        timezone: d.timezone,
       };
     });
 }
