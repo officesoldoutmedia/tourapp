@@ -468,6 +468,11 @@ function DesignMode({
                     :{" "}
                   </span>
                   {fieldLabel(item.key)}
+                  {item.required && (
+                    <span className="ml-1 text-danger" title={t("requiredToggle")}>
+                      *
+                    </span>
+                  )}
                 </span>
               )}
               {item.type === "title" && (
@@ -487,6 +492,20 @@ function DesignMode({
                 <span className="text-xs font-semibold text-secondary">SCHEDULE ROW</span>
               )}
             </span>
+            {item.type === "field" && (
+              <input
+                type="checkbox"
+                checked={!!item.required}
+                disabled={pending}
+                title={t("requiredToggle")}
+                onChange={(e) => {
+                  const next = [...layout];
+                  next[idx] = { ...item, required: e.target.checked };
+                  onChange(next);
+                }}
+                className="h-3.5 w-3.5 shrink-0 accent-accent"
+              />
+            )}
             <button
               disabled={pending}
               onClick={() => move(idx, -1)}

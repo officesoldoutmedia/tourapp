@@ -4,6 +4,9 @@ import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { formatDayHeader, isDstTransitionDay } from "@/lib/datetime";
 import { DEFAULT_TZ } from "@/lib/tzLookup";
+import { isValidLayout } from "@/lib/advance";
+import { computeAdvanceProgress } from "@/lib/advanceProgress";
+import { versionChains } from "@/lib/fileVersions";
 import {
   NotesSection,
   ScheduleSection,
@@ -80,7 +83,7 @@ export default async function DayPage({
       .order("name"),
     supabase
       .from("events")
-      .select("id, title, venues(name, address_line1, city, postal_code, country, urls, phones), advances(status, deleted_at)")
+      .select("id, title, venues(name, address_line1, city, postal_code, country, urls, phones), advances(status, deleted_at, layout)")
       .eq("day_id", day.id)
       .is("deleted_at", null)
       .order("created_at"),
@@ -185,7 +188,7 @@ export default async function DayPage({
         .order("created_at"),
       supabase
         .from("file_categories")
-        .select("id, name")
+        .select("id, name, is_required")
         .eq("organization_id", org.id)
         .is("deleted_at", null)
         .order("sort_order")
@@ -377,13 +380,23 @@ export default async function DayPage({
       url: firstUrl,
     }];
   });
-  const { data: contactValues } = (events ?? []).length
-    ? await supabase
-        .from("event_field_values")
-        .select("value")
-        .in("event_id", (events ?? []).map((e) => e.id))
-        .eq("field_key", "venue_info.venue_contacts")
-    : { data: [] as { value: string | null }[] };
+  const eventIds = (events ?? []).map((e) => e.id);
+  const [{ data: contactValues }, { data: fieldValueRows }] = eventIds.length
+    ? await Promise.all([
+        supabase
+          .from("event_field_values")
+          .select("value")
+          .in("event_id", eventIds)
+          .eq("field_key", "venue_info.venue_contacts"),
+        supabase
+          .from("event_field_values")
+          .select("field_key, value")
+          .in("event_id", eventIds),
+      ])
+    : [
+        { data: [] as { value: string | null }[] },
+        { data: [] as { field_key: string; value: string | null }[] },
+      ];
   const keyContactsText = (contactValues ?? [])
     .map((r) => r.value ?? "")
     .filter(Boolean)
@@ -414,14 +427,37 @@ export default async function DayPage({
     .sort((a, b) => a.startMs - b.startMs);
   const confirmedCount = focusItems.filter((i) => i.confirmed).length;
 
-  const advanceStatuses = (events ?? []).flatMap((e) =>
-    ((e as unknown as { advances?: { status: string; deleted_at: string | null }[] }).advances ?? [])
-      .filter((a) => a.deleted_at === null)
-      .map((a) => a.status),
+  const advanceRows = (events ?? []).flatMap((e) =>
+    ((e as unknown as { advances?: { status: string; deleted_at: string | null; layout: unknown }[] }).advances ?? [])
+      .filter((a) => a.deleted_at === null),
   );
-  const advanceTotal = advanceStatuses.length;
-  const advanceDone = advanceStatuses.filter((st) => st === "done").length;
-  const advancePct = advanceTotal > 0 ? Math.round((advanceDone / advanceTotal) * 100) : null;
+  const advanceStatuses = advanceRows.map((a) => a.status);
+
+  // Fișierele reale ale zilei (heads nesuperseded, ne-placeholder) — refolosește
+  // datele Task 4, fără query dublu [SP3b Task 5].
+  const dayFileHeads = versionChains(
+    (dayAttachments ?? []) as AttachmentData[],
+  ).map((chain) => chain.head);
+  const realDayFileCategoryIds = dayFileHeads
+    .filter((h) => h.storage_path !== null)
+    .map((h) => h.category_id)
+    .filter((id): id is string => id !== null);
+  const requiredCats = (fileCategories ?? []).filter(
+    (c) => (c as { is_required?: boolean }).is_required,
+  );
+
+  const progress = computeAdvanceProgress({
+    layouts: advanceRows.map((a) => (isValidLayout(a.layout) ? a.layout : [])),
+    fieldValues: new Map(
+      (fieldValueRows ?? []).map((r) => [r.field_key, r.value ?? ""]),
+    ),
+    requiredCategoryIds: requiredCats.map((c) => c.id),
+    dayFileCategoryIds: realDayFileCategoryIds,
+    manualStatuses: advanceStatuses,
+  });
+  const advanceTotal = progress.total;
+  const advanceDone = progress.done;
+  const advancePct = advanceTotal > 0 ? progress.percent : null;
 
   const firstVenue = venueCards[0] ?? null;
   const firstEvent = (events ?? [])[0] ?? null;

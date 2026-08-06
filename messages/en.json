@@ -335,7 +335,8 @@
     "remove": "Delete advance",
     "confirmRow": "Confirm",
     "emptyLayout": "Empty layout — switch to design to add fields.",
-    "noAdvances": "No advances on this event."
+    "noAdvances": "No advances on this event.",
+    "requiredToggle": "Required — counts toward the advancing percentage"
   },
   "travel": {
     "title": "Travel",

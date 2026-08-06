@@ -335,7 +335,8 @@
     "remove": "Șterge advance-ul",
     "confirmRow": "Confirmă",
     "emptyLayout": "Layout gol — comută pe design ca să adaugi câmpuri.",
-    "noAdvances": "Niciun advance pe acest event."
+    "noAdvances": "Niciun advance pe acest event.",
+    "requiredToggle": "Obligatoriu — intră în procentul de advancing"
   },
   "travel": {
     "title": "Travel",
