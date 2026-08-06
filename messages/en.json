@@ -479,6 +479,15 @@
     "techNotes": "Tech notes",
     "empty": "No songs in the library."
   },
+  "fileCategories": {
+    "title": "File categories",
+    "hint": "Categories marked as required count toward each show's advancing percentage.",
+    "nameLabel": "Category name",
+    "required": "Required",
+    "add": "Add category",
+    "delete": "Delete",
+    "empty": "No categories."
+  },
   "setlist": {
     "title": "Set List",
     "addSong": "ADD SONG",

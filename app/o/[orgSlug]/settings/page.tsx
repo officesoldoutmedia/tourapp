@@ -14,6 +14,7 @@ export default async function OrgSettingsPage({
   const { orgSlug } = await params;
   const { org, permission, tier } = await requireOrg(orgSlug);
   const t = await getTranslations("settings");
+  const tFiles = await getTranslations("fileCategories");
   if (!hasMinPermission(permission, "manager")) notFound();
 
   const canManageUsers = can({ tier, permission }, "manage_users");
@@ -79,6 +80,11 @@ export default async function OrgSettingsPage({
         <li>
           <Link href={`/o/${orgSlug}/settings/songs`} className="block px-4 py-3 hover:bg-subtle">
             🎵 {t("songs")}
+          </Link>
+        </li>
+        <li>
+          <Link href={`/o/${orgSlug}/settings/file-categories`} className="block px-4 py-3 hover:bg-subtle">
+            🗂️ {tFiles("title")}
           </Link>
         </li>
       </ul>

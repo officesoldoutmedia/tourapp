@@ -479,6 +479,15 @@
     "techNotes": "Tech notes",
     "empty": "Nicio piesă în bibliotecă."
   },
+  "fileCategories": {
+    "title": "Categorii de fișiere",
+    "hint": "Categoriile marcate ca obligatorii intră în procentul de advancing al fiecărui show.",
+    "nameLabel": "Nume categorie",
+    "required": "Obligatoriu",
+    "add": "Adaugă categoria",
+    "delete": "Șterge",
+    "empty": "Nicio categorie."
+  },
   "setlist": {
     "title": "Set List",
     "addSong": "ADD SONG",
