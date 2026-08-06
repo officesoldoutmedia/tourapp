@@ -222,6 +222,12 @@ export default async function OrgDashboard({
   const allDays: DashboardDay[] = dayRows ?? [];
 
   const todayKey = new Date().toISOString().slice(0, 10);
+  // Luna inițială a MasterCalendar — derivată din `todayKey` (deja calculat
+  // mai sus, o singură dată, pe server) ca SSR-ul și primul pass de
+  // hidratare din DashboardClient să coincidă exact (fără `new Date()` în
+  // render-ul client-ului — cf. task 6 review).
+  const [todayYear, todayMonth] = todayKey.split("-").map(Number);
+  const initialMonth = { year: todayYear, month0: todayMonth - 1 };
   const showDays = allDays.filter((d) => d.day_type === "show");
   const upcomingShowDays = showDays.filter((d) => d.date >= todayKey);
   const nextShow = upcomingShowDays[0];
@@ -335,6 +341,14 @@ export default async function OrgDashboard({
   const activeArtists = artistRows.filter((a) => !a.is_archived);
   const archivedArtists = artistRows.filter((a) => a.is_archived);
 
+  // Artiștii pt. filtrul calendarului: oricine apare în `artistOfTour`
+  // (adică are cel puțin un tur), indiferent de `is_archived` — un artist
+  // arhivat cu un tur activ tot are zile în `allDays`; dacă filtrul ar
+  // exclude-ul, show-urile lui ar dispărea din calendar/Upcoming fără chip
+  // de reactivare (cf. task 6 review).
+  const artistIdsWithTours = new Set(artistOfTour.values());
+  const dashboardArtists = artistRows.filter((a) => artistIdsWithTours.has(a.id));
+
   // ── props pt. Next Event card / rândurile Upcoming — funcții pure,
   // NU componente (nu întorc JSX ca element numit), ca să nu declanșeze
   // react-hooks/static-components; ele doar formatează datele din
@@ -412,10 +426,12 @@ export default async function OrgDashboard({
           <DashboardClient
             orgSlug={org.slug}
             locale={locale}
-            artists={activeArtists.map((a) => ({ id: a.id, name: a.name, slug: a.slug, color: a.color }))}
+            artists={dashboardArtists.map((a) => ({ id: a.id, name: a.name, slug: a.slug, color: a.color }))}
             days={allDays}
             artistOfTourEntries={[...artistOfTour.entries()]}
             upcoming={upcoming.slice(1)}
+            initialTodayKey={todayKey}
+            initialMonth={initialMonth}
             labels={{
               upcoming: td("upcoming"),
               today: td("today"),

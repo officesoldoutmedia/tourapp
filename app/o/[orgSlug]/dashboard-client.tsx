@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { buildCalendarDots, monthGrid } from "@/lib/masterCalendar";
 import type { DashboardDay, UpcomingShow } from "@/lib/dashboard";
@@ -69,13 +69,17 @@ function toUpcomingRowProps(
   };
 }
 
-/** Cheia `YYYY-MM-DD` a zilei curente — referință locală (fusul orar al
- * browser-ului), nu UTC: e componenta corectă pt. „azi” într-un client
- * component. Poate să nu coincidă cu ziua serverului la SSR (mismatch de
- * hidratare acceptat aici, cf. brief). */
-function todayKeyLocal(): string {
+/** Ziua locală curentă (fusul orar al browser-ului), spartă în componentele
+ * de care are nevoie calendarul — apelată DOAR dintr-un `useEffect` de la
+ * mount (niciodată în render body: `new Date()` acolo ar diferi între
+ * pasul de SSR — server, UTC — și hidratare — client, local — și ar
+ * declanșa hydration mismatch). */
+function localDateParts(): { todayKey: string; year: number; month0: number } {
   const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  const year = now.getFullYear();
+  const month0 = now.getMonth();
+  const todayKey = `${year}-${String(month0 + 1).padStart(2, "0")}-${String(now.getDate()).padStart(2, "0")}`;
+  return { todayKey, year, month0 };
 }
 
 export function DashboardClient(props: {
@@ -88,6 +92,11 @@ export function DashboardClient(props: {
   days: DashboardDay[];
   artistOfTourEntries: [string, string][];
   upcoming: UpcomingShow[];
+  // „Azi" și luna inițială — derivate O SINGURĂ DATĂ pe server (page.tsx),
+  // ca SSR-ul și primul pass de hidratare să randeze identic; corectate
+  // client-side (fus orar local) doar după mount, via efectul de mai jos.
+  initialTodayKey: string;
+  initialMonth: { year: number; month0: number };
   labels: {
     upcoming: string;
     today: string;
@@ -100,10 +109,27 @@ export function DashboardClient(props: {
   const [enabled, setEnabled] = useState<Set<string>>(
     () => new Set(props.artists.map((a) => a.id)),
   );
-  const [month, setMonth] = useState(() => {
-    const now = new Date();
-    return { year: now.getFullYear(), month0: now.getMonth() };
-  });
+  const [month, setMonth] = useState(props.initialMonth);
+  const [todayKey, setTodayKey] = useState(props.initialTodayKey);
+
+  // O singură corecție, la mount: dacă fusul orar local al userului dă o
+  // altă zi/lună decât cea calculată pe server (UTC), aliniem starea aici
+  // — fără nicio chemare `new Date()` în render body, deci fără mismatch.
+  // setState-ul e în callback-ul unui `setTimeout(…, 0)`, nu sincron în
+  // corpul efectului (cf. react-hooks/set-state-in-effect — același
+  // pattern ca fetch-ul debounced din `travel-client.tsx`).
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      const local = localDateParts();
+      setTodayKey((prev) => (prev === local.todayKey ? prev : local.todayKey));
+      setMonth((prev) =>
+        prev.year === local.year && prev.month0 === local.month0
+          ? prev
+          : { year: local.year, month0: local.month0 },
+      );
+    }, 0);
+    return () => clearTimeout(timer);
+  }, []);
 
   const artistOfTour = useMemo(
     () => new Map(props.artistOfTourEntries),
@@ -136,8 +162,6 @@ export function DashboardClient(props: {
       ),
     [props.locale],
   );
-
-  const todayKey = todayKeyLocal();
 
   function toggleArtist(id: string) {
     setEnabled((prev) => {
