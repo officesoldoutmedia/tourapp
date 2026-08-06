@@ -22,6 +22,10 @@ export interface TimelineDay extends TimelineDayInput {
 export function buildArtistTimeline(
   days: TimelineDayInput[],
   advances: TimelineAdvanceInput[],
+  // Procentul de advancing calculat (SP3b Task 6) — când există intrare
+  // pentru o zi, ea înlocuiește agregatul din statusuri de mai jos; altfel
+  // comportamentul vechi rămâne identic.
+  progressOfDay?: ReadonlyMap<string, { done: number; total: number }>,
 ): TimelineDay[] {
   const byDay = new Map<string, { done: number; total: number }>();
   for (const a of advances) {
@@ -32,5 +36,5 @@ export function buildArtistTimeline(
   }
   return [...days]
     .sort((a, b) => a.date.localeCompare(b.date))
-    .map((d) => ({ ...d, advance: byDay.get(d.id) ?? null }));
+    .map((d) => ({ ...d, advance: progressOfDay?.get(d.id) ?? byDay.get(d.id) ?? null }));
 }

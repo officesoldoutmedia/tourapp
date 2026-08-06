@@ -17,4 +17,9 @@ describe("buildArtistTimeline", () => {
     expect(rows[1].advance).toEqual({ done: 1, total: 2 });
     expect(rows[0].advance).toBeNull();
   });
+  it("progressOfDay înlocuiește agregatul din statusuri pentru ziua respectivă", () => {
+    const rows = buildArtistTimeline(days, advances, new Map([["d2", { done: 3, total: 5 }]]));
+    expect(rows.find((r) => r.id === "d2")?.advance).toEqual({ done: 3, total: 5 });
+    expect(rows.find((r) => r.id === "d1")?.advance).toBeNull(); // d1 nu are intrare → comportament vechi
+  });
 });

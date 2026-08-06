@@ -31,6 +31,10 @@ export interface UpcomingInput {
   showSlots: { day_id: string; start_at: string }[];
   todayKey: string;
   limit?: number;
+  // Procentul de advancing calculat (SP3b Task 6) — când există intrare
+  // pentru o zi, ea înlocuiește agregatul din statusuri de mai jos;
+  // altfel comportamentul vechi rămâne identic.
+  progressOfDay?: ReadonlyMap<string, { done: number; total: number }>;
 }
 
 export function buildUpcoming(input: UpcomingInput): UpcomingShow[] {
@@ -74,6 +78,7 @@ export function buildUpcoming(input: UpcomingInput): UpcomingShow[] {
             : { ...agg };
         }
       }
+      advance = input.progressOfDay?.get(d.id) ?? advance;
       return {
         dayId: d.id,
         date: d.date,

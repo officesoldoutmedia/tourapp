@@ -51,4 +51,13 @@ describe("buildUpcoming", () => {
     expect(rows).toHaveLength(1);
     expect(rows[0].dayId).toBe("d2");
   });
+  it("progressOfDay înlocuiește agregatul din statusuri pentru ziua respectivă", () => {
+    const rows = buildUpcoming({
+      days, artistOfTour, events, advances, showSlots,
+      todayKey: "2026-09-01", limit: 10,
+      progressOfDay: new Map([["d2", { done: 3, total: 5 }]]),
+    });
+    expect(rows[0].advance).toEqual({ done: 3, total: 5 });
+    expect(rows[1].advance).toBeNull(); // d1 nu are intrare → comportament vechi
+  });
 });
