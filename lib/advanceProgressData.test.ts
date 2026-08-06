@@ -96,4 +96,33 @@ describe("computeProgressOfDays", () => {
     });
     expect(result.get("day-1")).toEqual({ done: 1, total: 1, percent: 100, source: "required" });
   });
+
+  it("dealRequiredByDay înlocuiește setul org pentru ziua respectivă", () => {
+    // zi show cu categoria org-required c1 nesatisfăcută, dar deal-ul cere doar c2 (satisfăcută)
+    const result = computeProgressOfDays({
+      days: [{ id: "d1", day_type: "show" }],
+      dayOfEvent: new Map([["e1", "d1"]]),
+      advanceRows: [],
+      fieldValueRows: [],
+      fileRows: [
+        { id: "f1", parent_id: "d1", category_id: "c2", storage_path: "p",
+          status: "final", supersedes_id: null, created_at: "2026-01-01" },
+      ],
+      requiredCategoryIds: ["c1"],
+      dealRequiredByDay: new Map([["d1", ["c2"]]]),
+    });
+    expect(result.get("d1")).toMatchObject({ done: 1, total: 1 });
+  });
+  it("zi absentă din dealRequiredByDay → setul org (comportament vechi)", () => {
+    const result = computeProgressOfDays({
+      days: [{ id: "d1", day_type: "show" }],
+      dayOfEvent: new Map(),
+      advanceRows: [],
+      fieldValueRows: [],
+      fileRows: [],
+      requiredCategoryIds: ["c1"],
+      dealRequiredByDay: new Map(),
+    });
+    expect(result.get("d1")).toMatchObject({ done: 0, total: 1 });
+  });
 });

@@ -52,6 +52,10 @@ export interface ComputeProgressOfDaysInput {
   fieldValueRows: ProgressFieldValueRow[];
   fileRows: ProgressFileRow[];
   requiredCategoryIds: string[]; // categoriile obligatorii ale org-ului
+  /** C1: zilele prezente în map folosesc lista respectivă de categorii
+   *  obligatorii ÎN LOC de `requiredCategoryIds` (org); zilele absente
+   *  păstrează comportamentul vechi (fallback org), identic byte-cu-byte. */
+  dealRequiredByDay?: ReadonlyMap<string, string[]>;
 }
 
 /** Calculează progresul de advancing pentru fiecare zi din `days`, cu
@@ -62,7 +66,15 @@ export interface ComputeProgressOfDaysInput {
 export function computeProgressOfDays(
   input: ComputeProgressOfDaysInput,
 ): Map<string, AdvanceProgress> {
-  const { days, dayOfEvent, advanceRows, fieldValueRows, fileRows, requiredCategoryIds } = input;
+  const {
+    days,
+    dayOfEvent,
+    advanceRows,
+    fieldValueRows,
+    fileRows,
+    requiredCategoryIds,
+    dealRequiredByDay,
+  } = input;
 
   const advancesByDay = new Map<string, ProgressAdvanceRow[]>();
   for (const a of advanceRows) {
@@ -100,11 +112,14 @@ export function computeProgressOfDays(
       .filter((h) => h.storage_path !== null && h.status !== "superseded")
       .map((h) => h.category_id)
       .filter((id): id is string => id !== null);
+    // C1: ziua d folosește lista deal-ului dacă e prezentă în map, altfel
+    // fallback pe setul org — aplicat TOT doar pe zile show, regula (a).
+    const dayRequiredCategoryIds = dealRequiredByDay?.get(day.id) ?? requiredCategoryIds;
     const progress = computeAdvanceProgress({
       layouts: dayAdvances.map((a) => (isValidLayout(a.layout) ? a.layout : [])),
       fieldValues: fieldValuesByDay.get(day.id) ?? new Map<string, string>(),
       // (a) categoriile obligatorii intră în total doar pe zile show.
-      requiredCategoryIds: day.day_type === "show" ? requiredCategoryIds : [],
+      requiredCategoryIds: day.day_type === "show" ? dayRequiredCategoryIds : [],
       dayFileCategoryIds,
       manualStatuses: dayAdvances.map((a) => a.status),
     });
