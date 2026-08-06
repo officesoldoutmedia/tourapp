@@ -51,8 +51,10 @@ Nimic stocat pe `advances`/`events` — procentul e calculat.
 - **Câmpuri obligatorii:** itemii `field` cu `required: true` din layout-urile
   advance-urilor show-ului; completat = valoare non-goală în `event_field_values`.
 - **Fișiere obligatorii:** categoriile org cu `is_required`; completat = attachment
-  REAL pe ziua respectivă în categoria aia (storage_path non-null, status ≠
-  `superseded`, nesters).
+  REAL în categoria aia cu `parent_type = 'day'` și `parent_id` = ziua show-ului
+  (storage_path non-null, status ≠ `superseded`, nesters). Fișierele moștenite de
+  la artist NU satisfac obligatoriul (sunt riderele permanente, nu predările
+  show-ului). Seed-ul NU marchează nimic obligatoriu — opt-in explicit.
 - `percent = done/total`; culori §2.3: gri 0%, galben 1–99%, verde 100%.
   („Locked/Day sheet sent" = Faza C.)
 - **Fallback:** `total = 0` (niciun obligatoriu definit) → procentul manual
