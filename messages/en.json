@@ -711,7 +711,18 @@
     "ofGross": "of fee",
     "toBooker": "Booker",
     "toBookerHint": "Checked = part of the booking deal: deducted from the commission base and shown on the cost sheet. Unchecked = internal cost, yours only.",
-    "bookerCosts": "of which costs to booker"
+    "bookerCosts": "of which costs to booker",
+    "calcTitle": "Calculated",
+    "calcPerDiem": "Per diem",
+    "calcDays": "Days",
+    "calcPeople": "ppl",
+    "calcAdd": "Add to costs",
+    "calcUpdate": "Update",
+    "calcTransport": "Ground transport",
+    "calcKm": "Km (round trip)",
+    "calcNoRate": "Set the rate on the artist profile.",
+    "calcNoPerDiem": "No per diem set.",
+    "calcNoHomeBase": "Set the home base on the artist profile."
   },
   "tourDashboard": {
     "title": "Tour overview",

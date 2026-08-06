@@ -6,6 +6,56 @@ import { Trash2, Printer } from "lucide-react";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { computeShowProfit, convertCostLines, formatMoney } from "@/lib/showFinance";
+import {
+  perDiemLine,
+  groundTransportLine,
+  PER_DIEM_KEY_PREFIX,
+  GROUND_KEY,
+} from "@/lib/costCalc";
+import { computeGroundDistance } from "@/lib/googlePlaces";
+
+type GeneratedLine = { key: string; label: string; amount: number; currency: string };
+
+/**
+ * Helper de upsert pentru liniile de cost GENERATE (diurnă, transport
+ * terestru) — folosit de acțiunile din panoul „Calculat". Modul-level,
+ * NU server action: nu poate fi apelat direct din client.
+ */
+async function upsertCostLine(
+  supabase: Awaited<ReturnType<typeof requireOrg>>["supabase"],
+  eventId: string,
+  userId: string,
+  line: GeneratedLine,
+) {
+  const { data: existing } = await supabase
+    .from("show_costs")
+    .select("id")
+    .eq("event_id", eventId)
+    .eq("generated_key", line.key)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (existing) {
+    await supabase
+      .from("show_costs")
+      .update({
+        label: line.label,
+        amount: line.amount,
+        currency: line.currency,
+        updated_by: userId,
+      })
+      .eq("id", existing.id);
+  } else {
+    await supabase.from("show_costs").insert({
+      event_id: eventId,
+      kind: "extra",
+      label: line.label,
+      amount: line.amount,
+      currency: line.currency,
+      generated_key: line.key,
+      updated_by: userId,
+    });
+  }
+}
 
 /**
  * Costuri & profit per show (cererea lui Ștefan): echipa SELECTATĂ per
@@ -25,37 +75,109 @@ export default async function ShowCostsPage({
   if (!can({ tier, permission }, "view_accounting")) notFound();
   const canEdit = can({ tier, permission }, "edit_accounting");
 
-  const [{ data: event }, { data: finance }, { data: costs }, { data: crew }, { data: tour }] =
-    await Promise.all([
-      supabase
-        .from("events")
-        .select("id, title, venues(name)")
-        .eq("id", eventId)
-        .is("deleted_at", null)
-        .maybeSingle(),
-      supabase.from("show_finances").select("*").eq("event_id", eventId).maybeSingle(),
-      supabase
-        .from("show_costs")
-        .select("id, kind, label, payment_type, amount, currency, personnel_id, billable_to_booker")
-        .eq("event_id", eventId)
-        .is("deleted_at", null)
-        .order("kind")
-        .order("sort_order")
-        .order("created_at"),
-      supabase
-        .from("tour_personnel")
-        .select("id, first_name, last_name, role, cost_per_show, cost_currency, payment_type")
-        .eq("tour_id", tourId)
-        .is("deleted_at", null)
-        .order("last_name"),
-      supabase.from("tours").select("booking_percent").eq("id", tourId).maybeSingle(),
-    ]);
+  const [
+    { data: event },
+    { data: finance },
+    { data: costs },
+    { data: crew },
+    { data: tour },
+    { data: parties },
+    { data: partyPersonnel },
+    { data: dayRow },
+  ] = await Promise.all([
+    supabase
+      .from("events")
+      .select("id, title, venues(name)")
+      .eq("id", eventId)
+      .is("deleted_at", null)
+      .maybeSingle(),
+    supabase.from("show_finances").select("*").eq("event_id", eventId).maybeSingle(),
+    supabase
+      .from("show_costs")
+      .select(
+        "id, kind, label, payment_type, amount, currency, personnel_id, billable_to_booker, generated_key",
+      )
+      .eq("event_id", eventId)
+      .is("deleted_at", null)
+      .order("kind")
+      .order("sort_order")
+      .order("created_at"),
+    supabase
+      .from("tour_personnel")
+      .select("id, first_name, last_name, role, cost_per_show, cost_currency, payment_type")
+      .eq("tour_id", tourId)
+      .is("deleted_at", null)
+      .order("last_name"),
+    supabase
+      .from("tours")
+      .select(
+        "booking_percent, artist_id, artists(home_base_city, home_base_lat, home_base_lng, ground_rate_per_km, ground_rate_currency, slug)",
+      )
+      .eq("id", tourId)
+      .maybeSingle(),
+    supabase
+      .from("tour_parties")
+      .select("id, name, per_diem_rate, per_diem_currency")
+      .eq("tour_id", tourId)
+      .is("deleted_at", null)
+      .order("sort_order"),
+    supabase
+      .from("tour_personnel")
+      .select("id, party_id")
+      .eq("tour_id", tourId)
+      .is("deleted_at", null),
+    supabase
+      .from("days")
+      .select("id, city, country, lat, lng")
+      .eq("tour_id", tourId)
+      .eq("date", date)
+      .is("deleted_at", null)
+      .maybeSingle(),
+  ]);
   if (!event) notFound();
 
   const path = `/o/${orgSlug}/t/${tourId}/d/${date}/e/${eventId}/costs`;
   const currency = finance?.fee_currency ?? "RON";
   const bookingPercent = finance?.booking_percent ?? tour?.booking_percent ?? 0;
   const onShow = new Set((costs ?? []).filter((c) => c.personnel_id).map((c) => c.personnel_id));
+
+  // ── panoul „Calculat" — diurnă + transport terestru ────────────────
+  const artistData = tour?.artists as unknown as {
+    home_base_city: string | null;
+    home_base_lat: number | null;
+    home_base_lng: number | null;
+    ground_rate_per_km: number | null;
+    ground_rate_currency: string | null;
+    slug: string | null;
+  } | null;
+
+  const headcountByParty = new Map<string, number>();
+  for (const p of partyPersonnel ?? []) {
+    if (!p.party_id) continue;
+    headcountByParty.set(p.party_id, (headcountByParty.get(p.party_id) ?? 0) + 1);
+  }
+
+  const generatedKeys = new Set(
+    (costs ?? []).map((c) => c.generated_key).filter((k): k is string => !!k),
+  );
+
+  // Distanța sugerată e best-effort (poate rămâne null — introducere manuală).
+  let suggestedKm: number | null = null;
+  if (artistData?.home_base_lat != null && artistData?.home_base_lng != null) {
+    let destination: string | null = null;
+    if (dayRow?.lat != null && dayRow?.lng != null) {
+      destination = `${dayRow.lat},${dayRow.lng}`;
+    } else if (dayRow?.city) {
+      destination = [dayRow.city, dayRow.country].filter(Boolean).join(", ");
+    }
+    if (destination) {
+      const result = await computeGroundDistance(
+        `${artistData.home_base_lat},${artistData.home_base_lng}`,
+        destination,
+      );
+      if (result) suggestedKm = Math.round(result.distanceKm * 2);
+    }
+  }
 
   async function saveFinance(formData: FormData) {
     "use server";
@@ -142,6 +264,67 @@ export default async function ShowCostsPage({
       .from("show_costs")
       .update({ deleted_at: new Date().toISOString() })
       .eq("id", String(formData.get("id")));
+    revalidatePath(path);
+  }
+
+  async function upsertPerDiem(formData: FormData) {
+    "use server";
+    const { supabase, permission: p2, tier: t2, user } = await requireOrg(orgSlug);
+    if (!can({ tier: t2, permission: p2 }, "edit_accounting")) return;
+    const partyId = String(formData.get("partyId") ?? "");
+    const days = Number(formData.get("days") ?? 1);
+    if (!partyId || !Number.isFinite(days) || days <= 0) return;
+    const [{ data: party }, { count }] = await Promise.all([
+      supabase
+        .from("tour_parties")
+        .select("id, name, per_diem_rate, per_diem_currency")
+        .eq("id", partyId)
+        .is("deleted_at", null)
+        .maybeSingle(),
+      supabase
+        .from("tour_personnel")
+        .select("id", { count: "exact", head: true })
+        .eq("party_id", partyId)
+        .is("deleted_at", null),
+    ]);
+    if (!party) return;
+    const line = perDiemLine(party, count ?? 0, days);
+    if (!line) return;
+    await upsertCostLine(supabase, eventId, user.id, line);
+    revalidatePath(path);
+  }
+
+  async function upsertGroundTransport(formData: FormData) {
+    "use server";
+    const { supabase, permission: p2, tier: t2, user } = await requireOrg(orgSlug);
+    if (!can({ tier: t2, permission: p2 }, "edit_accounting")) return;
+    const km = Number(formData.get("km") ?? 0);
+    if (!Number.isFinite(km) || km <= 0) return;
+    const { data: t } = await supabase
+      .from("tours")
+      .select("artists(ground_rate_per_km, ground_rate_currency)")
+      .eq("id", tourId)
+      .maybeSingle();
+    const a = t?.artists as unknown as {
+      ground_rate_per_km: number | null;
+      ground_rate_currency: string | null;
+    } | null;
+    const rate = Number(a?.ground_rate_per_km ?? 0);
+    if (!rate) return;
+    const { data: day } = await supabase
+      .from("days")
+      .select("city")
+      .eq("tour_id", tourId)
+      .eq("date", date)
+      .is("deleted_at", null)
+      .maybeSingle();
+    const line = groundTransportLine({
+      city: day?.city ?? null,
+      km: Math.round(km),
+      rate,
+      currency: a?.ground_rate_currency || "EUR",
+    });
+    await upsertCostLine(supabase, eventId, user.id, line);
     revalidatePath(path);
   }
 
@@ -308,6 +491,119 @@ export default async function ShowCostsPage({
           </ul>
         )}
       </section>
+
+      {/* panoul „Calculat" — diurnă + transport terestru cu un click */}
+      {canEdit && (
+        <section className="rounded-[12px] border border-hairline bg-surface p-4">
+          <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">{t("calcTitle")}</h2>
+
+          <div className="space-y-2">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              {t("calcPerDiem")}
+            </h3>
+            {(parties ?? []).length > 0 && (
+              <ul className="divide-y divide-hairline">
+                {(parties ?? []).map((party) => {
+                  const headcount = headcountByParty.get(party.id) ?? 0;
+                  const preview = perDiemLine(party, headcount, 1);
+                  const hasLine = generatedKeys.has(`${PER_DIEM_KEY_PREFIX}${party.id}`);
+                  return (
+                    <li
+                      key={party.id}
+                      className={`flex flex-wrap items-center gap-2 py-2 ${!preview ? "opacity-50" : ""}`}
+                    >
+                      <span className="min-w-24 flex-1 text-sm font-medium">{party.name}</span>
+                      {preview ? (
+                        <>
+                          <span className="font-mono text-xs text-tertiary">
+                            {formatMoney(preview.amount, preview.currency)} ({headcount}{" "}
+                            {t("calcPeople")})
+                          </span>
+                          <form action={upsertPerDiem} className="flex items-center gap-1.5">
+                            <input type="hidden" name="partyId" value={party.id} />
+                            <label className="flex items-center gap-1 text-xs text-secondary">
+                              {t("calcDays")}
+                              <input
+                                name="days"
+                                type="number"
+                                min="1"
+                                step="1"
+                                defaultValue={1}
+                                className={`${input} w-14 font-mono`}
+                              />
+                            </label>
+                            <button className="btn-quiet h-7 px-2.5 text-xs">
+                              {hasLine ? t("calcUpdate") : t("calcAdd")}
+                            </button>
+                          </form>
+                        </>
+                      ) : (
+                        <span className="text-xs text-tertiary">{t("calcNoPerDiem")}</span>
+                      )}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
+          </div>
+
+          <div className="mt-4 space-y-2 border-t border-hairline pt-4">
+            <h3 className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              {t("calcTransport")}
+            </h3>
+            <p className="text-sm">
+              {artistData?.home_base_city ?? "—"} → {dayRow?.city ?? "—"}
+            </p>
+            {!artistData?.home_base_city && (
+              <p className="text-xs font-medium text-warning">
+                {t("calcNoHomeBase")}{" "}
+                {artistData?.slug && (
+                  <Link
+                    href={`/o/${orgSlug}/a/${artistData.slug}/profile`}
+                    className="text-accent hover:underline"
+                  >
+                    →
+                  </Link>
+                )}
+              </p>
+            )}
+            {!artistData?.ground_rate_per_km && (
+              <p className="text-xs font-medium text-warning">
+                {t("calcNoRate")}{" "}
+                {artistData?.slug && (
+                  <Link
+                    href={`/o/${orgSlug}/a/${artistData.slug}/profile`}
+                    className="text-accent hover:underline"
+                  >
+                    →
+                  </Link>
+                )}
+              </p>
+            )}
+            {artistData?.ground_rate_per_km && (
+              <form action={upsertGroundTransport} className="flex flex-wrap items-center gap-2">
+                <label className="flex items-center gap-1 text-xs text-secondary">
+                  {t("calcKm")}
+                  <input
+                    name="km"
+                    type="number"
+                    min="1"
+                    step="1"
+                    defaultValue={suggestedKm ?? ""}
+                    className={`${input} w-24 font-mono`}
+                  />
+                </label>
+                <span className="font-mono text-xs text-tertiary">
+                  {artistData.ground_rate_per_km} {artistData.ground_rate_currency ?? "EUR"}/km
+                </span>
+                <button className="btn-quiet h-7 px-2.5 text-xs">
+                  {generatedKeys.has(GROUND_KEY) ? t("calcUpdate") : t("calcAdd")}
+                </button>
+              </form>
+            )}
+          </div>
+        </section>
+      )}
 
       {/* liniile de cost */}
       <section className="rounded-[12px] border border-hairline bg-surface p-4">
