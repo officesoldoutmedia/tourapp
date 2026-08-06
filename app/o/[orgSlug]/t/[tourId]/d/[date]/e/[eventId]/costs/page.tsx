@@ -171,11 +171,17 @@ export default async function ShowCostsPage({
       destination = [dayRow.city, dayRow.country].filter(Boolean).join(", ");
     }
     if (destination) {
-      const result = await computeGroundDistance(
-        `${artistData.home_base_lat},${artistData.home_base_lng}`,
-        destination,
-      );
-      if (result) suggestedKm = Math.round(result.distanceKm * 2);
+      try {
+        const result = await computeGroundDistance(
+          `${artistData.home_base_lat},${artistData.home_base_lng}`,
+          destination,
+        );
+        if (result) suggestedKm = Math.round(result.distanceKm * 2);
+      } catch {
+        // Best-effort la SSR: dacă fetch-ul aruncă (network/DNS/timeout),
+        // nu trebuie să pice toată pagina — km-ul rămâne gol, introducere manuală.
+        suggestedKm = null;
+      }
     }
   }
 
