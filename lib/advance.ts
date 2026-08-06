@@ -7,7 +7,7 @@
 export type AdvanceStatus = 'not_started' | 'in_progress' | 'done'
 
 export type AdvanceLayoutItem =
-  | { type: 'field'; key: string }
+  | { type: 'field'; key: string; required?: boolean }
   | { type: 'title'; title: string; description?: string }
   | { type: 'schedule_row'; schedule_item_id: string } // [C-S v1.1]
 
@@ -35,7 +35,11 @@ export function isValidLayout(value: unknown): value is AdvanceLayoutItem[] {
     const it = item as Record<string, unknown>
     switch (it.type) {
       case 'field':
-        return typeof it.key === 'string' && it.key.length > 0
+        return (
+          typeof it.key === 'string' &&
+          it.key.length > 0 &&
+          (it.required === undefined || typeof it.required === 'boolean')
+        )
       case 'title':
         return typeof it.title === 'string'
       case 'schedule_row':
