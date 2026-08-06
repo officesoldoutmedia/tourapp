@@ -28,6 +28,7 @@ export default async function ArtistLayout({
   const tabs = [
     { href: base, label: t("tabDates"), exact: true },
     { href: `${base}/profile`, label: t("tabProfile") },
+    { href: `${base}/deals`, label: t("tabDeals") },
     { href: `${base}/access`, label: t("tabAccess") },
   ];
 

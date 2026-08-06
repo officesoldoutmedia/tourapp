@@ -870,6 +870,7 @@
   "artist": {
     "tabDates": "Dates",
     "tabProfile": "Profile",
+    "tabDeals": "Deals",
     "tabAccess": "Access",
     "upcoming": "Upcoming",
     "past": "Past",
@@ -912,6 +913,29 @@
     "addParty": "Add party",
     "deleteParty": "Delete",
     "noParties": "No parties yet."
+  },
+  "deals": {
+    "title": "Deal templates",
+    "hint": "Applied to shows as a snapshot — editing the template never changes existing shows.",
+    "nameLabel": "Deal name",
+    "feeLabel": "Fee",
+    "basisLabel": "Deal basis",
+    "basisLanded": "Landed",
+    "basisAllIn": "All-in",
+    "basisFeePlusCosts": "Fee + costs",
+    "withholdingLabel": "Withholding (%)",
+    "landedLabel": "Landed items (provided by promoter)",
+    "landedAdd": "Add item",
+    "accommodationLabel": "Accommodation",
+    "roomsSingle": "Single rooms",
+    "roomsDouble": "Double rooms",
+    "nights": "Nights",
+    "categoryLabel": "Hotel category",
+    "requiredLabel": "Required files for this show type",
+    "add": "Add template",
+    "save": "Save",
+    "delete": "Delete",
+    "empty": "No templates yet. Start from a suggestion:"
   },
   "newEvent": {
     "title": "New show",

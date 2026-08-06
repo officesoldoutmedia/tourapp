@@ -870,6 +870,7 @@
   "artist": {
     "tabDates": "Date",
     "tabProfile": "Profil",
+    "tabDeals": "Deals",
     "tabAccess": "Acces",
     "upcoming": "Urmează",
     "past": "Trecute",
@@ -912,6 +913,29 @@
     "addParty": "Adaugă party",
     "deleteParty": "Șterge",
     "noParties": "Niciun party încă."
+  },
+  "deals": {
+    "title": "Deal templates",
+    "hint": "Se aplică pe show-uri cu snapshot — schimbarea template-ului nu modifică show-urile existente.",
+    "nameLabel": "Nume deal",
+    "feeLabel": "Fee",
+    "basisLabel": "Deal basis",
+    "basisLanded": "Landed",
+    "basisAllIn": "All-in",
+    "basisFeePlusCosts": "Fee + costuri",
+    "withholdingLabel": "Reținere la sursă (%)",
+    "landedLabel": "Landed items (incluse de organizator)",
+    "landedAdd": "Adaugă item",
+    "accommodationLabel": "Cazare",
+    "roomsSingle": "Camere single",
+    "roomsDouble": "Camere double",
+    "nights": "Nopți",
+    "categoryLabel": "Categorie hotel",
+    "requiredLabel": "Fișiere obligatorii pentru tipul ăsta de show",
+    "add": "Adaugă template",
+    "save": "Salvează",
+    "delete": "Șterge",
+    "empty": "Niciun template încă. Pornește de la o sugestie:"
   },
   "newEvent": {
     "title": "Show nou",
