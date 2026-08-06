@@ -60,8 +60,10 @@ suprascrierea unui fee deja introdus manual cere confirmare.
 3. **Withholding:** `withholding_percent > 0` → linie de cost prin mecanismul
    SP3a: `generated_key: 'withholding'`, kind `extra`,
    `billable_to_booker: false`, etichetă „Impozit reținut {p}% — {sumă}", suma
-   = round2(p% × fee-ul aplicat). Editabilă/ștergibilă; re-aplicarea face
-   upsert, nu duplică.
+   = round2(p% × fee-ul EFECTIV din `show_finances` DUPĂ pasul 2 — cel aplicat
+   sau cel păstrat de user la refuzul suprascrierii). Editabilă/ștergibilă;
+   re-aplicarea face upsert, nu duplică. Fee efectiv 0/gol → linia nu se
+   creează.
 4. **Landed items + cazare:** doar în snapshot; afișate (§3).
 5. **Categorii obligatorii:** citite din snapshot la calculul advancing (§4).
 
@@ -88,7 +90,10 @@ show-urile existente.
 
 În helperul comun `computeProgressOfDays` (SP3b):
 - Zi cu ≥1 event cu `deal_snapshot.required_category_ids` NE-gol → setul
-  obligatoriu al zilei = UNIUNEA listelor din snapshot-urile event-urilor.
+  obligatoriu al zilei = UNIUNEA listelor din snapshot-urile event-urilor,
+  INTERSECTATĂ cu categoriile LIVE ale org-ului (id-urile din snapshot care nu
+  mai există / sunt soft-deleted se ignoră — altfel ar deveni obligatorii
+  nesatisfiabile pentru totdeauna).
 - Altfel → fallback pe setul global `is_required` (comportamentul de azi).
 - Restul regulilor neschimbate; modificarea e izolată în helper + datele pasate
   de cele 3 pagini (day/dashboard/timeline).
