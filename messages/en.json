@@ -822,7 +822,10 @@
     "inDays": "in {count} days",
     "today": "today",
     "noUpcoming": "No upcoming shows.",
-    "advance": "Advancing"
+    "advance": "Advancing",
+    "filterAll": "All artists",
+    "prevMonth": "Previous month",
+    "nextMonth": "Next month"
   },
   "artist": {
     "tabDates": "Dates",

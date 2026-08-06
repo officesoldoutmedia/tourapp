@@ -822,7 +822,10 @@
     "inDays": "în {count} zile",
     "today": "azi",
     "noUpcoming": "Niciun show programat.",
-    "advance": "Advancing"
+    "advance": "Advancing",
+    "filterAll": "Toți artiștii",
+    "prevMonth": "Luna anterioară",
+    "nextMonth": "Luna următoare"
   },
   "artist": {
     "tabDates": "Date",

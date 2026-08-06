@@ -5,6 +5,7 @@ import { can } from "@/lib/permissions";
 import { MetricStrip, type Metric } from "@/components/ui/MetricStrip";
 import { buildUpcoming, type DashboardDay, type UpcomingShow } from "@/lib/dashboard";
 import { SHOW_SLOT_TITLE } from "@/lib/showSlot";
+import { DashboardClient } from "./dashboard-client";
 
 interface ArtistRow {
   id: string;
@@ -160,40 +161,6 @@ function NextEventCard({
             />
           </div>
         </div>
-      )}
-    </Link>
-  );
-}
-
-interface UpcomingRowProps {
-  href: string;
-  artistColor: string | null;
-  title: string;
-  location: string;
-  dateLabel: string;
-  pct: number | null;
-}
-
-/** Un rând din lista Upcoming (restul din `upcoming`, fără primul —
- * deja afișat în `NextEventCard`). Component static, fără closures:
- * Task 6 îl mută într-un component client cu filtru pe artist, fără
- * să re-deriveze datele. */
-function UpcomingRow({ href, artistColor, title, location, dateLabel, pct }: UpcomingRowProps) {
-  return (
-    <Link href={href} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 hover:bg-subtle">
-      <span className="w-16 shrink-0 font-mono text-xs text-secondary">{dateLabel}</span>
-      <span
-        className={`h-1.5 w-1.5 shrink-0 rounded-full ${artistColor ? "" : "border border-hairline"}`}
-        style={artistColor ? { backgroundColor: artistColor } : undefined}
-      />
-      <span className="min-w-0 flex-1">
-        <span className="block truncate text-sm font-medium text-primary">{title}</span>
-        {location && <span className="block truncate text-xs text-tertiary">{location}</span>}
-      </span>
-      {pct !== null && (
-        <span className={`shrink-0 text-xs font-medium ${pct === 100 ? "text-success" : "text-secondary"}`}>
-          {pct}%
-        </span>
       )}
     </Link>
   );
@@ -401,25 +368,8 @@ export default async function OrgDashboard({
     };
   }
 
-  function toUpcomingRowProps(show: UpcomingShow): UpcomingRowProps {
-    const artist = artistById.get(show.artistId);
-    return {
-      href: `/o/${org.slug}/t/${show.tourId}/d/${show.date}`,
-      artistColor: artist?.color ?? null,
-      title: show.eventTitle ?? show.city ?? "—",
-      location: [show.city, show.country].filter(Boolean).join(", "),
-      dateLabel: new Intl.DateTimeFormat(locale, { day: "numeric", month: "short" }).format(
-        new Date(`${show.date}T00:00:00`),
-      ),
-      pct:
-        show.advance && show.advance.total > 0
-          ? Math.round((show.advance.done / show.advance.total) * 100)
-          : null,
-    };
-  }
-
   return (
-    <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
+    <main className="mx-auto w-full max-w-4xl space-y-8 p-6">
       <div className="flex items-center justify-between">
         <h1 className="font-display text-2xl font-semibold tracking-tight">{td("title")}</h1>
         <div className="flex items-center gap-2">
@@ -459,16 +409,22 @@ export default async function OrgDashboard({
             <NextEventCard {...toNextEventProps(upcoming[0])} />
           </section>
 
-          {upcoming.length > 1 && (
-            <section className="space-y-2">
-              <h2 className="text-sm font-medium text-secondary">{td("upcoming")}</h2>
-              <div className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface px-4">
-                {upcoming.slice(1).map((show) => (
-                  <UpcomingRow key={show.dayId} {...toUpcomingRowProps(show)} />
-                ))}
-              </div>
-            </section>
-          )}
+          <DashboardClient
+            orgSlug={org.slug}
+            locale={locale}
+            artists={activeArtists.map((a) => ({ id: a.id, name: a.name, slug: a.slug, color: a.color }))}
+            days={allDays}
+            artistOfTourEntries={[...artistOfTour.entries()]}
+            upcoming={upcoming.slice(1)}
+            labels={{
+              upcoming: td("upcoming"),
+              today: td("today"),
+              noUpcoming: td("noUpcoming"),
+              filterAll: td("filterAll"),
+              prevMonth: td("prevMonth"),
+              nextMonth: td("nextMonth"),
+            }}
+          />
         </>
       )}
 
