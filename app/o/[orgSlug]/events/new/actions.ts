@@ -9,6 +9,7 @@ import { SHOW_SLOT_TITLE } from "@/lib/showSlot";
 import { resolveVenue, type VenueInput } from "../../t/[tourId]/d/[date]/e/venue-resolve";
 import { applyScheduleTemplate } from "../../t/[tourId]/d/[date]/actions";
 import { createAdvance } from "../../t/[tourId]/d/[date]/e/[eventId]/advance/actions";
+import { copyArtistPartiesToTour } from "@/lib/partySnapshot";
 
 export interface OneOffPayload {
   artistId: string;
@@ -87,6 +88,12 @@ export async function createOneOffEvent(
       await supabase.from("tours").update({ deleted_at: null }).eq("id", found.id);
     }
     bucket = found;
+
+    // Snapshot travel parties DOAR pe ramura care a creat efectiv bucket-ul
+    // (nu pentru bucket existent sau restaurat din soft-delete — spec §2).
+    if (!ins.error && bucket) {
+      await copyArtistPartiesToTour(supabase, org.id, artist.id, bucket.id, user.id);
+    }
   }
   if (!bucket) return { error: "bucket_failed" };
 

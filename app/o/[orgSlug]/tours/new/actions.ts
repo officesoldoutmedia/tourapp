@@ -5,6 +5,7 @@ import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { dayInstant } from "@/lib/datetime";
 import { DEFAULT_TZ } from "@/lib/tzLookup";
+import { copyArtistPartiesToTour } from "@/lib/partySnapshot";
 
 export interface WizardDay {
   date: string; // YYYY-MM-DD
@@ -66,6 +67,8 @@ export async function createTour(
     .select("id")
     .single();
   if (tourError || !tour) return { error: tourError?.message ?? "failed" };
+
+  await copyArtistPartiesToTour(supabase, org.id, payload.artistId, tour.id, user.id);
 
   const { data: days, error: daysError } = await supabase
     .from("days")
