@@ -32,6 +32,11 @@ Coloana text `party` rămâne pentru compatibilitate; UI-ul trece integral pe FK
 
 **`artists`** + `ground_rate_per_km numeric`, `ground_rate_currency text`.
 
+**`show_costs.generated_key text`** — nullable; marker stabil pentru liniile
+generate (`per_diem:{tour_party_id}` / `ground_transport`). Butonul „Adaugă în
+costuri" face upsert pe `(event_id, generated_key)` — de aici „actualizează, nu
+duplică". Liniile manuale au `generated_key NULL` și nu sunt atinse niciodată.
+
 **Neatinse:** `travel_items.party`, `day_hotels.party` (text liber) — se leagă de
 entitate la rooming/manifest (luna 2 Zola).
 
@@ -67,8 +72,8 @@ respectiv (nesterși); zile = input editabil, default 1. Buton „Adaugă în co
   „Transport {oraș} — {km} km".
 
 **Reguli:**
-- Re-apăsarea butonului **actualizează** linia generată anterior (match pe un
-  marker stabil în linie — vezi planul; nu duplică).
+- Re-apăsarea butonului **actualizează** linia generată anterior — upsert pe
+  `show_costs.generated_key` (§1); nu duplică.
 - Liniile adăugate sunt snapshot-uri — schimbarea ratelor nu le modifică;
   regenerare explicită.
 - Valute mixte → conversia FX existentă din P&L.
