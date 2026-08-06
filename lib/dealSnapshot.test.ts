@@ -24,6 +24,19 @@ describe("buildDealSnapshot", () => {
     expect(s.fee_amount).toBe(3500);
     expect(s.required_category_ids).toEqual(["c1", "c2"]);
   });
+
+  it("accommodation array → {}", () => {
+    const s = buildDealSnapshot({ ...template, accommodation: ["x", "y"] } as never);
+    expect(s.accommodation).toEqual({});
+  });
+
+  it("accommodation cu chei extra + tipuri greșite → doar cheile valide supraviețuiesc", () => {
+    const s = buildDealSnapshot({
+      ...template,
+      accommodation: { rooms_single: "two", nights: 1, extra: "junk" },
+    } as never);
+    expect(s.accommodation).toEqual({ nights: 1 });
+  });
 });
 
 describe("parseDealSnapshot", () => {

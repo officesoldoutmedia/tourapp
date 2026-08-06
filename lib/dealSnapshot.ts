@@ -31,14 +31,26 @@ function round2(n: number): number {
   return Math.round(n * 100) / 100;
 }
 
+/** Normalizează `accommodation` cu whitelist strict — hardening la citirea
+ *  jsonb-ului: chei extra și tipuri greșite nu se propagă în DealSnapshot. */
+function normalizeAccommodation(value: unknown): DealSnapshot["accommodation"] {
+  if (!value || typeof value !== "object" || Array.isArray(value)) return {};
+  const v = value as Record<string, unknown>;
+  const out: DealSnapshot["accommodation"] = {};
+  if (typeof v.rooms_single === "number" && Number.isFinite(v.rooms_single))
+    out.rooms_single = v.rooms_single;
+  if (typeof v.rooms_double === "number" && Number.isFinite(v.rooms_double))
+    out.rooms_double = v.rooms_double;
+  if (typeof v.category === "string") out.category = v.category;
+  if (typeof v.nights === "number" && Number.isFinite(v.nights)) out.nights = v.nights;
+  return out;
+}
+
 export function buildDealSnapshot(template: DealTemplateRow): DealSnapshot {
   const landed = Array.isArray(template.landed_items)
     ? template.landed_items.filter((x): x is string => typeof x === "string")
     : [];
-  const acc =
-    template.accommodation && typeof template.accommodation === "object"
-      ? (template.accommodation as DealSnapshot["accommodation"])
-      : {};
+  const acc = normalizeAccommodation(template.accommodation);
   return {
     name: template.name,
     fee_amount: template.fee_amount != null ? Number(template.fee_amount) : null,
