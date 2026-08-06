@@ -87,26 +87,111 @@ export async function recordAttachment(
     mimeType: string;
     sizeBytes: number;
     tags: string[];
+    categoryId?: string | null;
+    dueDate?: string | null;
+    supersedesId?: string | null;
+    placeholderId?: string | null;
   },
 ): Promise<{ error?: string }> {
   const { supabase, org, user } = await requireEditor(orgSlug);
-  const { error } = await supabase.from("attachments").insert({
-    organization_id: org.id,
-    parent_type: input.parentType,
-    parent_id: input.parentId,
-    file_name: input.fileName,
-    storage_path: input.storagePath,
-    mime_type: input.mimeType,
-    size_bytes: input.sizeBytes,
-    tags: input.tags,
-    uploaded_by: user.id,
-  });
+
+  // Placeholder-ul ("fișier așteptat") deja există ca rând — încărcarea
+  // lui completează rândul in-place, nu creează unul nou (rămâne v1).
+  const { error } = input.placeholderId
+    ? await supabase
+        .from("attachments")
+        .update({
+          file_name: input.fileName,
+          storage_path: input.storagePath,
+          mime_type: input.mimeType,
+          size_bytes: input.sizeBytes,
+          uploaded_by: user.id,
+        })
+        .eq("id", input.placeholderId)
+    : await supabase.from("attachments").insert({
+        organization_id: org.id,
+        parent_type: input.parentType,
+        parent_id: input.parentId,
+        file_name: input.fileName,
+        storage_path: input.storagePath,
+        mime_type: input.mimeType,
+        size_bytes: input.sizeBytes,
+        tags: input.tags,
+        uploaded_by: user.id,
+        category_id: input.categoryId ?? null,
+        due_date: input.dueDate ?? null,
+        supersedes_id: input.supersedesId ?? null,
+      });
+
+  if (input.supersedesId && !error) {
+    await supabase
+      .from("attachments")
+      .update({ status: "superseded" })
+      .eq("id", input.supersedesId);
+  }
+
   if (error) return { error: error.message };
   revalidatePath(
     input.parentType === "tour"
       ? `/o/${orgSlug}/t/${tourId}/attachments`
       : dayPath(orgSlug, tourId, date),
   );
+  return {};
+}
+
+// Placeholder ("fișier așteptat") — rând fără storage_path, populat mai
+// târziu de recordAttachment(placeholderId) când fișierul chiar sosește.
+export async function createExpectedFile(
+  orgSlug: string,
+  tourId: string,
+  date: string,
+  input: { dayId: string; categoryId: string; dueDate: string | null; fileName?: string },
+): Promise<{ error?: string }> {
+  const { supabase, org, user } = await requireEditor(orgSlug);
+  let fileName = input.fileName?.trim();
+  if (!fileName) {
+    const { data: category } = await supabase
+      .from("file_categories")
+      .select("name")
+      .eq("id", input.categoryId)
+      .maybeSingle();
+    fileName = category?.name ?? "";
+  }
+  const { error } = await supabase.from("attachments").insert({
+    organization_id: org.id,
+    parent_type: "day",
+    parent_id: input.dayId,
+    file_name: fileName,
+    storage_path: null,
+    category_id: input.categoryId,
+    due_date: input.dueDate,
+    tags: [],
+    uploaded_by: user.id,
+  });
+  if (error) return { error: error.message };
+  revalidatePath(dayPath(orgSlug, tourId, date));
+  return {};
+}
+
+export async function updateAttachmentMeta(
+  orgSlug: string,
+  tourId: string,
+  date: string,
+  attachmentId: string,
+  patch: { status?: "draft" | "approved" | "final"; categoryId?: string | null; dueDate?: string | null },
+): Promise<{ error?: string }> {
+  const { supabase } = await requireEditor(orgSlug);
+  const update: Record<string, unknown> = {};
+  if (patch.status !== undefined) update.status = patch.status;
+  if (patch.categoryId !== undefined) update.category_id = patch.categoryId;
+  if (patch.dueDate !== undefined) update.due_date = patch.dueDate;
+  if (Object.keys(update).length === 0) return {};
+  const { error } = await supabase
+    .from("attachments")
+    .update(update)
+    .eq("id", attachmentId);
+  if (error) return { error: error.message };
+  revalidatePath(dayPath(orgSlug, tourId, date));
   return {};
 }
 

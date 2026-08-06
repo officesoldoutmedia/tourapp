@@ -30,7 +30,7 @@ export default async function ArtistAccessPage({
   if (!artist) notFound();
   const artistId = artist.id;
 
-  const [{ data: rules }, { data: groups }, { data: members }, { data: attachments }] =
+  const [{ data: rules }, { data: groups }, { data: members }, { data: attachments }, { data: categories }] =
     await Promise.all([
       supabase
         .from("visibility_rules")
@@ -51,11 +51,18 @@ export default async function ArtistAccessPage({
         .eq("organization_id", org.id),
       supabase
         .from("attachments")
-        .select("id, file_name, mime_type, size_bytes, created_at")
+        .select("id, file_name, mime_type, size_bytes, created_at, category_id")
         .eq("parent_type", "artist")
         .eq("parent_id", artistId)
         .is("deleted_at", null)
         .order("created_at", { ascending: false }),
+      supabase
+        .from("file_categories")
+        .select("id, name")
+        .eq("organization_id", org.id)
+        .is("deleted_at", null)
+        .order("sort_order")
+        .order("created_at"),
     ]);
 
   const memberIds = (members ?? []).map((m) => m.user_id);
@@ -190,6 +197,7 @@ export default async function ArtistAccessPage({
           orgId={org.id}
           artistId={artistId}
           files={(attachments ?? []) as ArtistFileData[]}
+          categories={categories ?? []}
         />
       </section>
     </div>

@@ -13,7 +13,7 @@ import { Download, File, Trash2, Upload } from "lucide-react";
 import { createClient } from "@/lib/supabase/browser";
 import { toast } from "@/components/ui/Toaster";
 import { getAttachmentUrl } from "@/app/o/[orgSlug]/t/[tourId]/d/[date]/extras-actions";
-import { addArtistAttachment, deleteArtistAttachment } from "./actions";
+import { addArtistAttachment, deleteArtistAttachment, setArtistFileCategory } from "./actions";
 
 export interface ArtistFileData {
   id: string;
@@ -21,6 +21,12 @@ export interface ArtistFileData {
   mime_type: string | null;
   size_bytes: number | null;
   created_at: string;
+  category_id: string | null;
+}
+
+export interface ArtistFileCategoryData {
+  id: string;
+  name: string;
 }
 
 function formatSize(bytes: number | null): string {
@@ -35,12 +41,14 @@ export function ArtistFiles({
   orgId,
   artistId,
   files,
+  categories,
 }: {
   orgSlug: string;
   artistSlug: string;
   orgId: string;
   artistId: string;
   files: ArtistFileData[];
+  categories: ArtistFileCategoryData[];
 }) {
   const t = useTranslations("artist");
   const ta = useTranslations("attachments");
@@ -90,7 +98,7 @@ export function ArtistFiles({
           {files.map((f) => (
             <li
               key={f.id}
-              className="grid h-12 grid-cols-[32px_minmax(0,1fr)_90px_110px_auto] items-center gap-2 px-3"
+              className="grid h-12 grid-cols-[32px_minmax(0,1fr)_130px_90px_110px_auto] items-center gap-2 px-3"
             >
               <File size={16} strokeWidth={1.5} className="shrink-0 text-secondary" />
               <button
@@ -101,6 +109,24 @@ export function ArtistFiles({
               >
                 {f.file_name}
               </button>
+              <select
+                value={f.category_id ?? ""}
+                disabled={pending}
+                aria-label={ta("categoryLabel")}
+                onChange={(e) =>
+                  startTransition(async () => {
+                    await setArtistFileCategory(orgSlug, artistSlug, f.id, e.target.value || null);
+                  })
+                }
+                className="rounded border border-hairline px-1.5 py-1 text-[11px]"
+              >
+                <option value="">{ta("uncategorized")}</option>
+                {categories.map((cat) => (
+                  <option key={cat.id} value={cat.id}>
+                    {cat.name}
+                  </option>
+                ))}
+              </select>
               <span className="text-right font-mono text-[11px] text-tertiary">
                 {formatSize(f.size_bytes)}
               </span>

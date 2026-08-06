@@ -525,7 +525,20 @@
     "noMatches": "Niciun fișier nu se potrivește filtrelor.",
     "uploadedToast": "Fișier încărcat",
     "deletedToast": "Fișier șters",
-    "deleteFile": "Șterge"
+    "deleteFile": "Șterge",
+    "uncategorized": "Fără categorie",
+    "newVersion": "Versiune nouă",
+    "history": "Istoric",
+    "expectFile": "Așteaptă fișier",
+    "expected": "Așteptat",
+    "overdue": "Depășit",
+    "dueLabel": "Termen",
+    "statusDraft": "Draft",
+    "statusApproved": "Aprobat",
+    "statusFinal": "Final",
+    "statusSuperseded": "Înlocuit",
+    "inherited": "Din profilul artistului",
+    "categoryLabel": "Categorie"
   },
   "contacts": {
     "title": "Companies & Contacts",

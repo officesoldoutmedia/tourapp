@@ -69,6 +69,22 @@ export async function addArtistAttachment(
   return {};
 }
 
+export async function setArtistFileCategory(
+  orgSlug: string,
+  artistSlug: string,
+  attachmentId: string,
+  categoryId: string | null,
+): Promise<{ error?: string }> {
+  const { supabase } = await requireManage(orgSlug);
+  const { error } = await supabase
+    .from("attachments")
+    .update({ category_id: categoryId })
+    .eq("id", attachmentId);
+  if (error) return { error: error.message };
+  revalidatePath(`/o/${orgSlug}/a/${artistSlug}/access`);
+  return {};
+}
+
 export async function deleteArtistAttachment(
   orgSlug: string,
   artistSlug: string,

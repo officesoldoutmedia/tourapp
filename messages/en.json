@@ -525,7 +525,20 @@
     "noMatches": "No files match the filters.",
     "uploadedToast": "File uploaded",
     "deletedToast": "File deleted",
-    "deleteFile": "Delete"
+    "deleteFile": "Delete",
+    "uncategorized": "Uncategorized",
+    "newVersion": "New version",
+    "history": "History",
+    "expectFile": "Expect a file",
+    "expected": "Expected",
+    "overdue": "Overdue",
+    "dueLabel": "Due",
+    "statusDraft": "Draft",
+    "statusApproved": "Approved",
+    "statusFinal": "Final",
+    "statusSuperseded": "Superseded",
+    "inherited": "From artist profile",
+    "categoryLabel": "Category"
   },
   "contacts": {
     "title": "Companies & Contacts",

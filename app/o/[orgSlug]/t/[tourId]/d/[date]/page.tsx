@@ -18,6 +18,8 @@ import {
   DayActionsBar,
   TasksSection,
   type AttachmentData,
+  type FileCategoryData,
+  type InheritedFileData,
   type TaskData,
 } from "./extras-client";
 import { formatTimeInZone, dayInstant, dayKeyInZone } from "@/lib/datetime";
@@ -164,21 +166,41 @@ export default async function DayPage({
     }),
   ];
 
-  const [{ data: dayTasks }, { data: dayAttachments }] = await Promise.all([
-    supabase
-      .from("tasks")
-      .select("id, title, due_at, is_complete")
-      .eq("day_id", day.id)
-      .is("deleted_at", null)
-      .order("due_at", { ascending: true, nullsFirst: false }),
-    supabase
-      .from("attachments")
-      .select("id, file_name, size_bytes, tags")
-      .eq("parent_type", "day")
-      .eq("parent_id", day.id)
-      .is("deleted_at", null)
-      .order("created_at"),
-  ]);
+  const [{ data: dayTasks }, { data: dayAttachments }, { data: fileCategories }, { data: tourForArtist }] =
+    await Promise.all([
+      supabase
+        .from("tasks")
+        .select("id, title, due_at, is_complete")
+        .eq("day_id", day.id)
+        .is("deleted_at", null)
+        .order("due_at", { ascending: true, nullsFirst: false }),
+      supabase
+        .from("attachments")
+        .select("id, file_name, size_bytes, tags, category_id, status, due_date, supersedes_id, created_at")
+        .eq("parent_type", "day")
+        .eq("parent_id", day.id)
+        .is("deleted_at", null)
+        .order("created_at"),
+      supabase
+        .from("file_categories")
+        .select("id, name")
+        .eq("organization_id", org.id)
+        .is("deleted_at", null)
+        .order("sort_order")
+        .order("created_at"),
+      supabase.from("tours").select("artist_id").eq("id", tourId).maybeSingle(),
+    ]);
+
+  // Fișierele permanente ale artistului (SP1) — moștenite read-only [Task 4].
+  const artistId = tourForArtist?.artist_id ?? null;
+  const { data: artistAttachments } = artistId
+    ? await supabase
+        .from("attachments")
+        .select("id, file_name, storage_path, category_id")
+        .eq("parent_type", "artist")
+        .eq("parent_id", artistId)
+        .is("deleted_at", null)
+    : { data: [] as InheritedFileData[] };
 
   const { data: prevDayHotels } = prevDay
     ? await supabase
@@ -607,6 +629,9 @@ export default async function DayPage({
           dayId={day.id}
           orgId={org.id}
           attachments={(dayAttachments ?? []) as AttachmentData[]}
+          categories={(fileCategories ?? []) as FileCategoryData[]}
+          inheritedFiles={(artistAttachments ?? []) as InheritedFileData[]}
+          todayKey={todayKey}
           canEdit={canEdit}
         />
       </div>
