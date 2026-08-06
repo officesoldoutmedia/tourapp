@@ -2,6 +2,7 @@ import Link from "next/link";
 import { getTranslations, getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
+import { formatTimeInZone } from "@/lib/datetime";
 import { MetricStrip, type Metric } from "@/components/ui/MetricStrip";
 import { buildUpcoming, type DashboardDay, type UpcomingShow } from "@/lib/dashboard";
 import { SHOW_SLOT_TITLE } from "@/lib/showSlot";
@@ -370,12 +371,9 @@ export default async function OrgDashboard({
       location: [show.city, show.country].filter(Boolean).join(" · "),
       dateLabel,
       relLabel: diff === 0 ? td("today") : td("inDays", { count: diff }),
+      // 24h fix, ca pe paginile de zi — nu ora locală dependentă de `locale`.
       stageLabel: show.stageTime
-        ? new Intl.DateTimeFormat(locale, {
-            hour: "2-digit",
-            minute: "2-digit",
-            timeZone: show.timezone ?? "UTC",
-          }).format(new Date(show.stageTime))
+        ? formatTimeInZone(new Date(show.stageTime), show.timezone ?? "UTC")
         : null,
       advance: show.advance,
       advanceLabel: td("advance"),

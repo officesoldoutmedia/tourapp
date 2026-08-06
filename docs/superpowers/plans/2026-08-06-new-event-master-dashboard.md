@@ -25,19 +25,19 @@
 
 **Files:**
 - Create: `supabase/migrations/00028_bucket_tours.sql`
-- Create: `supabase/tests/faza10_bucket_rls.test.sql`
+- Create: `supabase/tests/faza1a_bucket_rls.test.sql`
 
 **Interfaces:**
 - Produces: `tours.bucket_year int` (NULL = tur normal) + index unic parțial `(artist_id, bucket_year) where bucket_year is not null`. Task 4 face find-or-create pe el (eroare 23505 la duplicat).
 
 - [ ] **Step 1: Scrie testul (pică fără migrare)**
 
-Creează `supabase/tests/faza10_bucket_rls.test.sql`:
+Creează `supabase/tests/faza1a_bucket_rls.test.sql`:
 
 ```sql
 -- ═══ Faza 10 — bucket_year pe tours (one-off shows, SP2) ═══
 -- Rulează DUPĂ faza1 (refolosește org-ul, userii și artistul 'speak').
--- ATENȚIE la ordinea alfabetică: 'faza10' sortează ÎNTRE 'faza1' și 'faza2',
+-- ATENȚIE la ordinea alfabetică: 'faza1a' sortează ÎNTRE 'faza1' și 'faza2',
 -- deci fazele 2–9 rulează după acest fișier — de asta tururile create aici
 -- se soft-deletează la final, ca să nu polueze count-urile fazelor următoare.
 \set ON_ERROR_STOP on
@@ -100,7 +100,7 @@ reset role;
 - [ ] **Step 2: Rulează — pică**
 
 Run: `bash scripts/test-rls.sh`
-Expected: FAIL la faza10 cu `column "bucket_year" ... does not exist`.
+Expected: FAIL la faza1a cu `column "bucket_year" ... does not exist`.
 
 - [ ] **Step 3: Scrie migrarea**
 
@@ -125,12 +125,12 @@ create unique index tours_artist_bucket_uq
 - [ ] **Step 4: Rulează — trece tot**
 
 Run: `bash scripts/test-rls.sh`
-Expected: toate PASS-urile faza0–faza10, exit 0.
+Expected: toate PASS-urile din suită (faza0…faza9, incl. faza1a nou-creat), exit 0.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add supabase/migrations/00028_bucket_tours.sql supabase/tests/faza10_bucket_rls.test.sql
+git add supabase/migrations/00028_bucket_tours.sql supabase/tests/faza1a_bucket_rls.test.sql
 git commit -m "feat: bucket_year pe tours — bucket-uri one-off per artist/an
 
 Co-Authored-By: Claude Fable 5 <noreply@anthropic.com>"

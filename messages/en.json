@@ -819,7 +819,7 @@
     "upcoming": "Upcoming",
     "rosterTitle": "Roster",
     "newShow": "New show",
-    "inDays": "in {count} days",
+    "inDays": "{count, plural, one {tomorrow} other {in # days}}",
     "today": "today",
     "noUpcoming": "No upcoming shows.",
     "advance": "Advancing",

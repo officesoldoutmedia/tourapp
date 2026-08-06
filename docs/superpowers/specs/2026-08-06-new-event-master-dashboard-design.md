@@ -137,7 +137,7 @@ normale sub toate politicile existente.
 - **Vitest (TDD)** pe helperii puri: `lib/masterCalendar.ts` (grupare zile→celule,
   filtru artiști), `lib/dashboard.ts` (next event + upcoming din liste de
   zile/advances), numele bucket-ului.
-- **SQL** în suita RLS (fișier nou `faza10_bucket_rls.test.sql`): unicitate bucket
+- **SQL** în suita RLS (fișier nou `faza1a_bucket_rls.test.sql`): unicitate bucket
   (al doilea insert același artist+an → eșec), bucket vizibil prin politicile
   normale de tur.
 - **Standard:** `check-i18n`, `tsc --noEmit`, `pnpm build`, `bash scripts/test-rls.sh`.

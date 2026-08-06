@@ -32,12 +32,17 @@ export async function createOneOffEvent(
     return { error: "invalid" };
   }
 
-  // Artistul aparține org-ului (regula din SP1 — FK-ul ocolește RLS).
+  // Artistul aparține org-ului (regula din SP1 — FK-ul ocolește RLS) și nu e
+  // șters. `is_archived` NU se filtrează aici — select-ul din `events/new`
+  // deja nu oferă artiști arhivați, dar dacă cineva trimite direct id-ul unui
+  // artist arhivat (nu șters), tot poate crea show-ul; doar cei șterși sunt
+  // respinși server-side.
   const { data: artist } = await supabase
     .from("artists")
     .select("id, name")
     .eq("id", payload.artistId)
     .eq("organization_id", org.id)
+    .is("deleted_at", null)
     .maybeSingle();
   if (!artist) return { error: "invalid" };
 

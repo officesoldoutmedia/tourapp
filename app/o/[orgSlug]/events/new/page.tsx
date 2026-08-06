@@ -38,13 +38,21 @@ export default async function NewEventPage({
         .order("title"),
     ]);
 
+  // Un artist arhivat (sau șters) poate ajunge pe acest link prin `?artist=`
+  // din pagina lui (`a/[artistSlug]`), dar select-ul de mai sus îl exclude —
+  // dacă i-am da oricum id-ul lui la `defaultArtistId`, submit-ul ar pica
+  // silențios pe `invalid` la validarea din `createOneOffEvent`. Oferim
+  // default-ul doar dacă id-ul chiar există în lista încărcată.
+  const artistIds = new Set((artists ?? []).map((a) => a.id));
+  const defaultArtistId = artist && artistIds.has(artist) ? artist : undefined;
+
   return (
     <NewEventForm
       orgSlug={orgSlug}
       artists={artists ?? []}
       scheduleTemplates={scheduleTemplates ?? []}
       advanceTemplates={advanceTemplates ?? []}
-      defaultArtistId={artist}
+      defaultArtistId={defaultArtistId}
     />
   );
 }

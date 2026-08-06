@@ -819,7 +819,7 @@
     "upcoming": "Urmează",
     "rosterTitle": "Roster",
     "newShow": "Show nou",
-    "inDays": "în {count} zile",
+    "inDays": "{count, plural, one {mâine} few {în # zile} other {în # de zile}}",
     "today": "azi",
     "noUpcoming": "Niciun show programat.",
     "advance": "Advancing",
