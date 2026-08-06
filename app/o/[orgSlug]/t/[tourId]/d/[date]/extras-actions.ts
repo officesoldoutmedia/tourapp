@@ -222,11 +222,26 @@ export async function deleteAttachment(
   attachmentId: string,
 ): Promise<{ error?: string }> {
   const { supabase } = await requireEditor(orgSlug);
+  const { data: attachment } = await supabase
+    .from("attachments")
+    .select("supersedes_id")
+    .eq("id", attachmentId)
+    .maybeSingle();
   const { error } = await supabase
     .from("attachments")
     .update({ deleted_at: new Date().toISOString() })
     .eq("id", attachmentId);
   if (error) return { error: error.message };
+  // Reclaim: dacă head-ul șters avea un predecesor, acela redevine capul
+  // lanțului — resetăm statusul lui la 'draft' DOAR dacă e încă 'superseded'
+  // (nu atingem alte statusuri) [review fix #3].
+  if (attachment?.supersedes_id) {
+    await supabase
+      .from("attachments")
+      .update({ status: "draft" })
+      .eq("id", attachment.supersedes_id)
+      .eq("status", "superseded");
+  }
   revalidatePath(dayPath(orgSlug, tourId, date));
   return {};
 }

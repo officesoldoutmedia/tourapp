@@ -19,12 +19,21 @@ interface UpcomingRowProps {
   location: string;
   dateLabel: string;
   pct: number | null;
+  filesOverdueLabel: string | null;
 }
 
 /** Un rând din lista Upcoming — mutat din page.tsx (Task 5) fără schimbări
  * de randare; acum alimentat cu `visibleUpcoming` (filtrat pe artist), nu
  * cu tot `upcoming`-ul de pe server. */
-function UpcomingRow({ href, artistColor, title, location, dateLabel, pct }: UpcomingRowProps) {
+function UpcomingRow({
+  href,
+  artistColor,
+  title,
+  location,
+  dateLabel,
+  pct,
+  filesOverdueLabel,
+}: UpcomingRowProps) {
   return (
     <Link href={href} className="flex items-center gap-3 py-3 first:pt-0 last:pb-0 hover:bg-subtle">
       <span className="w-16 shrink-0 font-mono text-xs text-secondary">{dateLabel}</span>
@@ -36,6 +45,13 @@ function UpcomingRow({ href, artistColor, title, location, dateLabel, pct }: Upc
         <span className="block truncate text-sm font-medium text-primary">{title}</span>
         {location && <span className="block truncate text-xs text-tertiary">{location}</span>}
       </span>
+      {filesOverdueLabel && (
+        // Badge roșu overdue (review fix #4) — placeholdere ale zilei cu
+        // due_date depășit; NU atinge NextEventCard (randat separat).
+        <span className="shrink-0 rounded-full bg-danger-subtle px-1.5 py-0.5 text-[10px] font-medium text-danger">
+          {filesOverdueLabel}
+        </span>
+      )}
       {pct !== null && (
         <span className={`shrink-0 text-xs font-medium ${pct === 100 ? "text-success" : "text-secondary"}`}>
           {pct}%
@@ -52,6 +68,8 @@ function toUpcomingRowProps(
   artistById: Map<string, Artist>,
   orgSlug: string,
   locale: string,
+  overdueDayIds: ReadonlySet<string>,
+  filesOverdueLabel: string,
 ): UpcomingRowProps {
   const artist = artistById.get(show.artistId);
   return {
@@ -66,6 +84,7 @@ function toUpcomingRowProps(
       show.advance && show.advance.total > 0
         ? Math.round((show.advance.done / show.advance.total) * 100)
         : null,
+    filesOverdueLabel: overdueDayIds.has(show.dayId) ? filesOverdueLabel : null,
   };
 }
 
@@ -92,6 +111,9 @@ export function DashboardClient(props: {
   days: DashboardDay[];
   artistOfTourEntries: [string, string][];
   upcoming: UpcomingShow[];
+  // Zilele (id-uri) cu fișiere placeholder întârziate — badge roșu pe
+  // rândul Upcoming corespunzător (review fix #4). Prop additiv.
+  overdueDayIds: string[];
   // „Azi" și luna inițială — derivate O SINGURĂ DATĂ pe server (page.tsx),
   // ca SSR-ul și primul pass de hidratare să randeze identic; corectate
   // client-side (fus orar local) doar după mount, via efectul de mai jos.
@@ -104,6 +126,7 @@ export function DashboardClient(props: {
     filterAll: string;
     prevMonth: string;
     nextMonth: string;
+    filesOverdue: string;
   };
 }) {
   const [enabled, setEnabled] = useState<Set<string>>(
@@ -139,6 +162,7 @@ export function DashboardClient(props: {
     () => new Map(props.artists.map((a) => [a.id, a])),
     [props.artists],
   );
+  const overdueDaySet = useMemo(() => new Set(props.overdueDayIds), [props.overdueDayIds]);
   const dots = useMemo(
     () => buildCalendarDots(props.days, artistOfTour, enabled),
     [props.days, artistOfTour, enabled],
@@ -197,7 +221,14 @@ export function DashboardClient(props: {
               {visibleUpcoming.map((show) => (
                 <UpcomingRow
                   key={show.dayId}
-                  {...toUpcomingRowProps(show, artistById, props.orgSlug, props.locale)}
+                  {...toUpcomingRowProps(
+                    show,
+                    artistById,
+                    props.orgSlug,
+                    props.locale,
+                    overdueDaySet,
+                    props.labels.filesOverdue,
+                  )}
                 />
               ))}
             </div>

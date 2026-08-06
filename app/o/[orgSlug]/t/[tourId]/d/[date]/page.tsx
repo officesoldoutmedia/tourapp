@@ -4,9 +4,7 @@ import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { formatDayHeader, isDstTransitionDay } from "@/lib/datetime";
 import { DEFAULT_TZ } from "@/lib/tzLookup";
-import { isValidLayout } from "@/lib/advance";
-import { computeAdvanceProgress } from "@/lib/advanceProgress";
-import { versionChains } from "@/lib/fileVersions";
+import { computeProgressOfDays } from "@/lib/advanceProgressData";
 import {
   NotesSection,
   ScheduleSection,
@@ -390,12 +388,12 @@ export default async function DayPage({
           .eq("field_key", "venue_info.venue_contacts"),
         supabase
           .from("event_field_values")
-          .select("field_key, value")
+          .select("event_id, field_key, value")
           .in("event_id", eventIds),
       ])
     : [
         { data: [] as { value: string | null }[] },
-        { data: [] as { field_key: string; value: string | null }[] },
+        { data: [] as { event_id: string; field_key: string; value: string | null }[] },
       ];
   const keyContactsText = (contactValues ?? [])
     .map((r) => r.value ?? "")
@@ -427,43 +425,39 @@ export default async function DayPage({
     .sort((a, b) => a.startMs - b.startMs);
   const confirmedCount = focusItems.filter((i) => i.confirmed).length;
 
+  // Toate advance-urile (nesterse) ale zilei, cu event_id atașat explicit —
+  // cerut de helperul comun `computeProgressOfDays` (review fix #2).
   const advanceRows = (events ?? []).flatMap((e) =>
     ((e as unknown as { advances?: { status: string; deleted_at: string | null; layout: unknown }[] }).advances ?? [])
-      .filter((a) => a.deleted_at === null),
+      .filter((a) => a.deleted_at === null)
+      .map((a) => ({ event_id: e.id, status: a.status, layout: a.layout })),
   );
-  const advanceStatuses = advanceRows.map((a) => a.status);
-
-  // Fișierele reale ale zilei (heads nesuperseded, ne-placeholder) — refolosește
-  // datele Task 4, fără query dublu [SP3b Task 5].
-  const dayFileHeads = versionChains(
-    (dayAttachments ?? []) as AttachmentData[],
-  ).map((chain) => chain.head);
-  const realDayFileCategoryIds = dayFileHeads
-    .filter((h) => h.storage_path !== null)
-    .map((h) => h.category_id)
-    .filter((id): id is string => id !== null);
   const requiredCats = (fileCategories ?? []).filter(
     (c) => (c as { is_required?: boolean }).is_required,
   );
+  const dayOfEvent = new Map(eventIds.map((id) => [id, day.id]));
 
-  // Zi cu mai multe event-uri pe același field_key → „completat pe oricare
-  // event" câștigă, indiferent de ordinea (nedeterministă) a rândurilor din
-  // DB; semantica per-event fină e follow-up [SP3b Task 5 fix].
-  const fieldValues = new Map<string, string>();
-  for (const r of fieldValueRows ?? []) {
-    const v = r.value ?? "";
-    if (v.trim() !== "" || !fieldValues.has(r.field_key)) {
-      fieldValues.set(r.field_key, v);
-    }
-  }
-
-  const progress = computeAdvanceProgress({
-    layouts: advanceRows.map((a) => (isValidLayout(a.layout) ? a.layout : [])),
-    fieldValues,
+  // Regulile UNICE de calcul al procentului de advancing (helper comun cu
+  // dashboard-ul și timeline-ul de artist) — vezi lib/advanceProgressData.ts
+  // [review fix #2]: categoriile obligatorii intră în total doar pe zile
+  // show; excluderea superseded+placeholder e identică peste tot.
+  const progressOfDay = computeProgressOfDays({
+    days: [{ id: day.id, day_type: day.day_type }],
+    dayOfEvent,
+    advanceRows,
+    fieldValueRows: fieldValueRows ?? [],
+    fileRows: (dayAttachments ?? []).map((a) => ({
+      id: a.id,
+      supersedes_id: a.supersedes_id,
+      created_at: a.created_at,
+      parent_id: day.id,
+      category_id: a.category_id,
+      storage_path: a.storage_path,
+      status: a.status,
+    })),
     requiredCategoryIds: requiredCats.map((c) => c.id),
-    dayFileCategoryIds: realDayFileCategoryIds,
-    manualStatuses: advanceStatuses,
   });
+  const progress = progressOfDay.get(day.id)!;
   const advanceTotal = progress.total;
   const advanceDone = progress.done;
   const advancePct = advanceTotal > 0 ? progress.percent : null;

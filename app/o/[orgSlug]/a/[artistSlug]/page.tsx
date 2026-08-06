@@ -4,17 +4,16 @@ import { getTranslations, getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { buildArtistTimeline, type TimelineDay } from "@/lib/artistTimeline";
-import { isValidLayout } from "@/lib/advance";
-import { computeAdvanceProgress } from "@/lib/advanceProgress";
-import { versionChains } from "@/lib/fileVersions";
+import { computeProgressOfDays } from "@/lib/advanceProgressData";
 
 // Rând brut de attachment pt. calculul bulk al procentului de advancing
-// (SP3b Task 6) — subset minim cerut de `versionChains`/`computeAdvanceProgress`.
+// (SP3b Task 6) — subset minim cerut de `computeProgressOfDays`.
 interface DayFileRow {
   id: string;
   parent_id: string;
   category_id: string | null;
   storage_path: string | null;
+  status: string | null;
   supersedes_id: string | null;
   created_at: string;
 }
@@ -79,13 +78,17 @@ export default async function ArtistDatesPage({
   const dayOfEvent = new Map(eventRows.map((event) => [event.id, event.day_id]));
 
   const todayKey = new Date().toISOString().slice(0, 10);
-  // Zilele viitoare — DOAR pentru ele se calculează procentul de advancing
-  // bulk (SP3b Task 6); trecutul rămâne pe agregatul vechi din statusuri
-  // (ieftin și suficient, decizie de spec).
-  const futureDayIds = dayRows.filter((day) => day.date >= todayKey).map((day) => day.id);
-  const futureDayIdSet = new Set(futureDayIds);
+  // Zilele viitoare DE TIP SHOW — DOAR pentru ele se calculează procentul
+  // de advancing bulk (SP3b Task 6; regula (a) din review fix #2: pe zile
+  // non-show, categoriile obligatorii nu trebuie să „curgă" în total).
+  // Trecutul rămâne pe agregatul vechi din statusuri (ieftin și suficient,
+  // decizie de spec).
+  const futureShowDayIds = dayRows
+    .filter((day) => day.date >= todayKey && day.day_type === "show")
+    .map((day) => day.id);
+  const futureShowDayIdSet = new Set(futureShowDayIds);
   const futureEventIds = eventRows
-    .filter((event) => futureDayIdSet.has(event.day_id))
+    .filter((event) => futureShowDayIdSet.has(event.day_id))
     .map((event) => event.id);
 
   const [
@@ -107,19 +110,19 @@ export default async function ArtistDatesPage({
           .select("event_id, field_key, value")
           .in("event_id", futureEventIds)
       : Promise.resolve({ data: [] as { event_id: string; field_key: string; value: string | null }[] }),
-    futureDayIds.length
+    futureShowDayIds.length
       ? supabase
           .from("file_categories")
           .select("id, is_required")
           .eq("organization_id", org.id)
           .is("deleted_at", null)
       : Promise.resolve({ data: [] as { id: string; is_required: boolean | null }[] }),
-    futureDayIds.length
+    futureShowDayIds.length
       ? supabase
           .from("attachments")
-          .select("id, parent_id, category_id, storage_path, supersedes_id, created_at")
+          .select("id, parent_id, category_id, storage_path, status, supersedes_id, created_at")
           .eq("parent_type", "day")
-          .in("parent_id", futureDayIds)
+          .in("parent_id", futureShowDayIds)
           .is("deleted_at", null)
           .not("storage_path", "is", null)
           .neq("status", "superseded")
@@ -135,63 +138,22 @@ export default async function ArtistDatesPage({
     .filter((c) => c.is_required)
     .map((c) => c.id);
 
-  const advancesByDay = new Map<string, { status: string; layout: unknown }[]>();
-  for (const a of advanceRows ?? []) {
-    const dayId = dayOfEvent.get(a.event_id);
-    if (!dayId) continue;
-    const list = advancesByDay.get(dayId) ?? [];
-    list.push(a);
-    advancesByDay.set(dayId, list);
-  }
-
-  // Zi cu mai multe event-uri pe același field_key → „completat pe oricare
-  // event" câștigă, indiferent de ordinea (nedeterministă) a rândurilor din
-  // DB — copiat exact din merge-ul determinist al paginii de zi (Task 5),
-  // aplicat aici per zi (nu global peste toate zilele).
-  const fieldValuesByDay = new Map<string, Map<string, string>>();
-  for (const r of fieldValueRows ?? []) {
-    const dayId = dayOfEvent.get(r.event_id);
-    if (!dayId) continue;
-    const map = fieldValuesByDay.get(dayId) ?? new Map<string, string>();
-    const v = r.value ?? "";
-    if (v.trim() !== "" || !map.has(r.field_key)) {
-      map.set(r.field_key, v);
-    }
-    fieldValuesByDay.set(dayId, map);
-  }
-
-  const attachmentsByDay = new Map<string, DayFileRow[]>();
-  for (const a of dayAttachmentRows ?? []) {
-    const list = attachmentsByDay.get(a.parent_id) ?? [];
-    list.push(a);
-    attachmentsByDay.set(a.parent_id, list);
-  }
-
+  // Regulile UNICE de calcul (helper comun cu pagina de zi și dashboard-ul)
+  // — vezi lib/advanceProgressData.ts. `futureShowDayIds` sunt deja doar
+  // zile show (filtrate mai sus), deci regula (a) e mereu activă aici.
+  const progressOfDayRaw = computeProgressOfDays({
+    days: futureShowDayIds.map((id) => ({ id, day_type: "show" })),
+    dayOfEvent,
+    advanceRows: advanceRows ?? [],
+    fieldValueRows: fieldValueRows ?? [],
+    fileRows: dayAttachmentRows ?? [],
+    requiredCategoryIds,
+  });
+  // Zilele fără obligatorii ȘI fără advance-uri (progress.total === 0)
+  // rămân neincluse — comportamentul vechi (advance: null) persistă.
   const progressOfDay = new Map<string, { done: number; total: number }>();
-  for (const dayId of futureDayIds) {
-    const dayAdvances = advancesByDay.get(dayId) ?? [];
-    // Fișierele reale ale zilei (heads nesuperseded, ne-placeholder) —
-    // mirror-ul exact al Task 5 (query-ul e deja restrâns la status !=
-    // superseded / storage_path non-null, versionChains rămâne defensiv).
-    const dayFileHeads = versionChains(attachmentsByDay.get(dayId) ?? []).map(
-      (chain) => chain.head,
-    );
-    const dayFileCategoryIds = dayFileHeads
-      .filter((h) => h.storage_path !== null)
-      .map((h) => h.category_id)
-      .filter((id): id is string => id !== null);
-    const progress = computeAdvanceProgress({
-      layouts: dayAdvances.map((a) => (isValidLayout(a.layout) ? a.layout : [])),
-      fieldValues: fieldValuesByDay.get(dayId) ?? new Map<string, string>(),
-      requiredCategoryIds,
-      dayFileCategoryIds,
-      manualStatuses: dayAdvances.map((a) => a.status),
-    });
-    // Zilele fără obligatorii ȘI fără advance-uri (progress.total === 0)
-    // rămân neincluse — comportamentul vechi (advance: null) persistă.
-    if (progress.total > 0) {
-      progressOfDay.set(dayId, { done: progress.done, total: progress.total });
-    }
+  for (const [dayId, progress] of progressOfDayRaw) {
+    if (progress.total > 0) progressOfDay.set(dayId, { done: progress.done, total: progress.total });
   }
 
   const timeline = buildArtistTimeline(dayRows, advances, progressOfDay);

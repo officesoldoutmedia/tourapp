@@ -864,7 +864,8 @@
     "advance": "Advancing",
     "filterAll": "Toți artiștii",
     "prevMonth": "Luna anterioară",
-    "nextMonth": "Luna următoare"
+    "nextMonth": "Luna următoare",
+    "filesOverdue": "Fișiere întârziate"
   },
   "artist": {
     "tabDates": "Date",

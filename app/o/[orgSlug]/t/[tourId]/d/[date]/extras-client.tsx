@@ -285,11 +285,18 @@ export function AttachmentsSection({
       if (list) list.push(chain);
       else grouped.set(key, [chain]);
     }
+    const knownIds = new Set(categories.map((cat) => cat.id));
     const sections = categories
       .filter((cat) => grouped.has(cat.id))
       .map((cat) => ({ id: cat.id, name: cat.name, chains: grouped.get(cat.id)! }));
-    const uncategorized = grouped.get("");
-    if (uncategorized) sections.push({ id: "", name: t("uncategorized"), chains: uncategorized });
+    // Bucket-ul „Fără categorie" strânge atât fișierele fără categorie
+    // (key "") cât și cele cu un category_id care nu mai există în lista
+    // de categorii primite (categorie soft-deleted) — altfel dispar din UI
+    // fără nicio cale de recuperare [review fix #1].
+    const uncategorized = [...grouped.entries()]
+      .filter(([key]) => key === "" || !knownIds.has(key))
+      .flatMap(([, list]) => list);
+    if (uncategorized.length > 0) sections.push({ id: "", name: t("uncategorized"), chains: uncategorized });
     return sections;
   }, [chains, categories, t]);
 

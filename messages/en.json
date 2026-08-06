@@ -864,7 +864,8 @@
     "advance": "Advancing",
     "filterAll": "All artists",
     "prevMonth": "Previous month",
-    "nextMonth": "Next month"
+    "nextMonth": "Next month",
+    "filesOverdue": "Files overdue"
   },
   "artist": {
     "tabDates": "Dates",
