@@ -6,6 +6,13 @@
 
 select id as org_id from public.organizations limit 1 \gset
 
+-- Al doilea org (superuser, fără rol) — doar pentru proba de mai jos cu
+-- organization_id nepotrivit pe insert (with-check trebuie să lege rândul
+-- de org-ul REAL al turului, nu de orice organization_id trimis de client).
+insert into public.organizations (name, slug, org_type, owner_id)
+values ('SxS Cross', 'sxs-cross', 'music', 'a0000000-0000-0000-0000-00000000000a')
+returning id as org2_id \gset
+
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-00000000000a"}', false);
 set role authenticated;
 
@@ -69,8 +76,23 @@ do $$ begin
 end $$;
 \echo 'PASS: restrictia pe artist ascunde artist_parties si tour_parties'
 
--- ── Cleanup ──
+-- ── organization_id nepotrivit e respins (leagă write-ul de tour_id) ──
 select set_config('request.jwt.claims', '{"sub":"a0000000-0000-0000-0000-00000000000a"}', false);
+do $$ declare org2 uuid; tid uuid; begin
+  select id into org2 from public.organizations where slug = 'sxs-cross';
+  select id into tid from public.tours
+    where deleted_at is null and bucket_year is null limit 1;
+  begin
+    insert into public.tour_parties (organization_id, tour_id, name)
+    values (org2, tid, 'CROSS');
+    raise exception 'FAIL: adminul a creat tour_party cu organization_id nepotrivit fata de tur';
+  exception when others then
+    if sqlerrm like 'FAIL%' then raise; end if;
+  end;
+end $$;
+\echo 'PASS: insert cu organization_id nepotrivit e respins de with-check'
+
+-- ── Cleanup ──
 delete from public.visibility_rules
   where subject_type = 'artist' and subject_id = :'artist_id';
 update public.tour_personnel set party_id = null where party_id = :'tp_id';
@@ -78,3 +100,4 @@ delete from public.tour_parties where id = :'tp_id';
 delete from public.artist_parties where id = :'ap_id';
 
 reset role;
+delete from public.organizations where slug = 'sxs-cross';

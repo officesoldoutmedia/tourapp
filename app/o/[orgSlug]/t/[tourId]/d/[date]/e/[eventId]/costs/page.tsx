@@ -45,6 +45,8 @@ async function upsertCostLine(
       })
       .eq("id", existing.id);
   } else {
+    // Decizia owner-ului: diurna/transportul sunt interne (nu billable la
+    // booker) by default — toggle-ul rămâne editabil per linie.
     await supabase.from("show_costs").insert({
       event_id: eventId,
       kind: "extra",
@@ -52,6 +54,7 @@ async function upsertCostLine(
       amount: line.amount,
       currency: line.currency,
       generated_key: line.key,
+      billable_to_booker: false,
       updated_by: userId,
     });
   }

@@ -70,6 +70,21 @@ where tp.tour_id = p.tour_id and tp.name = p.party
   and p.party_id is null;
 
 -- ── RLS ─────────────────────────────────────────────────────────────
+-- Helper §5.2 (mirror private.tour_org din 00004): org-ul REAL al rândului,
+-- nu cel trimis de client — insert/update/delete leagă write-ul de artist_id/
+-- tour_id, la fel ca restul tabelelor de conținut de tur.
+create or replace function private.artist_org(artist uuid)
+returns uuid
+language sql
+stable
+security definer
+set search_path = ''
+as $$
+  select organization_id from public.artists where id = artist;
+$$;
+
+grant execute on all functions in schema private to authenticated;
+
 alter table public.artist_parties enable row level security;
 
 create policy artist_parties_select on public.artist_parties
@@ -81,14 +96,20 @@ create policy artist_parties_select on public.artist_parties
   );
 create policy artist_parties_insert on public.artist_parties
   for insert to authenticated
-  with check (private.can_edit_tour_content(organization_id));
+  with check (
+    private.can_edit_tour_content(private.artist_org(artist_id))
+    and organization_id = private.artist_org(artist_id)
+  );
 create policy artist_parties_update on public.artist_parties
   for update to authenticated
-  using (private.can_edit_tour_content(organization_id))
-  with check (private.can_edit_tour_content(organization_id));
+  using (private.can_edit_tour_content(private.artist_org(artist_id)))
+  with check (
+    private.can_edit_tour_content(private.artist_org(artist_id))
+    and organization_id = private.artist_org(artist_id)
+  );
 create policy artist_parties_delete on public.artist_parties
   for delete to authenticated
-  using (private.can_edit_tour_content(organization_id));
+  using (private.can_edit_tour_content(private.artist_org(artist_id)));
 
 alter table public.tour_parties enable row level security;
 
@@ -100,11 +121,17 @@ create policy tour_parties_select on public.tour_parties
   );
 create policy tour_parties_insert on public.tour_parties
   for insert to authenticated
-  with check (private.can_edit_tour_content(organization_id));
+  with check (
+    private.can_edit_tour_content(private.tour_org(tour_id))
+    and organization_id = private.tour_org(tour_id)
+  );
 create policy tour_parties_update on public.tour_parties
   for update to authenticated
-  using (private.can_edit_tour_content(organization_id))
-  with check (private.can_edit_tour_content(organization_id));
+  using (private.can_edit_tour_content(private.tour_org(tour_id)))
+  with check (
+    private.can_edit_tour_content(private.tour_org(tour_id))
+    and organization_id = private.tour_org(tour_id)
+  );
 create policy tour_parties_delete on public.tour_parties
   for delete to authenticated
-  using (private.can_edit_tour_content(organization_id));
+  using (private.can_edit_tour_content(private.tour_org(tour_id)));
