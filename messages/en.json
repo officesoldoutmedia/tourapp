@@ -643,7 +643,12 @@
     "addPerson": "Add person",
     "addHint": "After adding, open the profile to set the photo, contact, costs and payment details.",
     "filter": "Filter people…",
-    "noMatches": "No people match the filter."
+    "noMatches": "No people match the filter.",
+    "partiesTitle": "Parties",
+    "partyLabel": "Party",
+    "noParty": "—",
+    "perDiem": "Per diem",
+    "addParty": "Add party"
   },
   "tourSettings": {
     "title": "Tour settings",

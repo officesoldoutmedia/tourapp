@@ -643,7 +643,12 @@
     "addPerson": "Adaugă persoană",
     "addHint": "După adăugare, deschide profilul pentru poza, contactul, costurile și datele de plată.",
     "filter": "Filtrează persoane…",
-    "noMatches": "Nicio persoană nu se potrivește filtrului."
+    "noMatches": "Nicio persoană nu se potrivește filtrului.",
+    "partiesTitle": "Parties",
+    "partyLabel": "Party",
+    "noParty": "—",
+    "perDiem": "Diurnă",
+    "addParty": "Adaugă party"
   },
   "tourSettings": {
     "title": "Setări tur",

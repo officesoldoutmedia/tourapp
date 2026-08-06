@@ -5,8 +5,9 @@
 import { useState, useTransition } from "react";
 import Link from "next/link";
 import { useTranslations } from "next-intl";
-import { ChevronRight } from "lucide-react";
+import { ChevronRight, Users } from "lucide-react";
 import { PageHeader } from "@/components/ui/PageHeader";
+import { TourParties, type TourPartyData } from "./parties-client";
 
 export interface PersonRow {
   id: string;
@@ -22,18 +23,21 @@ export function PersonnelClient({
   orgSlug,
   tourId,
   rows,
+  parties,
   canEdit,
   addAction,
 }: {
   orgSlug: string;
   tourId: string;
   rows: PersonRow[];
+  parties: TourPartyData[];
   canEdit: boolean;
   addAction: (formData: FormData) => Promise<void>;
 }) {
   const t = useTranslations("personnel");
   const [query, setQuery] = useState("");
   const [adding, setAdding] = useState(false);
+  const [showParties, setShowParties] = useState(false);
   const [pending, startTransition] = useTransition();
 
   const filtered = query.trim()
@@ -59,6 +63,15 @@ export function PersonnelClient({
               className="h-8 w-[220px] rounded-[8px] border border-hairline bg-inset px-3 text-[12.5px] text-primary outline-none placeholder:text-tertiary"
             />
             {canEdit && (
+              <button
+                onClick={() => setShowParties((v) => !v)}
+                className={`btn-quiet h-8 ${showParties ? "bg-fill-segment-active text-primary" : ""}`}
+              >
+                <Users size={13} strokeWidth={1.75} className="mr-1 inline" />
+                {t("partiesTitle")}
+              </button>
+            )}
+            {canEdit && (
               <button onClick={() => setAdding((v) => !v)} className="btn-quiet h-8">
                 {t("addPerson")}
               </button>
@@ -68,6 +81,12 @@ export function PersonnelClient({
       />
 
       <div className="mx-auto w-full max-w-[960px] px-8">
+        {canEdit && showParties && (
+          <div className="pt-4">
+            <TourParties orgSlug={orgSlug} tourId={tourId} parties={parties} />
+          </div>
+        )}
+
         {canEdit && adding && (
           <form
             action={(fd) => startTransition(() => addAction(fd))}

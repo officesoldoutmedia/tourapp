@@ -31,16 +31,33 @@ export default async function CrewProfilePage({
   const canAccounting = can({ tier, permission }, "view_accounting");
   const canEditAccounting = can({ tier, permission }, "edit_accounting");
 
-  const { data: person } = await supabase
-    .from("tour_personnel")
-    .select("*")
-    .eq("id", personnelId)
-    .is("deleted_at", null)
-    .maybeSingle();
+  const tp = await getTranslations("personnel");
+
+  const [{ data: person }, { data: parties }] = await Promise.all([
+    supabase
+      .from("tour_personnel")
+      .select("*")
+      .eq("id", personnelId)
+      .is("deleted_at", null)
+      .maybeSingle(),
+    supabase
+      .from("tour_parties")
+      .select("id, name")
+      .eq("tour_id", tourId)
+      .is("deleted_at", null)
+      .order("sort_order")
+      .order("created_at"),
+  ]);
   if (!person) notFound();
 
   const name = [person.first_name, person.last_name].filter(Boolean).join(" ") || "—";
   const billing = (person.billing_details ?? {}) as Record<string, string>;
+  const partyOptions = parties ?? [];
+  // FK are prioritate; textul liber vechi rămâne vizibil doar pentru
+  // rândurile nemigrate (party_id null dar party text existent).
+  const partyName = person.party_id
+    ? (partyOptions.find((p) => p.id === person.party_id)?.name ?? null)
+    : person.party;
 
   const photoUrl = person.photo_path
     ? (
@@ -189,9 +206,9 @@ export default async function CrewProfilePage({
                 {(person.emails as { email?: string }[])[0].email}
               </a>
             )}
-            {person.party && (
+            {partyName && (
               <span className="rounded-full bg-accent-subtle px-2 text-xs font-bold uppercase leading-5 text-accent">
-                {person.party}
+                {partyName}
               </span>
             )}
           </p>
@@ -229,7 +246,6 @@ export default async function CrewProfilePage({
                 ["role", t("role"), person.role],
                 ["title", t("jobTitle"), person.title],
                 ["company", t("companyLabel"), person.company],
-                ["party", t("party"), person.party],
                 ["phone", t("phone"), (person.phones as { number?: string }[])?.[0]?.number],
                 ["email", t("email"), (person.emails as { email?: string }[])?.[0]?.email],
               ] as const
@@ -243,6 +259,21 @@ export default async function CrewProfilePage({
                 />
               </label>
             ))}
+            <label className="min-w-36 flex-1 space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
+              {tp("partyLabel")}
+              <select
+                name="party_id"
+                defaultValue={person.party_id ?? ""}
+                className={`${input} block w-full`}
+              >
+                <option value="">{tp("noParty")}</option>
+                {partyOptions.map((p) => (
+                  <option key={p.id} value={p.id}>
+                    {p.name}
+                  </option>
+                ))}
+              </select>
+            </label>
             <button className="btn-quiet">{t("save")}</button>
           </form>
         </section>

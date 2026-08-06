@@ -21,16 +21,28 @@ export default async function PersonnelPage({
   const canEdit = can({ tier, permission }, "edit_tour_content");
   const canSeeCosts = can({ tier, permission }, "view_accounting");
 
-  const [{ data: tour }, { data: people }] = await Promise.all([
+  const [{ data: tour }, { data: people }, { data: parties }] = await Promise.all([
     supabase.from("tours").select("id, name").eq("id", tourId).is("deleted_at", null).maybeSingle(),
     supabase
       .from("tour_personnel")
-      .select("id, first_name, last_name, role, company, party, phones, cost_per_show, cost_currency, payment_type")
+      .select(
+        "id, first_name, last_name, role, company, party, party_id, phones, cost_per_show, cost_currency, payment_type",
+      )
       .eq("tour_id", tourId)
       .is("deleted_at", null)
       .order("last_name"),
+    supabase
+      .from("tour_parties")
+      .select("id, name, per_diem_rate, per_diem_currency")
+      .eq("tour_id", tourId)
+      .is("deleted_at", null)
+      .order("sort_order")
+      .order("created_at"),
   ]);
   if (!tour) notFound();
+
+  const tourParties = parties ?? [];
+  const partyNameById = new Map(tourParties.map((p) => [p.id, p.name]));
 
   async function addPerson(formData: FormData) {
     "use server";
@@ -61,6 +73,7 @@ export default async function PersonnelPage({
     role: string | null;
     company: string | null;
     party: string | null;
+    party_id: string | null;
     phones: { number?: string }[];
     cost_per_show: number | null;
     cost_currency: string;
@@ -75,7 +88,9 @@ export default async function PersonnelPage({
       [person.first_name?.[0], person.last_name?.[0]].filter(Boolean).join("").toUpperCase() ||
       "?",
     sub: [person.role, person.company].filter(Boolean).join(" · ") || "—",
-    party: person.party,
+    // FK are prioritate; textul liber vechi rămâne vizibil doar pentru
+    // rândurile nemigrate (party_id null dar party text existent).
+    party: person.party_id ? (partyNameById.get(person.party_id) ?? null) : person.party,
     phone: person.phones?.[0]?.number ?? null,
     cost:
       canSeeCosts && person.cost_per_show != null
@@ -88,6 +103,7 @@ export default async function PersonnelPage({
       orgSlug={orgSlug}
       tourId={tourId}
       rows={listRows}
+      parties={tourParties}
       canEdit={canEdit}
       addAction={addPerson}
     />

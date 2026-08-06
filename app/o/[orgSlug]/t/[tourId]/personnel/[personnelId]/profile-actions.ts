@@ -50,12 +50,18 @@ export async function saveIdentity(
       role: String(formData.get("role") ?? "").trim() || null,
       title: String(formData.get("title") ?? "").trim() || null,
       company: String(formData.get("company") ?? "").trim() || null,
-      party: String(formData.get("party") ?? "").trim() || null,
+      // party e acum select-uit din tour_parties (FK) — nu mai scriem
+      // coloana text liberă `party`; ea rămâne doar ca fallback de
+      // afișare pentru rândurile nemigrate (vezi personnel/page.tsx).
+      party_id: String(formData.get("party_id") ?? "") || null,
       phones: phone ? [{ number: phone }] : [],
       emails: email ? [{ email }] : [],
     })
     .eq("id", personnelId);
   revalidatePath(profilePath(orgSlug, tourId, personnelId));
+  // capsula de party din listă depinde de același party_id — revalidăm
+  // și lista, la fel ca setPersonnelParty (parties-actions.ts).
+  revalidatePath(`/o/${orgSlug}/t/${tourId}/personnel`);
 }
 
 export async function saveBillingDetails(
