@@ -176,7 +176,9 @@ export default async function DayPage({
         .order("due_at", { ascending: true, nullsFirst: false }),
       supabase
         .from("attachments")
-        .select("id, file_name, size_bytes, tags, category_id, status, due_date, supersedes_id, created_at")
+        .select(
+          "id, file_name, size_bytes, tags, storage_path, category_id, status, due_date, supersedes_id, created_at",
+        )
         .eq("parent_type", "day")
         .eq("parent_id", day.id)
         .is("deleted_at", null)
