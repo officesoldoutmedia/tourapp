@@ -862,7 +862,16 @@
     "filesTitle": "Fișierele artistului",
     "filesHint": "Rider tehnic, hospitality, press — se vor moșteni în event-uri.",
     "upload": "Încarcă",
-    "noFiles": "Niciun fișier."
+    "noFiles": "Niciun fișier.",
+    "groundRateLabel": "Rată transport (per km)",
+    "groundRateHint": "Folosită la calculul costului de transport din home base.",
+    "partiesTitle": "Travel parties",
+    "partiesHint": "Se copiază în fiecare tur/show nou; diurnă per persoană per zi.",
+    "partyName": "Nume party",
+    "perDiem": "Diurnă",
+    "addParty": "Adaugă party",
+    "deleteParty": "Șterge",
+    "noParties": "Niciun party încă."
   },
   "newEvent": {
     "title": "Show nou",

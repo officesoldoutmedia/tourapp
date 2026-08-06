@@ -6,6 +6,7 @@ import { allTimezones, DEFAULT_TZ } from "@/lib/tzLookup";
 import { ARTIST_COLORS } from "@/app/o/[orgSlug]/artists/new/colors";
 import { ArtistPhoto } from "./photo-client";
 import { ProfileForm } from "./form";
+import { ArtistParties } from "./parties-client";
 
 const CURRENCIES = ["EUR", "RON", "USD", "GBP"];
 
@@ -26,13 +27,20 @@ export default async function ArtistProfilePage({
   const { data: artist } = await supabase
     .from("artists")
     .select(
-      "id, name, slug, legal_name, home_base_city, default_currency, timezone, color, links, photo_path, is_archived",
+      "id, name, slug, legal_name, home_base_city, default_currency, timezone, color, links, photo_path, is_archived, ground_rate_per_km, ground_rate_currency",
     )
     .eq("organization_id", org.id)
     .eq("slug", artistSlug)
     .is("deleted_at", null)
     .maybeSingle();
   if (!artist) notFound();
+
+  const { data: parties } = await supabase
+    .from("artist_parties")
+    .select("id, name, per_diem_rate, per_diem_currency")
+    .eq("artist_id", artist.id)
+    .is("deleted_at", null)
+    .order("sort_order");
 
   const photoUrl = artist.photo_path
     ? ((await supabase.storage.from("attachments").createSignedUrl(artist.photo_path, 3600))
@@ -78,8 +86,24 @@ export default async function ArtistProfilePage({
             youtube: links.youtube ?? "",
             website: links.website ?? "",
           },
+          groundRatePerKm: artist.ground_rate_per_km != null ? String(artist.ground_rate_per_km) : "",
+          groundRateCurrency: artist.ground_rate_currency ?? "",
         }}
       />
+
+      <div className="space-y-2">
+        <h3 className="font-display text-[13.5px] font-semibold tracking-tight text-primary">
+          {t("partiesTitle")}
+        </h3>
+        <p className="text-[11.5px] text-tertiary">{t("partiesHint")}</p>
+        <ArtistParties
+          orgSlug={orgSlug}
+          artistSlug={artistSlug}
+          artistId={artist.id}
+          currencies={CURRENCIES}
+          parties={parties ?? []}
+        />
+      </div>
     </div>
   );
 }

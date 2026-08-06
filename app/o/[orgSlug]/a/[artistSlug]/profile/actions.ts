@@ -84,6 +84,13 @@ export async function saveArtistProfile(
         youtube: String(formData.get("link_youtube") ?? "").trim() || undefined,
         website: String(formData.get("link_website") ?? "").trim() || undefined,
       },
+      ground_rate_per_km: (() => {
+        const raw = String(formData.get("ground_rate_per_km") ?? "").trim();
+        const n = Number(raw);
+        return raw && Number.isFinite(n) && n > 0 ? n : null;
+      })(),
+      ground_rate_currency:
+        String(formData.get("ground_rate_currency") ?? "").trim() || null,
     })
     .eq("id", artistId);
   if (error) return { error: error.message };
@@ -107,6 +114,93 @@ export async function setArtistPhoto(
   // doar pe tabul de profil.
   revalidatePath(`/o/${orgSlug}/a/${artistSlug}/profile`);
   revalidatePath(`/o/${orgSlug}`, "layout");
+  return {};
+}
+
+export async function saveArtistParty(
+  orgSlug: string,
+  artistSlug: string,
+  artistId: string,
+  input: { id?: string; name: string; perDiemRate: number | null; perDiemCurrency: string },
+): Promise<{ error?: string }> {
+  const { supabase, org, user } = await requireManage(orgSlug);
+  const name = input.name.trim();
+  if (!name) return { error: "invalid" };
+  const rate =
+    input.perDiemRate != null && Number.isFinite(input.perDiemRate) && input.perDiemRate > 0
+      ? input.perDiemRate
+      : null;
+  const payload = {
+    name,
+    per_diem_rate: rate,
+    per_diem_currency: rate ? input.perDiemCurrency || "EUR" : null,
+  };
+  let error;
+  if (input.id) {
+    ({ error } = await supabase.from("artist_parties").update(payload).eq("id", input.id));
+  } else {
+    // sort_order la insert = numărul de siblings existenți (nedelete), ca
+    // noul party să aterizeze la finalul listei fără să reordonăm restul.
+    const { count } = await supabase
+      .from("artist_parties")
+      .select("id", { count: "exact", head: true })
+      .eq("artist_id", artistId)
+      .is("deleted_at", null);
+    ({ error } = await supabase.from("artist_parties").insert({
+      ...payload,
+      organization_id: org.id,
+      artist_id: artistId,
+      created_by: user.id,
+      sort_order: count ?? 0,
+    }));
+  }
+  if (error) return { error: error.message };
+  revalidatePath(`/o/${orgSlug}/a/${artistSlug}/profile`);
+  return {};
+}
+
+export async function deleteArtistParty(
+  orgSlug: string,
+  artistSlug: string,
+  partyId: string,
+): Promise<{ error?: string }> {
+  const { supabase } = await requireManage(orgSlug);
+  const { error } = await supabase
+    .from("artist_parties")
+    .update({ deleted_at: new Date().toISOString() })
+    .eq("id", partyId);
+  if (error) return { error: error.message };
+  revalidatePath(`/o/${orgSlug}/a/${artistSlug}/profile`);
+  return {};
+}
+
+export async function moveArtistParty(
+  orgSlug: string,
+  artistSlug: string,
+  partyId: string,
+  direction: "up" | "down",
+): Promise<{ error?: string }> {
+  const { supabase } = await requireManage(orgSlug);
+  const { data: row } = await supabase
+    .from("artist_parties")
+    .select("id, artist_id, sort_order")
+    .eq("id", partyId)
+    .maybeSingle();
+  if (!row) return { error: "not_found" };
+  const { data: siblings } = await supabase
+    .from("artist_parties")
+    .select("id, sort_order")
+    .eq("artist_id", row.artist_id)
+    .is("deleted_at", null)
+    .order("sort_order")
+    .order("created_at");
+  const list = siblings ?? [];
+  const idx = list.findIndex((s) => s.id === partyId);
+  const swap = direction === "up" ? idx - 1 : idx + 1;
+  if (idx < 0 || swap < 0 || swap >= list.length) return {};
+  await supabase.from("artist_parties").update({ sort_order: swap }).eq("id", list[idx].id);
+  await supabase.from("artist_parties").update({ sort_order: idx }).eq("id", list[swap].id);
+  revalidatePath(`/o/${orgSlug}/a/${artistSlug}/profile`);
   return {};
 }
 

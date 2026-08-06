@@ -38,6 +38,8 @@ export function ProfileForm({
     timezone: string;
     color: string;
     links: Links;
+    groundRatePerKm: string;
+    groundRateCurrency: string;
   };
 }) {
   const t = useTranslations("artist");
@@ -88,6 +90,33 @@ export function ProfileForm({
           <input name="home_base_city" defaultValue={initial.homeBaseCity} className={input} />
           <span className="block text-[11px] text-tertiary">{t("homeBaseHint")}</span>
         </label>
+
+        <div className="space-y-1.5">
+          <span className={label}>{t("groundRateLabel")}</span>
+          <div className="grid grid-cols-[1fr_110px] gap-3">
+            <input
+              name="ground_rate_per_km"
+              type="number"
+              step="0.01"
+              min="0"
+              defaultValue={initial.groundRatePerKm}
+              className={input}
+            />
+            <select
+              name="ground_rate_currency"
+              defaultValue={initial.groundRateCurrency}
+              className={input}
+            >
+              <option value="">—</option>
+              {currencies.map((c) => (
+                <option key={c} value={c}>
+                  {c}
+                </option>
+              ))}
+            </select>
+          </div>
+          <span className="block text-[11px] text-tertiary">{t("groundRateHint")}</span>
+        </div>
 
         <div className="grid grid-cols-2 gap-4">
           <label className="block space-y-1">

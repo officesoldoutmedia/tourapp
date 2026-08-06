@@ -862,7 +862,16 @@
     "filesTitle": "Artist files",
     "filesHint": "Tech rider, hospitality, press — will be inherited by events.",
     "upload": "Upload",
-    "noFiles": "No files."
+    "noFiles": "No files.",
+    "groundRateLabel": "Ground rate (per km)",
+    "groundRateHint": "Used to compute ground transport cost from home base.",
+    "partiesTitle": "Travel parties",
+    "partiesHint": "Copied into every new tour/show; per diem is per person per day.",
+    "partyName": "Party name",
+    "perDiem": "Per diem",
+    "addParty": "Add party",
+    "deleteParty": "Delete",
+    "noParties": "No parties yet."
   },
   "newEvent": {
     "title": "New show",
