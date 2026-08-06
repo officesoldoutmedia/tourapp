@@ -446,11 +446,20 @@ export default async function DayPage({
     (c) => (c as { is_required?: boolean }).is_required,
   );
 
+  // Zi cu mai multe event-uri pe același field_key → „completat pe oricare
+  // event" câștigă, indiferent de ordinea (nedeterministă) a rândurilor din
+  // DB; semantica per-event fină e follow-up [SP3b Task 5 fix].
+  const fieldValues = new Map<string, string>();
+  for (const r of fieldValueRows ?? []) {
+    const v = r.value ?? "";
+    if (v.trim() !== "" || !fieldValues.has(r.field_key)) {
+      fieldValues.set(r.field_key, v);
+    }
+  }
+
   const progress = computeAdvanceProgress({
     layouts: advanceRows.map((a) => (isValidLayout(a.layout) ? a.layout : [])),
-    fieldValues: new Map(
-      (fieldValueRows ?? []).map((r) => [r.field_key, r.value ?? ""]),
-    ),
+    fieldValues,
     requiredCategoryIds: requiredCats.map((c) => c.id),
     dayFileCategoryIds: realDayFileCategoryIds,
     manualStatuses: advanceStatuses,
