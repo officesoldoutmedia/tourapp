@@ -64,9 +64,12 @@ export async function setPersonnelParty(
   partyId: string | null,
 ): Promise<{ error?: string }> {
   const { supabase } = await requireEditor(orgSlug);
+  // La fel ca saveIdentity (profile-actions.ts): golim și coloana legacy
+  // `party`, altfel alegerea „—" (partyId null) reafișează stale textul
+  // vechi prin fallback-ul de afișare din personnel/page.tsx.
   const { error } = await supabase
     .from("tour_personnel")
-    .update({ party_id: partyId })
+    .update({ party_id: partyId, party: null })
     .eq("id", personnelId);
   if (error) return { error: error.message };
   // Chemat fie din lista de personnel, fie din profilul persoanei — cea

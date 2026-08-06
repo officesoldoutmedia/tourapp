@@ -50,10 +50,14 @@ export async function saveIdentity(
       role: String(formData.get("role") ?? "").trim() || null,
       title: String(formData.get("title") ?? "").trim() || null,
       company: String(formData.get("company") ?? "").trim() || null,
-      // party e acum select-uit din tour_parties (FK) — nu mai scriem
-      // coloana text liberă `party`; ea rămâne doar ca fallback de
-      // afișare pentru rândurile nemigrate (vezi personnel/page.tsx).
+      // party e acum select-uit din tour_parties (FK). Backfill-ul din
+      // migrarea 00029 a copiat textul vechi în party_id pentru TOATE
+      // rândurile nenule — deci textul liber rămas pe coloana `party` e
+      // acum doar un fallback „mort" care ar reapărea dacă userul alege
+      // „—" (party_id -> null) fără să golim și textul. Orice formular
+      // care scrie party_id retrage explicit și coloana legacy.
       party_id: String(formData.get("party_id") ?? "") || null,
+      party: null,
       phones: phone ? [{ number: phone }] : [],
       emails: email ? [{ email }] : [],
     })
