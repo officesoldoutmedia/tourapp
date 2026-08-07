@@ -3,6 +3,7 @@
     "appName": "TourApp",
     "loading": "Se încarcă…",
     "save": "Salvează",
+    "edit": "Editează",
     "cancel": "Anulează",
     "delete": "Șterge",
     "error": "A apărut o eroare. Încearcă din nou.",
@@ -147,6 +148,30 @@
     "noItems": "Niciun item în program.",
     "delete": "Șterge",
     "edit": "Editează"
+  },
+  "scheduleTemplates": {
+    "title": "Template-uri de program",
+    "hint": "Itemii „Relativ la show” se generează din stage time (T) și se mută cu „Recalculează”. Itemii „Oră fixă” rămân pe ceas.",
+    "empty": "Niciun template încă. Salvează unul dintr-o zi („Save as template”) sau creează unul gol.",
+    "add": "Template nou",
+    "delete": "Șterge template-ul",
+    "nameLabel": "Nume",
+    "itemCount": "{count, plural, one {# item} few {# itemi} other {# de itemi}}",
+    "hasShowAnchors": "cu offset-uri de show",
+    "itemTitle": "Titlu",
+    "anchorLabel": "Ancoră",
+    "anchorDay": "Oră fixă",
+    "anchorShow": "Relativ la show",
+    "directionLabel": "Direcție",
+    "before": "Înainte de show",
+    "after": "După show",
+    "offsetMinutes": "Minute",
+    "fixedTime": "Ora",
+    "durationMin": "Durată (min)",
+    "addItem": "Adaugă item",
+    "deleteItem": "Șterge itemul",
+    "moveUp": "Mută mai sus",
+    "moveDown": "Mută mai jos"
   },
   "fields": {
     "venue_info": {

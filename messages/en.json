@@ -3,6 +3,7 @@
     "appName": "TourApp",
     "loading": "Loading…",
     "save": "Save",
+    "edit": "Edit",
     "cancel": "Cancel",
     "delete": "Delete",
     "error": "Something went wrong. Please try again.",
@@ -147,6 +148,30 @@
     "noItems": "No schedule items yet.",
     "delete": "Delete",
     "edit": "Edit"
+  },
+  "scheduleTemplates": {
+    "title": "Schedule templates",
+    "hint": "\"Relative to show\" items are generated from stage time (T) and move with \"Recalculate\". \"Fixed time\" items stay on the clock.",
+    "empty": "No templates yet. Save one from a day (\"Save as template\") or create an empty one.",
+    "add": "New template",
+    "delete": "Delete template",
+    "nameLabel": "Name",
+    "itemCount": "{count, plural, one {# item} other {# items}}",
+    "hasShowAnchors": "with show offsets",
+    "itemTitle": "Title",
+    "anchorLabel": "Anchor",
+    "anchorDay": "Fixed time",
+    "anchorShow": "Relative to show",
+    "directionLabel": "Direction",
+    "before": "Before show",
+    "after": "After show",
+    "offsetMinutes": "Minutes",
+    "fixedTime": "Time",
+    "durationMin": "Duration (min)",
+    "addItem": "Add item",
+    "deleteItem": "Delete item",
+    "moveUp": "Move up",
+    "moveDown": "Move down"
   },
   "fields": {
     "venue_info": {
