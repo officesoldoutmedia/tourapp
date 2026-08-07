@@ -91,6 +91,7 @@ export async function generateContractDocument(
         .from("issuing_entities")
         .select("name, cui, reg_com, address, iban, bank, representative")
         .eq("id", template.issuing_entity_id)
+        .eq("organization_id", org.id)
         .is("deleted_at", null)
         .maybeSingle()
     : { data: null };
@@ -259,7 +260,7 @@ export async function recordSignedContract(
   documentId: string,
   file: { storagePath: string; fileName: string; mimeType: string; sizeBytes: number },
   revalidate: string,
-): Promise<{ error?: string }> {
+): Promise<{ error?: string; attachmentError?: string }> {
   const { supabase, org, user } = await requireAccounting(orgSlug);
   const { data: doc } = await supabase
     .from("contract_documents")
@@ -276,7 +277,10 @@ export async function recordSignedContract(
     .eq("id", doc.id);
   if (error) return { error: error.message };
 
-  // anexă cu event → semnatul devine fișier REAL în categoria Admin pe zi
+  // anexă cu event → semnatul devine fișier REAL în categoria Admin pe zi;
+  // status-ul de mai sus a fost deja scris, deci un eșec aici NU retrage
+  // succesul principal — e semnalat separat, ca succes parțial.
+  let attachmentError: string | undefined;
   if (doc.kind === "annex" && doc.event_id) {
     const [{ data: ev }, { data: adminCat }] = await Promise.all([
       supabase
@@ -293,7 +297,7 @@ export async function recordSignedContract(
         .maybeSingle(),
     ]);
     if (ev?.day_id) {
-      await supabase.from("attachments").insert({
+      const { error: insertError } = await supabase.from("attachments").insert({
         organization_id: org.id,
         parent_type: "day",
         parent_id: ev.day_id,
@@ -305,8 +309,9 @@ export async function recordSignedContract(
         category_id: adminCat?.id ?? null,
         uploaded_by: user.id,
       });
+      if (insertError) attachmentError = insertError.message;
     }
   }
   revalidatePath(revalidate);
-  return {};
+  return attachmentError ? { attachmentError } : {};
 }
