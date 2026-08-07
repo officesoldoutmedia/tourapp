@@ -244,14 +244,20 @@ export async function applyScheduleTemplate(
   dayId: string,
   templateId: string,
 ): Promise<{ error?: string }> {
-  const { supabase, user } = await requireEditor(orgSlug);
+  const { supabase, user, org } = await requireEditor(orgSlug);
 
   const [{ data: day }, { data: template }, { data: existing }] = await Promise.all([
     supabase.from("days").select("date, timezone").eq("id", dayId).single(),
+    // Pin pe organizația apelantului (un editor multi-org nu poate aplica
+    // template-ul altei org) și exclude template-urile șterse soft — RLS le
+    // lasă vizibile la select. Același pattern ca la validarea deal-ului din
+    // wizard-ul de eveniment (events/new/form.tsx).
     supabase
       .from("schedule_templates")
       .select("items")
       .eq("id", templateId)
+      .eq("organization_id", org.id)
+      .is("deleted_at", null)
       .single(),
     supabase
       .from("schedule_items")

@@ -213,8 +213,14 @@ export function NewEventForm({
               setDealTemplateId(id);
               // C2: deal-ul aduce template-ul de program (§9.1) — doar dacă
               // are unul legat; alegerea manuală ulterioară rămâne posibilă.
+              // Reconciliat cu lista live de scheduleTemplates — un deal salvat
+              // înainte ca template-ul lui să fie șters (soft-delete) nu mai
+              // pre-completează un id mort (select-ul ar rămâne gol oricum).
               const tpl = artistDealTemplates.find((d) => d.id === id);
-              if (tpl?.schedule_template_id) {
+              if (
+                tpl?.schedule_template_id &&
+                scheduleTemplates.some((s) => s.id === tpl.schedule_template_id)
+              ) {
                 setScheduleTemplateId(tpl.schedule_template_id);
               }
             }}

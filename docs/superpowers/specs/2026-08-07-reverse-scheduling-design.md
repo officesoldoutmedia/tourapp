@@ -116,6 +116,11 @@ se mută doar orele.
 - Offset-uri validate la ±24h în editor.
 - Semantica existentă de aplicare a template-ului peste itemi existenți rămâne
   neschimbată (nu e scope-ul C2).
+- Notă post-review: ștergerea template-urilor e SOFT (`deleted_at`), deci FK-ul
+  `on delete set null` nu se declanșează niciodată — curățarea referințelor e
+  la nivel de aplicație (reconciliere în clienți + graceful-clear la salvarea
+  deal-ului + filtrul `deleted_at` la aplicare). Orice consumator viitor al
+  `schedule_template_id` trebuie să repete pattern-ul.
 
 ## 5. Migrare, testare
 
