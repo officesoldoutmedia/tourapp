@@ -971,6 +971,7 @@
     "nights": "Nights",
     "categoryLabel": "Hotel category",
     "requiredLabel": "Required files for this show type",
+    "scheduleTemplateLabel": "Schedule template",
     "add": "Add template",
     "save": "Save",
     "delete": "Delete",

@@ -42,7 +42,7 @@ export default async function NewEventPage({
         .order("title"),
       supabase
         .from("deal_templates")
-        .select("id, name, artist_id")
+        .select("id, name, artist_id, schedule_template_id")
         .eq("organization_id", org.id)
         .is("deleted_at", null)
         .order("sort_order")

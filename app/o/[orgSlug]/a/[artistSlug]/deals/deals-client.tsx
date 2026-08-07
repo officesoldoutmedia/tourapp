@@ -31,9 +31,15 @@ export interface DealTemplateData {
   landed_items: unknown;
   accommodation: unknown;
   required_category_ids: string[] | null;
+  schedule_template_id: string | null;
 }
 
 export interface FileCategoryData {
+  id: string;
+  name: string;
+}
+
+export interface ScheduleTemplateData {
   id: string;
   name: string;
 }
@@ -65,6 +71,7 @@ interface FormState {
   nights: string;
   category: string;
   requiredCategoryIds: string[];
+  scheduleTemplateId: string;
 }
 
 function emptyForm(currencies: string[], name = ""): FormState {
@@ -80,6 +87,7 @@ function emptyForm(currencies: string[], name = ""): FormState {
     nights: "",
     category: "",
     requiredCategoryIds: [],
+    scheduleTemplateId: "",
   };
 }
 
@@ -103,6 +111,7 @@ function formFromTemplate(tpl: DealTemplateData, currencies: string[]): FormStat
     nights: typeof acc.nights === "number" ? String(acc.nights) : "",
     category: typeof acc.category === "string" ? acc.category : "",
     requiredCategoryIds: tpl.required_category_ids ?? [],
+    scheduleTemplateId: tpl.schedule_template_id ?? "",
   };
 }
 
@@ -122,6 +131,7 @@ function toPayload(id: string | undefined, form: FormState): DealTemplateInput {
     landedItems: form.landedItems,
     accommodation,
     requiredCategoryIds: form.requiredCategoryIds,
+    scheduleTemplateId: form.scheduleTemplateId || null,
   };
 }
 
@@ -144,6 +154,7 @@ export function DealTemplates({
   currencies,
   templates,
   categories,
+  scheduleTemplates,
 }: {
   orgSlug: string;
   artistSlug: string;
@@ -151,6 +162,7 @@ export function DealTemplates({
   currencies: string[];
   templates: DealTemplateData[];
   categories: FileCategoryData[];
+  scheduleTemplates: ScheduleTemplateData[];
 }) {
   const t = useTranslations("deals");
   const tc = useTranslations("common");
@@ -193,6 +205,11 @@ export function DealTemplates({
     return "—";
   }
 
+  function scheduleTemplateName(id: string | null): string | undefined {
+    if (!id) return undefined;
+    return scheduleTemplates.find((tpl) => tpl.id === id)?.name;
+  }
+
   return (
     <div className="space-y-3">
       {templates.length === 0 ? (
@@ -227,6 +244,14 @@ export function DealTemplates({
                   >
                     {Array.isArray(tpl.landed_items) ? tpl.landed_items.length : 0}
                   </span>
+                  {scheduleTemplateName(tpl.schedule_template_id) && (
+                    <span
+                      title={t("scheduleTemplateLabel")}
+                      className="rounded-full bg-fill-control px-2 py-0.5 text-[10.5px] text-tertiary"
+                    >
+                      {scheduleTemplateName(tpl.schedule_template_id)}
+                    </span>
+                  )}
                   <span className="flex shrink-0 items-center gap-1">
                     <button
                       type="button"
@@ -271,6 +296,7 @@ export function DealTemplates({
                     <DealTemplateForm
                       currencies={currencies}
                       categories={categories}
+                      scheduleTemplates={scheduleTemplates}
                       initial={formFromTemplate(tpl, currencies)}
                       pending={pending}
                       submitLabel={t("save")}
@@ -307,6 +333,7 @@ export function DealTemplates({
           key={createKey}
           currencies={currencies}
           categories={categories}
+          scheduleTemplates={scheduleTemplates}
           initial={emptyForm(currencies, prefillName)}
           pending={pending}
           submitLabel={t("add")}
@@ -325,6 +352,7 @@ export function DealTemplates({
 function DealTemplateForm({
   currencies,
   categories,
+  scheduleTemplates,
   initial,
   pending,
   submitLabel,
@@ -333,6 +361,7 @@ function DealTemplateForm({
 }: {
   currencies: string[];
   categories: FileCategoryData[];
+  scheduleTemplates: ScheduleTemplateData[];
   initial: FormState;
   pending: boolean;
   submitLabel: string;
@@ -567,6 +596,22 @@ function DealTemplateForm({
           </div>
         </div>
       )}
+
+      <label className="block space-y-1">
+        <span className="text-sm font-medium">{t("scheduleTemplateLabel")}</span>
+        <select
+          value={form.scheduleTemplateId}
+          onChange={(e) => setForm((f) => ({ ...f, scheduleTemplateId: e.target.value }))}
+          className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
+        >
+          <option value="">—</option>
+          {scheduleTemplates.map((tpl) => (
+            <option key={tpl.id} value={tpl.id}>
+              {tpl.name}
+            </option>
+          ))}
+        </select>
+      </label>
 
       <div className="flex justify-end gap-2">
         {onCancel && (

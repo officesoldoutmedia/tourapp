@@ -31,24 +31,31 @@ export default async function ArtistDealsPage({
   if (!artist) notFound();
   const artistId = artist.id;
 
-  const [{ data: templates }, { data: categories }] = await Promise.all([
-    supabase
-      .from("deal_templates")
-      .select(
-        "id, name, fee_amount, fee_currency, deal_basis, withholding_percent, landed_items, accommodation, required_category_ids",
-      )
-      .eq("artist_id", artistId)
-      .is("deleted_at", null)
-      .order("sort_order")
-      .order("created_at"),
-    supabase
-      .from("file_categories")
-      .select("id, name")
-      .eq("organization_id", org.id)
-      .is("deleted_at", null)
-      .order("sort_order")
-      .order("created_at"),
-  ]);
+  const [{ data: templates }, { data: categories }, { data: scheduleTemplates }] =
+    await Promise.all([
+      supabase
+        .from("deal_templates")
+        .select(
+          "id, name, fee_amount, fee_currency, deal_basis, withholding_percent, landed_items, accommodation, required_category_ids, schedule_template_id",
+        )
+        .eq("artist_id", artistId)
+        .is("deleted_at", null)
+        .order("sort_order")
+        .order("created_at"),
+      supabase
+        .from("file_categories")
+        .select("id, name")
+        .eq("organization_id", org.id)
+        .is("deleted_at", null)
+        .order("sort_order")
+        .order("created_at"),
+      supabase
+        .from("schedule_templates")
+        .select("id, name")
+        .eq("organization_id", org.id)
+        .is("deleted_at", null)
+        .order("name"),
+    ]);
 
   return (
     <div className="space-y-3">
@@ -63,6 +70,7 @@ export default async function ArtistDealsPage({
         currencies={CURRENCIES}
         templates={(templates ?? []) as DealTemplateData[]}
         categories={(categories ?? []) as FileCategoryData[]}
+        scheduleTemplates={scheduleTemplates ?? []}
       />
     </div>
   );

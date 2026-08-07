@@ -17,7 +17,12 @@ export function NewEventForm({
   artists: { id: string; name: string }[];
   scheduleTemplates: { id: string; name: string }[];
   advanceTemplates: { id: string; title: string }[];
-  dealTemplates: { id: string; name: string; artist_id: string }[];
+  dealTemplates: {
+    id: string;
+    name: string;
+    artist_id: string;
+    schedule_template_id: string | null;
+  }[];
   defaultArtistId?: string;
 }) {
   const t = useTranslations("newEvent");
@@ -203,7 +208,16 @@ export function NewEventForm({
           <span className="text-sm font-medium">{t("dealLabel")}</span>
           <select
             value={dealTemplateId}
-            onChange={(e) => setDealTemplateId(e.target.value)}
+            onChange={(e) => {
+              const id = e.target.value;
+              setDealTemplateId(id);
+              // C2: deal-ul aduce template-ul de program (§9.1) — doar dacă
+              // are unul legat; alegerea manuală ulterioară rămâne posibilă.
+              const tpl = artistDealTemplates.find((d) => d.id === id);
+              if (tpl?.schedule_template_id) {
+                setScheduleTemplateId(tpl.schedule_template_id);
+              }
+            }}
             className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
           >
             <option value="">{t("noDeal")}</option>

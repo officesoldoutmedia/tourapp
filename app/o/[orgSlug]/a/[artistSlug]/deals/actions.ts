@@ -35,6 +35,7 @@ export interface DealTemplateInput {
   landedItems: string[];
   accommodation: DealTemplateAccommodationInput;
   requiredCategoryIds: string[];
+  scheduleTemplateId: string | null;
 }
 
 const DEAL_BASIS_VALUES = new Set(["landed", "all_in", "fee_plus_costs"]);
@@ -73,6 +74,21 @@ export async function saveDealTemplate(
   const dealBasis =
     input.dealBasis && DEAL_BASIS_VALUES.has(input.dealBasis) ? input.dealBasis : null;
 
+  // C2: legătura deal → template de program. Validăm explicit org-ul —
+  // un membru multi-org ar putea trimite id-ul unui template din alt org
+  // (RLS pe deal_templates leagă artistul, nu template-ul de program).
+  let scheduleTemplateId: string | null = null;
+  if (input.scheduleTemplateId) {
+    const { data: tpl } = await supabase
+      .from("schedule_templates")
+      .select("id, organization_id")
+      .eq("id", input.scheduleTemplateId)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (!tpl || tpl.organization_id !== org.id) return { error: "invalid" };
+    scheduleTemplateId = tpl.id;
+  }
+
   const payload = {
     name,
     fee_amount: feeAmount,
@@ -82,6 +98,7 @@ export async function saveDealTemplate(
     landed_items: input.landedItems.map((s) => s.trim()).filter(Boolean),
     accommodation: normalizeAccommodation(input.accommodation),
     required_category_ids: input.requiredCategoryIds,
+    schedule_template_id: scheduleTemplateId,
   };
 
   let error;
