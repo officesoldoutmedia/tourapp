@@ -134,9 +134,11 @@ function TemplateForm({
   const t = useTranslations("scheduleTemplates");
   const tc = useTranslations("common");
   const [name, setName] = useState(initial?.name ?? "");
-  const [items, setItems] = useState<ScheduleTemplateItem[]>(initial?.items ?? []);
+  const [items, setItems] = useState<(ScheduleTemplateItem & { dir?: -1 | 1 })[]>(
+    initial?.items ?? [],
+  );
 
-  function patch(idx: number, part: Partial<ScheduleTemplateItem>) {
+  function patch(idx: number, part: Partial<ScheduleTemplateItem & { dir?: -1 | 1 }>) {
     setItems((list) => list.map((it, i) => (i === idx ? { ...it, ...part } : it)));
   }
   function move(idx: number, dir: -1 | 1) {
@@ -177,8 +179,8 @@ function TemplateForm({
               aria-label={t("anchorLabel")}
               onChange={(e) =>
                 e.target.value === "show"
-                  ? patch(idx, { anchor: "show", offset_min: 0 })
-                  : patch(idx, { anchor: undefined, offset_min: 0 })
+                  ? patch(idx, { anchor: "show", offset_min: 0, dir: undefined })
+                  : patch(idx, { anchor: undefined, offset_min: 0, dir: undefined })
               }
               className={inputCls}
             >
@@ -188,15 +190,15 @@ function TemplateForm({
             {item.anchor === "show" ? (
               <span className="flex items-center gap-1">
                 <select
-                  value={item.offset_min < 0 ? "before" : "after"}
+                  value={(item.dir ?? (item.offset_min < 0 ? -1 : 1)) < 0 ? "before" : "after"}
                   aria-label={t("directionLabel")}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const newDir = e.target.value === "before" ? -1 : 1;
                     patch(idx, {
-                      offset_min:
-                        (e.target.value === "before" ? -1 : 1) *
-                        Math.abs(item.offset_min),
-                    })
-                  }
+                      dir: newDir,
+                      offset_min: newDir * Math.abs(item.offset_min),
+                    });
+                  }}
                   className={inputCls}
                 >
                   <option value="before">{t("before")}</option>
@@ -208,13 +210,13 @@ function TemplateForm({
                   max={1440}
                   value={Math.abs(item.offset_min)}
                   aria-label={t("offsetMinutes")}
-                  onChange={(e) =>
+                  onChange={(e) => {
+                    const effectiveDir = item.dir ?? (item.offset_min < 0 ? -1 : 1);
                     patch(idx, {
                       offset_min:
-                        (item.offset_min < 0 ? -1 : 1) *
-                        Math.min(1440, Math.abs(Number(e.target.value) || 0)),
-                    })
-                  }
+                        effectiveDir * Math.min(1440, Math.abs(Number(e.target.value) || 0)),
+                    });
+                  }}
                   className={`${inputCls} w-20`}
                 />
                 <span className="font-mono text-xs text-secondary">
@@ -285,7 +287,21 @@ function TemplateForm({
       <div className="flex items-center gap-2">
         <button
           disabled={pending || !name.trim() || items.some((i) => !i.title.trim())}
-          onClick={() => onSave({ id: initial?.id, name, items })}
+          onClick={() =>
+            onSave({
+              id: initial?.id,
+              name,
+              items: items.map(
+                (it): ScheduleTemplateItem => ({
+                  title: it.title,
+                  offset_min: it.offset_min,
+                  duration_min: it.duration_min,
+                  type: it.type,
+                  anchor: it.anchor,
+                }),
+              ),
+            })
+          }
           className="btn-primary h-8 px-3 disabled:opacity-50"
         >
           {tc("save")}
