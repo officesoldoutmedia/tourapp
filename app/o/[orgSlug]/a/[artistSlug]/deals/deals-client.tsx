@@ -91,7 +91,11 @@ function emptyForm(currencies: string[], name = ""): FormState {
   };
 }
 
-function formFromTemplate(tpl: DealTemplateData, currencies: string[]): FormState {
+function formFromTemplate(
+  tpl: DealTemplateData,
+  currencies: string[],
+  scheduleTemplates: ScheduleTemplateData[],
+): FormState {
   const landed = Array.isArray(tpl.landed_items)
     ? tpl.landed_items.filter((x): x is string => typeof x === "string")
     : [];
@@ -111,7 +115,12 @@ function formFromTemplate(tpl: DealTemplateData, currencies: string[]): FormStat
     nights: typeof acc.nights === "number" ? String(acc.nights) : "",
     category: typeof acc.category === "string" ? acc.category : "",
     requiredCategoryIds: tpl.required_category_ids ?? [],
-    scheduleTemplateId: tpl.schedule_template_id ?? "",
+    // Un template de program șters între timp nu trebuie să round-tripeze
+    // înapoi la salvare (ar bloca orice editare ulterioară a deal-ului) —
+    // seedăm doar dacă id-ul mai există în lista live.
+    scheduleTemplateId: scheduleTemplates.some((t) => t.id === tpl.schedule_template_id)
+      ? (tpl.schedule_template_id ?? "")
+      : "",
   };
 }
 
@@ -297,7 +306,7 @@ export function DealTemplates({
                       currencies={currencies}
                       categories={categories}
                       scheduleTemplates={scheduleTemplates}
-                      initial={formFromTemplate(tpl, currencies)}
+                      initial={formFromTemplate(tpl, currencies, scheduleTemplates)}
                       pending={pending}
                       submitLabel={t("save")}
                       onCancel={() => setEditingId(null)}

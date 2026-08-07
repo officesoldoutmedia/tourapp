@@ -76,17 +76,19 @@ export async function saveDealTemplate(
 
   // C2: legătura deal → template de program. Validăm explicit org-ul —
   // un membru multi-org ar putea trimite id-ul unui template din alt org
-  // (RLS pe deal_templates leagă artistul, nu template-ul de program).
+  // (RLS pe deal_templates leagă artistul, nu template-ul de program). Nu
+  // filtrăm pe `deleted_at` aici: un template șters între timp e un caz
+  // legitim (deal-ul rămâne salvabil, doar legătura se rupe), diferit de un
+  // id inexistent/din alt org — asta chiar e semnal de tampering.
   let scheduleTemplateId: string | null = null;
   if (input.scheduleTemplateId) {
     const { data: tpl } = await supabase
       .from("schedule_templates")
-      .select("id, organization_id")
+      .select("id, organization_id, deleted_at")
       .eq("id", input.scheduleTemplateId)
-      .is("deleted_at", null)
       .maybeSingle();
     if (!tpl || tpl.organization_id !== org.id) return { error: "invalid" };
-    scheduleTemplateId = tpl.id;
+    scheduleTemplateId = tpl.deleted_at ? null : tpl.id;
   }
 
   const payload = {
