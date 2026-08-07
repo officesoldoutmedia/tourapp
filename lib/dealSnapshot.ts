@@ -1,5 +1,11 @@
 /** Snapshot-ul de deal pe event (C1, spec §1-2). Pur — fără fetch. */
 
+/** Coloanele necesare pentru `buildDealSnapshot` — listă unică, partajată
+ *  între `apply-deal.ts` (Task 4/5) și wizard-ul de creare event (Task 6),
+ *  ca să nu diverge la modificări ulterioare de schemă. */
+export const DEAL_TEMPLATE_COLUMNS =
+  "id, name, fee_amount, fee_currency, deal_basis, withholding_percent, landed_items, accommodation, required_category_ids";
+
 export interface DealSnapshot {
   name: string;
   fee_amount: number | null;

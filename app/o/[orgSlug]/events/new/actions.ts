@@ -11,7 +11,7 @@ import { applyScheduleTemplate } from "../../t/[tourId]/d/[date]/actions";
 import { createAdvance } from "../../t/[tourId]/d/[date]/e/[eventId]/advance/actions";
 import { copyArtistPartiesToTour } from "@/lib/partySnapshot";
 import { applyDealToEvent } from "../apply-deal";
-import { buildDealSnapshot } from "@/lib/dealSnapshot";
+import { buildDealSnapshot, DEAL_TEMPLATE_COLUMNS } from "@/lib/dealSnapshot";
 
 export interface OneOffPayload {
   artistId: string;
@@ -209,19 +209,38 @@ export async function createOneOffEvent(
   // aplicăm doar snapshot-ul informativ pe event (fără fee/reținere) — deal-ul
   // rămâne atașat, iar cineva cu drepturi financiare aplică banii ulterior
   // din „Re-aplică" de pe pagina de costuri.
+  //
+  // Ownership: `dealTemplateId` vine din payload-ul clientului, nu doar din
+  // select-ul filtrat pe artist din wizard — un manager (`manage_tours`) are
+  // vizibilitate pe TOȚI artiștii org-ului (`can_see_subject` short-circuit-
+  // ează pe tier manager), deci RLS singură nu împiedică un id trimis „la
+  // mână" al unui deal al altui artist. Verificăm explicit `artist_id ===
+  // artist.id` pe AMBELE ramuri, înainte de orice scriere.
   if (payload.dealTemplateId) {
     if (can({ tier, permission }, "edit_accounting")) {
-      const dealRes = await applyDealToEvent(orgSlug, ev.data.id, payload.dealTemplateId, {
-        overwriteFee: true, // event nou — nu există fee manual de protejat
-      });
-      if (dealRes.error) return { error: dealRes.error };
+      const { data: owned } = await supabase
+        .from("deal_templates")
+        .select("id")
+        .eq("id", payload.dealTemplateId)
+        .eq("artist_id", artist.id)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (owned) {
+        const dealRes = await applyDealToEvent(orgSlug, ev.data.id, payload.dealTemplateId, {
+          overwriteFee: true, // event nou — nu există fee manual de protejat
+        });
+        if (dealRes.error) return { error: dealRes.error };
+      } else {
+        // Id inexistent, șters sau al altui artist — nu atașăm niciun deal;
+        // event-ul tot se creează normal, fără eroare (același rezultat ca
+        // și cum nu s-ar fi selectat niciun deal în wizard).
+      }
     } else {
       const { data: template } = await supabase
         .from("deal_templates")
-        .select(
-          "id, name, fee_amount, fee_currency, deal_basis, withholding_percent, landed_items, accommodation, required_category_ids",
-        )
+        .select(DEAL_TEMPLATE_COLUMNS)
         .eq("id", payload.dealTemplateId)
+        .eq("artist_id", artist.id)
         .is("deleted_at", null)
         .maybeSingle();
       if (template) {
@@ -230,6 +249,9 @@ export async function createOneOffEvent(
           .update({ deal_template_id: template.id, deal_snapshot: buildDealSnapshot(template) })
           .eq("id", ev.data.id);
         if (error) return { error: error.message };
+      } else {
+        // Id inexistent, șters sau al altui artist — nu atașăm niciun deal;
+        // event-ul tot se creează normal, fără eroare.
       }
     }
   }

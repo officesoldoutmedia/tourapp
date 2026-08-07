@@ -2,7 +2,7 @@
 
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
-import { buildDealSnapshot, withholdingLine } from "@/lib/dealSnapshot";
+import { buildDealSnapshot, withholdingLine, DEAL_TEMPLATE_COLUMNS } from "@/lib/dealSnapshot";
 
 /**
  * Aplică un deal template pe un event: scrie snapshot-ul pe `events`,
@@ -24,9 +24,7 @@ export async function applyDealToEvent(
 
   const { data: template } = await supabase
     .from("deal_templates")
-    .select(
-      "id, name, fee_amount, fee_currency, deal_basis, withholding_percent, landed_items, accommodation, required_category_ids",
-    )
+    .select(DEAL_TEMPLATE_COLUMNS)
     .eq("id", dealTemplateId)
     .is("deleted_at", null)
     .maybeSingle();
