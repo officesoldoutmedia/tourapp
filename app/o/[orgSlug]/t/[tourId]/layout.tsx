@@ -50,6 +50,7 @@ export default async function TourLayout({
   const base = `/o/${orgSlug}/t/${tourId}`;
   const dayBase = `${base}/d/${defaultDate}`;
   const canAccounting = can({ tier, permission }, "view_accounting");
+  const canEditAccounting = can({ tier, permission }, "edit_accounting");
 
   const sections: SidebarSection[] = [
     {
@@ -81,6 +82,9 @@ export default async function TourLayout({
         { label: "Roster", href: `/o/${orgSlug}` },
         { label: "Route map", href: `${base}/dashboard`, match: "/dashboard" },
         { label: "Contacts", href: `/o/${orgSlug}/contacts` },
+        ...(canEditAccounting
+          ? [{ label: "Registru juridic", href: `/o/${orgSlug}/crew`, match: "/crew" }]
+          : []),
       ],
     },
   ];

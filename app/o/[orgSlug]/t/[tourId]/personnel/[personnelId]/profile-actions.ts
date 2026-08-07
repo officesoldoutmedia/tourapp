@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
+import { saveCrewEntity, type CrewEntityInput } from "@/app/o/[orgSlug]/crew/actions";
 
 function profilePath(orgSlug: string, tourId: string, personnelId: string) {
   return `/o/${orgSlug}/t/${tourId}/personnel/${personnelId}`;
@@ -215,4 +216,74 @@ export async function deleteAnnex(
     .update({ deleted_at: new Date().toISOString() })
     .eq("id", id);
   revalidatePath(profilePath(orgSlug, tourId, personnelId));
+}
+
+/** C3 — legătura persoană ↔ entitate juridică (registrul din /crew). */
+export async function linkCrewEntity(
+  orgSlug: string,
+  tourId: string,
+  personnelId: string,
+  crewEntityId: string | null,
+): Promise<{ error?: string }> {
+  const { supabase, org } = await requireAccounting(orgSlug);
+  if (crewEntityId) {
+    const { data: entity } = await supabase
+      .from("crew_entities")
+      .select("id")
+      .eq("id", crewEntityId)
+      .eq("organization_id", org.id)
+      .is("deleted_at", null)
+      .maybeSingle();
+    if (!entity) return { error: "not_found" };
+  }
+  const { error } = await supabase
+    .from("tour_personnel")
+    .update({ crew_entity_id: crewEntityId })
+    .eq("id", personnelId);
+  if (error) return { error: error.message };
+  revalidatePath(profilePath(orgSlug, tourId, personnelId));
+  return {};
+}
+
+/** Creează o entitate juridică nouă din billing_details-ul persoanei
+ *  (fallback rapid pentru crew fără entitate încă în registru) și o leagă. */
+export async function createEntityFromBilling(
+  orgSlug: string,
+  tourId: string,
+  personnelId: string,
+): Promise<{ error?: string }> {
+  const { supabase } = await requireAccounting(orgSlug);
+  const { data: person } = await supabase
+    .from("tour_personnel")
+    .select("billing_details, first_name, last_name")
+    .eq("id", personnelId)
+    .maybeSingle();
+  if (!person) return { error: "not_found" };
+
+  const billing = (person.billing_details ?? {}) as Record<string, string>;
+  const personName = [person.first_name, person.last_name].filter(Boolean).join(" ").trim();
+
+  const input: CrewEntityInput = {
+    entityType: billing.cui ? "srl" : "individual",
+    displayName: billing.name || personName || "—",
+    companyName: billing.name ?? "",
+    cui: billing.cui ?? "",
+    regCom: billing.reg_com ?? "",
+    address: billing.address ?? "",
+    representative: billing.representative ?? "",
+    iban: billing.iban ?? "",
+    bank: billing.bank ?? "",
+    vatPayer: false,
+    fiscalCountry: "RO",
+    idDocument: billing.id_number ?? "",
+    defaultRate: null,
+    rateUnit: "per_show",
+    rateCurrency: "EUR",
+    paymentTermsDays: null,
+    docLanguage: "ro",
+  };
+
+  const result = await saveCrewEntity(orgSlug, input);
+  if (result.error || !result.entityId) return { error: result.error ?? "invalid" };
+  return linkCrewEntity(orgSlug, tourId, personnelId, result.entityId);
 }

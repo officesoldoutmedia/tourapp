@@ -12,6 +12,8 @@ import {
   createAnnex,
   toggleAnnexPaid,
   deleteAnnex,
+  linkCrewEntity,
+  createEntityFromBilling,
 } from "./profile-actions";
 
 /** Profilul membrului de crew: date, poză, facturare, situația plăților. */
@@ -26,6 +28,7 @@ export default async function CrewProfilePage({
   const { error } = await searchParams;
   const { supabase, org, permission, tier } = await requireOrg(orgSlug);
   const t = await getTranslations("crewProfile");
+  const tr = await getTranslations("crewRegistry");
   const locale = await getLocale();
   const canEdit = can({ tier, permission }, "edit_tour_content");
   const canAccounting = can({ tier, permission }, "view_accounting");
@@ -33,7 +36,7 @@ export default async function CrewProfilePage({
 
   const tp = await getTranslations("personnel");
 
-  const [{ data: person }, { data: parties }] = await Promise.all([
+  const [{ data: person }, { data: parties }, { data: crewEntities }] = await Promise.all([
     supabase
       .from("tour_personnel")
       .select("*")
@@ -47,8 +50,26 @@ export default async function CrewProfilePage({
       .is("deleted_at", null)
       .order("sort_order")
       .order("created_at"),
+    // registrul juridic (C3) — vizibil doar accounting via RLS (00033);
+    // vine gol pentru restul, select-ul de mai jos e oricum gated pe UI.
+    supabase
+      .from("crew_entities")
+      .select("id, display_name")
+      .eq("organization_id", org.id)
+      .is("deleted_at", null)
+      .order("display_name"),
   ]);
   if (!person) notFound();
+
+  const linkEntity = async (formData: FormData) => {
+    "use server";
+    const crewEntityId = String(formData.get("crewEntityId") ?? "") || null;
+    await linkCrewEntity(orgSlug, tourId, personnelId, crewEntityId);
+  };
+  const createFromBilling = async () => {
+    "use server";
+    await createEntityFromBilling(orgSlug, tourId, personnelId);
+  };
 
   const name = [person.first_name, person.last_name].filter(Boolean).join(" ") || "—";
   const billing = (person.billing_details ?? {}) as Record<string, string>;
@@ -285,6 +306,41 @@ export default async function CrewProfilePage({
           <h2 className="mb-3 font-display text-lg font-semibold tracking-tight">
             {t("billingTitle")}
           </h2>
+
+          {/* C3 — entitatea juridică din registru (contracte-cadru trăiesc acolo) */}
+          <div className="mb-3 flex flex-wrap items-center gap-2 border-b border-hairline pb-3">
+            <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
+              {tr("linkedEntity")}
+            </span>
+            {canEditAccounting ? (
+              <form action={linkEntity} className="flex items-center gap-2">
+                <select
+                  name="crewEntityId"
+                  defaultValue={person.crew_entity_id ?? ""}
+                  className={`${input}`}
+                >
+                  <option value="">—</option>
+                  {(crewEntities ?? []).map((ce) => (
+                    <option key={ce.id} value={ce.id}>
+                      {ce.display_name}
+                    </option>
+                  ))}
+                </select>
+                <button className="btn-quiet h-7 px-2.5">{t("save")}</button>
+              </form>
+            ) : (
+              <span className="text-sm">
+                {(crewEntities ?? []).find((ce) => ce.id === person.crew_entity_id)
+                  ?.display_name ?? "—"}
+              </span>
+            )}
+            {canEditAccounting && !person.crew_entity_id && (
+              <form action={createFromBilling}>
+                <button className="btn-quiet h-7 px-2.5">{tr("createFromBilling")}</button>
+              </form>
+            )}
+          </div>
+
           <form action={saveBilling} className="flex flex-wrap items-end gap-2">
             <label className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
               {t("costPerShow")}
