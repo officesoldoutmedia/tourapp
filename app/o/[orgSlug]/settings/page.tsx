@@ -16,6 +16,8 @@ export default async function OrgSettingsPage({
   const t = await getTranslations("settings");
   const tFiles = await getTranslations("fileCategories");
   const tSchedule = await getTranslations("scheduleTemplates");
+  const tIssuers = await getTranslations("issuingEntities");
+  const tContracts = await getTranslations("contractTemplates");
   if (!hasMinPermission(permission, "manager")) notFound();
 
   const canManageUsers = can({ tier, permission }, "manage_users");
@@ -91,6 +93,16 @@ export default async function OrgSettingsPage({
         <li>
           <Link href={`/o/${orgSlug}/settings/schedule-templates`} className="block px-4 py-3 hover:bg-subtle">
             🕘 {tSchedule("title")}
+          </Link>
+        </li>
+        <li>
+          <Link href={`/o/${orgSlug}/settings/issuing-entities`} className="block px-4 py-3 hover:bg-subtle">
+            🏢 {tIssuers("title")}
+          </Link>
+        </li>
+        <li>
+          <Link href={`/o/${orgSlug}/settings/contract-templates`} className="block px-4 py-3 hover:bg-subtle">
+            📄 {tContracts("title")}
           </Link>
         </li>
       </ul>
