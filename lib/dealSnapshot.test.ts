@@ -1,6 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   buildDealSnapshot,
+  hasFeeConflict,
   parseDealSnapshot,
   requiredCategoriesForDay,
   withholdingLine,
@@ -80,5 +81,52 @@ describe("withholdingLine", () => {
   it("null la percent sau fee ≤ 0", () => {
     expect(withholdingLine(0, 3500, "EUR")).toBeNull();
     expect(withholdingLine(5, 0, "EUR")).toBeNull();
+  });
+});
+
+describe("hasFeeConflict", () => {
+  it("sume diferite, aceeași monedă → conflict", () => {
+    expect(
+      hasFeeConflict({ fee: 3500, currency: "EUR" }, { fee: 4000, currency: "EUR" }),
+    ).toBe(true);
+  });
+
+  it("monede diferite, aceeași sumă → conflict (3500 RON ≠ 3500 EUR)", () => {
+    expect(
+      hasFeeConflict({ fee: 3500, currency: "RON" }, { fee: 3500, currency: "EUR" }),
+    ).toBe(true);
+  });
+
+  it("sumă și monedă identice → fără conflict", () => {
+    expect(
+      hasFeeConflict({ fee: 3500, currency: "EUR" }, { fee: 3500, currency: "EUR" }),
+    ).toBe(false);
+  });
+
+  it("fee curent zero/null → fără conflict (template-ul se aplică liber)", () => {
+    expect(hasFeeConflict({ fee: 0, currency: "EUR" }, { fee: 3500, currency: "EUR" })).toBe(
+      false,
+    );
+    expect(hasFeeConflict({ fee: null, currency: "EUR" }, { fee: 3500, currency: "EUR" })).toBe(
+      false,
+    );
+  });
+
+  it("fee template zero/null → fără conflict (nimic de suprascris)", () => {
+    expect(hasFeeConflict({ fee: 3500, currency: "EUR" }, { fee: 0, currency: "EUR" })).toBe(
+      false,
+    );
+    expect(hasFeeConflict({ fee: 3500, currency: "EUR" }, { fee: null, currency: "EUR" })).toBe(
+      false,
+    );
+  });
+
+  it("monede null: conflict doar dacă sumele diferă", () => {
+    expect(hasFeeConflict({ fee: 3500, currency: null }, { fee: 3500, currency: null })).toBe(
+      false,
+    );
+    expect(hasFeeConflict({ fee: 3500, currency: null }, { fee: 4000, currency: null })).toBe(
+      true,
+    );
   });
 });

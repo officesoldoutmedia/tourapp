@@ -2,7 +2,12 @@
 
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
-import { buildDealSnapshot, withholdingLine, DEAL_TEMPLATE_COLUMNS } from "@/lib/dealSnapshot";
+import {
+  buildDealSnapshot,
+  hasFeeConflict,
+  withholdingLine,
+  DEAL_TEMPLATE_COLUMNS,
+} from "@/lib/dealSnapshot";
 
 /**
  * Aplică un deal template pe un event: scrie snapshot-ul pe `events`,
@@ -22,10 +27,30 @@ export async function applyDealToEvent(
   const { supabase, permission, tier, user } = await requireOrg(orgSlug);
   if (!can({ tier, permission }, "edit_accounting")) return { error: "forbidden" };
 
+  // Ownership (review C1-T8 fix 1): `edit_accounting` vede TOȚI artiștii
+  // org-ului (posibil mai multe org-uri) — fără legarea explicită
+  // template↔event, un caller ar putea atașa deal-ul artistului X pe
+  // show-ul artistului Y. Rezolvăm artistul show-ului pe lanțul event →
+  // day → tour → artist_id (același pattern ca `costsheet/route.ts`) și
+  // constrângem select-ul de template pe el — asta fixează implicit și
+  // org-ul (tranzitiv prin artist). Wizard-ul (`events/new/actions.ts`)
+  // își păstrează propriul pre-check — defense in depth, ramura lui
+  // ne-privilegiată nu trece prin acțiunea asta.
+  const { data: event } = await supabase
+    .from("events")
+    .select("id, days!inner(tours!inner(artist_id))")
+    .eq("id", eventId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  const day = event?.days as unknown as { tours: { artist_id: string } | null } | undefined;
+  const artistId = day?.tours?.artist_id;
+  if (!artistId) return { error: "not_found" };
+
   const { data: template } = await supabase
     .from("deal_templates")
     .select(DEAL_TEMPLATE_COLUMNS)
     .eq("id", dealTemplateId)
+    .eq("artist_id", artistId)
     .is("deleted_at", null)
     .maybeSingle();
   if (!template) return { error: "not_found" };
@@ -42,9 +67,10 @@ export async function applyDealToEvent(
   const templateFee = snapshot.fee_amount ?? 0;
 
   if (
-    currentFee > 0 &&
-    templateFee > 0 &&
-    currentFee !== templateFee &&
+    hasFeeConflict(
+      { fee: currentFee, currency: finance?.fee_currency ?? null },
+      { fee: templateFee, currency: snapshot.fee_currency ?? null },
+    ) &&
     !opts.overwriteFee
   ) {
     return { feeConflict: true };
@@ -108,6 +134,17 @@ export async function applyDealToEvent(
         updated_by: user.id,
       });
     }
+  } else {
+    // Fix 2 (review C1-T8): deal-ul nou nu are reținere — dacă deal-ul
+    // ANTERIOR lăsase o linie generată `withholding` vie, ea supraviețuia
+    // re-apply-ului și rămânea în P&L. Soft-delete pe orice rând viu, ca
+    // să nu tragă `deleted_at` peste ceva deja șters.
+    await supabase
+      .from("show_costs")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("event_id", eventId)
+      .eq("generated_key", "withholding")
+      .is("deleted_at", null);
   }
   return {};
 }

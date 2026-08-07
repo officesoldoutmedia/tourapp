@@ -109,6 +109,22 @@ export function requiredCategoriesForDay(
   return [...union].filter((id) => liveCategoryIds.has(id));
 }
 
+/** Predicatul de conflict de fee la aplicarea unui deal template (C1 review
+ *  fix 3): conflict doar când AMBELE fee-uri sunt reale (> 0) și diferă —
+ *  fie ca sumă, fie ca monedă (3500 RON ≠ 3500 EUR). Fee curent gol/zero
+ *  → template-ul se aplică liber; fee template gol/zero → nimic de
+ *  suprascris — în ambele cazuri, fără prompt (comportamentul de azi). */
+export function hasFeeConflict(
+  current: { fee: number | null; currency: string | null },
+  template: { fee: number | null; currency: string | null },
+): boolean {
+  const currentFee = current.fee ?? 0;
+  const templateFee = template.fee ?? 0;
+  if (!(currentFee > 0) || !(templateFee > 0)) return false;
+  if (currentFee !== templateFee) return true;
+  return !!current.currency && !!template.currency && current.currency !== template.currency;
+}
+
 export function withholdingLine(
   percent: number,
   fee: number,
