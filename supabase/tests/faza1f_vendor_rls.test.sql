@@ -1,12 +1,15 @@
 -- ═══ Faza 1f — Vendor portal (C4): vendor_links + departament pe
 -- companii + proveniență personnel ═══
 -- Rulează DUPĂ faza1e (alfabetic: faza1e < faza1f < faza2).
--- Refolosește org/userii din faza0 + faza1e (nesterse la cleanup-ul lor
--- ca fixturi reutilizabile, cf. faza1e):
+-- Refolosește org/userii din faza0 + faza1e:
 --   a0…0a administrator/pro, c0…0c mobile_access/free (faza0),
 --   d0…0d manager/pro fără accounting (faza1e) — el e "managerul" de mai
 --   jos, 6…6 outsider/pro (faza1e) — org2-ul lui a fost șters la finalul
 --   faza1e, îi dăm unul nou doar pt. proba de izolare cross-org.
+-- DEPENDENȚĂ: d0 și 6 (auth.users + organization_members pe org_id)
+-- supraviețuiesc INTENȚIONAT cleanup-ului din faza1e (vezi nota de acolo)
+-- special ca să fie refolosiți aici. Dacă faza1e ajunge să-i șteargă,
+-- faza1f pică la fixturile de mai jos (\gset-uri fără rânduri).
 -- Turul/ziua 'SxS Summer 2026' / 2026-07-17 din faza1 + personnel-ul
 -- 'Dan Driver' — le refolosim. faza2 (care rulează DUPĂ acest fișier)
 -- nu a creat încă niciun event, deci creăm unul singur aici pe ziua

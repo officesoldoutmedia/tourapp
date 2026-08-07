@@ -3,12 +3,16 @@
 -- Rulează DUPĂ faza1d (alfabetic: faza1d < faza1e < faza2).
 -- Refolosește org/userii din faza0 (admin a0…0a administrator/pro,
 -- crew c0…0c mobile_access/free — tier 'pro' e default din 00014).
--- Adaugă 3 useri noi, needed doar aici:
+-- Adaugă 3 useri noi:
 --   f0…0f accounting/pro (scrie financiar), d0…0d manager/pro (fără
 --   accounting), 6…6 outsider/pro (administrator, dar într-un AL DOILEA
 --   org — pt. proba de izolare cross-org, ca în faza1b).
 -- Cleanup: hard-delete pe rândurile proprii + org-ul al doilea, ca să nu
 -- polueze fazele 2-9 (vezi nota din faza1b/faza1a despre `limit 1`).
+-- NU șterge la cleanup userii d0/6 (nici auth.users, nici
+-- organization_members-ul lor pe org_id) — faza1f (C4) îi refolosește ca
+-- fixturi ("managerul" și "outsider"-ul de acolo). Dacă strângi cleanup-ul
+-- de mai jos, verifică faza1f_vendor_rls.test.sql întâi.
 \set ON_ERROR_STOP on
 
 select id as org_id from public.organizations limit 1 \gset
