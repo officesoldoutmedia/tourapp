@@ -12,6 +12,14 @@
  * card informativ (nume, basis, reținere, landed items ca pastile, cazare
  * compactă) — select-ul + „Re-aplică" apar doar pentru `canEdit`, altfel
  * cardul rămâne strict informativ (nimic de selectat).
+ *
+ * Pe conflict de fee, flux în 3 trepte (spec: deal-ul se aplică oricum —
+ * refuzul suprascrierii NU anulează aplicarea, doar păstrează fee-ul):
+ * OK pe primul confirm → re-apel cu `overwriteFee: true` (fee-ul
+ * template-ului câștigă). Cancel → al doilea `window.confirm`
+ * (`dealFeeKeepConfirm`): OK → re-apel cu `keepFee: true` (fee-ul curent
+ * rămâne, dar snapshot-ul + reținerea pe fee-ul păstrat se aplică);
+ * Cancel → abort, nimic nu se scrie.
  */
 import { useState, useTransition } from "react";
 import { useRouter } from "next/navigation";
@@ -61,12 +69,16 @@ export function DealCard({
   const [selected, setSelected] = useState(currentTemplateId ?? templates[0]?.id ?? "");
   const [pending, startTransition] = useTransition();
 
-  function apply(overwriteFee: boolean) {
+  function apply(opts: { overwriteFee?: boolean; keepFee?: boolean } = {}) {
     if (!selected) return;
     startTransition(async () => {
-      const result = await applyDealToEvent(orgSlug, eventId, selected, { overwriteFee });
+      const result = await applyDealToEvent(orgSlug, eventId, selected, opts);
       if (result?.feeConflict) {
-        if (window.confirm(t("dealFeeConfirm"))) apply(true);
+        if (window.confirm(t("dealFeeConfirm"))) {
+          apply({ overwriteFee: true });
+        } else if (window.confirm(t("dealFeeKeepConfirm"))) {
+          apply({ keepFee: true });
+        }
         return;
       }
       if (!result?.error) router.refresh();
@@ -147,7 +159,7 @@ export function DealCard({
               <button
                 type="button"
                 disabled={pending || !selected}
-                onClick={() => apply(false)}
+                onClick={() => apply()}
                 className="btn-quiet h-8 px-3 text-sm disabled:opacity-50"
               >
                 {t("dealReapply")}
@@ -172,7 +184,7 @@ export function DealCard({
           <button
             type="button"
             disabled={pending || !selected}
-            onClick={() => apply(false)}
+            onClick={() => apply()}
             className="btn-quiet h-8 px-3 text-sm disabled:opacity-50"
           >
             {t("dealApply")}

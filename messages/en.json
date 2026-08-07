@@ -750,6 +750,7 @@
     "dealApply": "Apply",
     "dealReapply": "Re-apply",
     "dealFeeConfirm": "The manually entered fee will be replaced by the template fee. Continue?",
+    "dealFeeKeepConfirm": "Keep the current fee? The deal is still applied, and the withholding is calculated on the kept fee.",
     "dealBasisLanded": "Landed",
     "dealBasisAllIn": "All-in",
     "dealBasisFeePlusCosts": "Fee + costs",

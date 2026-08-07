@@ -750,6 +750,7 @@
     "dealApply": "Aplică",
     "dealReapply": "Re-aplică",
     "dealFeeConfirm": "Fee-ul introdus manual va fi înlocuit cu cel din template. Continui?",
+    "dealFeeKeepConfirm": "Păstrezi fee-ul actual? Deal-ul se aplică oricum, iar impozitul reținut se calculează pe fee-ul păstrat.",
     "dealBasisLanded": "Landed",
     "dealBasisAllIn": "All-in",
     "dealBasisFeePlusCosts": "Fee + costuri",

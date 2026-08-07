@@ -16,13 +16,21 @@ import {
  * pe fee-ul EFECTIV. Acțiune partajată (C1 spec §2) — folosită de Task 5
  * (panoul Costs) și Task 6 (wizard-ul de creare event).
  *
+ * Conflict de fee (fee curent ≠ fee template, ambele reale): fără
+ * `overwriteFee`/`keepFee` → `{ feeConflict: true }` ÎNAINTE de orice
+ * scriere. `overwriteFee: true` → fee-ul template-ului câștigă (comportament
+ * neschimbat). `keepFee: true` → deal-ul se aplică oricum (snapshot scris),
+ * dar fee-ul curent din `show_finances` rămâne neatins, iar reținerea (pas
+ * 3) se calculează pe el, nu pe fee-ul template-ului. Dacă ambele flag-uri
+ * vin true, `overwriteFee` are precedență — nu se întoarce eroare.
+ *
  * Nu revalidează căi — caller-ii au orgSlug/tourId/date în scope.
  */
 export async function applyDealToEvent(
   orgSlug: string,
   eventId: string,
   dealTemplateId: string,
-  opts: { overwriteFee: boolean },
+  opts: { overwriteFee?: boolean; keepFee?: boolean },
 ): Promise<{ error?: string; feeConflict?: boolean }> {
   const { supabase, permission, tier, user } = await requireOrg(orgSlug);
   if (!can({ tier, permission }, "edit_accounting")) return { error: "forbidden" };
@@ -71,7 +79,8 @@ export async function applyDealToEvent(
       { fee: currentFee, currency: finance?.fee_currency ?? null },
       { fee: templateFee, currency: snapshot.fee_currency ?? null },
     ) &&
-    !opts.overwriteFee
+    !opts.overwriteFee &&
+    !opts.keepFee
   ) {
     return { feeConflict: true };
   }
@@ -83,10 +92,15 @@ export async function applyDealToEvent(
     .eq("id", eventId);
   if (eventError) return { error: eventError.message };
 
-  // 2. Fee (aplicat doar când e cazul).
+  // 2. Fee (aplicat doar când e cazul). `overwriteFee` are precedență peste
+  // `keepFee` dacă ambele vin setate (spec: „both flags true → treat as
+  // overwriteFee, don't error") — de-aia `keepFee` efectiv se dezactivează
+  // când `overwriteFee` e true, în loc să fie citit direct din opts.
+  const overwriteFee = !!opts.overwriteFee;
+  const keepFee = !!opts.keepFee && !overwriteFee;
   let effectiveFee = currentFee;
   let effectiveCurrency = finance?.fee_currency ?? snapshot.fee_currency ?? "EUR";
-  if (templateFee > 0 && (currentFee <= 0 || opts.overwriteFee)) {
+  if (!keepFee && templateFee > 0 && (currentFee <= 0 || overwriteFee)) {
     effectiveFee = templateFee;
     effectiveCurrency = snapshot.fee_currency ?? effectiveCurrency;
     const payload = { fee: effectiveFee, fee_currency: effectiveCurrency };
@@ -97,6 +111,10 @@ export async function applyDealToEvent(
           .insert({ event_id: eventId, ...payload });
     if (res.error) return { error: res.error.message };
   }
+  // Când `keepFee`, blocul de mai sus e sărit complet — `effectiveFee` /
+  // `effectiveCurrency` rămân exact ce am citit din `show_finances` la
+  // început (fee-ul PĂSTRAT, cu moneda lui), deci pasul 3 (reținerea)
+  // calculează pe fee-ul curent al show-ului, nu pe cel al template-ului.
 
   // 3. Withholding pe fee-ul EFECTIV (spec §2 pas 3).
   const line = withholdingLine(
