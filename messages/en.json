@@ -745,7 +745,18 @@
     "calcKm": "Km (round trip)",
     "calcNoRate": "Set the rate on the artist profile.",
     "calcNoPerDiem": "No per diem set.",
-    "calcNoHomeBase": "Set the home base on the artist profile."
+    "calcNoHomeBase": "Set the home base on the artist profile.",
+    "dealTitle": "Deal",
+    "dealApply": "Apply",
+    "dealReapply": "Re-apply",
+    "dealFeeConfirm": "The manually entered fee will be replaced by the template fee. Continue?",
+    "dealBasisLanded": "Landed",
+    "dealBasisAllIn": "All-in",
+    "dealBasisFeePlusCosts": "Fee + costs",
+    "dealWithholding": "Withholding {p}%",
+    "dealLanded": "Provided by promoter",
+    "dealAccommodation": "Accommodation",
+    "dealNone": "No deal applied"
   },
   "tourDashboard": {
     "title": "Tour overview",

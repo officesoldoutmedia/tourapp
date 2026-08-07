@@ -745,7 +745,18 @@
     "calcKm": "Km (dus-întors)",
     "calcNoRate": "Setează rata pe profilul artistului.",
     "calcNoPerDiem": "Fără diurnă setată.",
-    "calcNoHomeBase": "Setează home base pe profilul artistului."
+    "calcNoHomeBase": "Setează home base pe profilul artistului.",
+    "dealTitle": "Deal",
+    "dealApply": "Aplică",
+    "dealReapply": "Re-aplică",
+    "dealFeeConfirm": "Fee-ul introdus manual va fi înlocuit cu cel din template. Continui?",
+    "dealBasisLanded": "Landed",
+    "dealBasisAllIn": "All-in",
+    "dealBasisFeePlusCosts": "Fee + costuri",
+    "dealWithholding": "Reținere {p}%",
+    "dealLanded": "Incluse de organizator",
+    "dealAccommodation": "Cazare",
+    "dealNone": "Fără deal aplicat"
   },
   "tourDashboard": {
     "title": "Privire de ansamblu",

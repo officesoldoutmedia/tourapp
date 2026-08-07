@@ -13,6 +13,8 @@ import {
   GROUND_KEY,
 } from "@/lib/costCalc";
 import { computeGroundDistance } from "@/lib/googlePlaces";
+import { parseDealSnapshot } from "@/lib/dealSnapshot";
+import { DealCard } from "./deal-card-client";
 
 type GeneratedLine = { key: string; label: string; amount: number; currency: string };
 
@@ -90,7 +92,7 @@ export default async function ShowCostsPage({
   ] = await Promise.all([
     supabase
       .from("events")
-      .select("id, title, venues(name)")
+      .select("id, title, venues(name), deal_template_id, deal_snapshot")
       .eq("id", eventId)
       .is("deleted_at", null)
       .maybeSingle(),
@@ -114,7 +116,7 @@ export default async function ShowCostsPage({
     supabase
       .from("tours")
       .select(
-        "booking_percent, artist_id, artists(home_base_city, home_base_lat, home_base_lng, ground_rate_per_km, ground_rate_currency, slug)",
+        "booking_percent, artist_id, artists(id, home_base_city, home_base_lat, home_base_lng, ground_rate_per_km, ground_rate_currency, slug)",
       )
       .eq("id", tourId)
       .maybeSingle(),
@@ -146,6 +148,7 @@ export default async function ShowCostsPage({
 
   // ── panoul „Calculat" — diurnă + transport terestru ────────────────
   const artistData = tour?.artists as unknown as {
+    id: string | null;
     home_base_city: string | null;
     home_base_lat: number | null;
     home_base_lng: number | null;
@@ -153,6 +156,19 @@ export default async function ShowCostsPage({
     ground_rate_currency: string | null;
     slug: string | null;
   } | null;
+
+  // ── cardul „Deal" — template-ele artistului + snapshot-ul aplicat ──
+  const artistId = artistData?.id ?? tour?.artist_id ?? null;
+  const { data: dealTemplateRows } = artistId
+    ? await supabase
+        .from("deal_templates")
+        .select("id, name")
+        .eq("artist_id", artistId)
+        .is("deleted_at", null)
+        .order("sort_order")
+    : { data: null };
+  const dealTemplates = dealTemplateRows ?? [];
+  const dealSnapshot = parseDealSnapshot(event.deal_snapshot);
 
   const headcountByParty = new Map<string, number>();
   for (const p of partyPersonnel ?? []) {
@@ -456,6 +472,17 @@ export default async function ShowCostsPage({
           </p>
         )}
       </form>
+
+      {/* cardul „Deal" — aplică snapshot-ul unui template de deal pe show */}
+      <DealCard
+        orgSlug={orgSlug}
+        eventId={eventId}
+        templates={dealTemplates}
+        snapshot={dealSnapshot}
+        currentTemplateId={event.deal_template_id}
+        canEdit={canEdit}
+        dayPath={path}
+      />
 
       {/* echipa show-ului: selectezi cine merge la ACEST show */}
       <section className="rounded-[12px] border border-hairline bg-surface p-4">
