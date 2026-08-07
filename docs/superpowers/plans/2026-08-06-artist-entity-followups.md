@@ -37,3 +37,24 @@
   din deals-client
 - Fluxul keepFee la conflict de fee folosește două window.confirm înlănțuite —
   de înlocuit cu un dialog custom 3-way când apare un pattern de modale
+
+## Adăugat post-C2 (2026-08-07)
+
+- Titlul „Show" acceptat ca item show-anchored în template = footgun de recalcul
+  (al doilea slot Show cu proveniență poate deveni reperul) — de respins în
+  normalizeItems sau de sărit rândurile cu proveniență în findShowSlot
+- Durata >1440 în editorul de template-uri se pierde silențios la save (offseturile
+  resping, durata nu); inputul nu clamped valorile tastate
+- Recalculează = N update-uri secvențiale fără atomicitate (self-healing la re-run;
+  un upsert batch ar fi atomic și mai rapid)
+- Capsula de offset rămâne pe valoarea generată după retime manual al unui item
+  neconfirmat — următorul Recalculează suprascrie editarea manuală (confirm e
+  escape hatch-ul); de discutat: golirea proveniențeí la editarea manuală a orei
+- title-tooltip pe butonul Recalculează dezactivat — invizibil în Safari
+- Erorile de save/delete rămân nesemnalate în templates-client + deals-client
+  (pattern-ul general al paginilor; de rezolvat cu un pattern de toast)
+- Fără index pe deal_templates.schedule_template_id (irelevant la volumele actuale)
+- Lecție smoke C2: bug-ul de direcție (semnul pierdut prin −0 la offset 0) a
+  scăpat de 3 review-uri și a fost prins doar la smoke pe producție — codul de
+  editor UI cu stare derivată din semn merită test de interacțiune sau măcar
+  smoke înainte de merge; fixat în 2 hotfix-uri pe main (a44dcb2 + 72d6f99)
