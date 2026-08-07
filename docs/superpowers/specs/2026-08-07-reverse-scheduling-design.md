@@ -16,6 +16,14 @@ templates (livrat). Ordinea Fazei C decisă cu utilizatorul: C1 → C2 → C3 �
   neconfirmate generate relativ la show. Respins recalculul automat (mută
   lucruri pe la spate) și varianta fără recalcul.
 - **Conflict & gap detection (§9.5) exclus** — backlog C2b, sub-proiect separat.
+- **Ancorele se setează prin capture inteligent + editor nou în settings**
+  (corecție post-explorare: azi NU există editor de template-uri — se salvează
+  dintr-o zi și se aplică, fără delete/rename). 1) „Save as template" pe o zi
+  cu slot „Show" timpat capturează itemii timpați ca relativi la T (slotul
+  Show însuși NU intră în template — el e reperul); fără slot Show → oră fixă,
+  ca azi. 2) Pagină nouă în settings „Template-uri de program": redenumire,
+  ștergere, editarea itemilor (titlu, ancoră, offset/oră, durată) — acolo se
+  întoarce soundcheck-ul pe „fereastră fixă AM".
 - Legătura deal → program: `deal_templates.schedule_template_id`, folosită DOAR
   la pre-popularea wizard-ului (programul aplicat E copia — consistent cu regula
   snapshot-ului; „Re-aplică" pe deal nu atinge programul).
@@ -64,6 +72,14 @@ la T+set+30 care cade la 02:00 rămâne pe ziua show-ului — itemii sunt legaț
 pune natural la coadă. Modelul actual suportă deja (end < start pe ceas = +1);
 zero schimbări.
 
+**Capture-ul** (`saveScheduleAsTemplate`): ziua are slot „Show" cu oră →
+itemii timpați se capturează cu `anchor:"show"` și
+`offset_min = start item − start show` (minute semnate); slotul Show e exclus
+din template; itemii netimpați rămân ca azi (oră fixă, offset 0). Zi fără slot
+Show → capture-ul actual neschimbat (oră fixă din ceasul local al zilei).
+Wizard-ul creează slotul Show ÎNAINTE de aplicarea template-ului (azi ordinea
+e inversă), ca T să existe la generare.
+
 **„Recalculează"** (buton pe secțiunea de program, doar editori): T din slotul
 Show al zilei (fără slot Show → dezactivat cu hint). Pentru fiecare item cu
 `generated_anchor='show'` și `is_confirmed=false` (nesters):
@@ -74,10 +90,13 @@ se mută doar orele.
 
 ## 3. UI
 
-- **Editorul de template-uri de program** (tour settings): toggle de ancoră pe
-  item — „Oră fixă" (default) / „Relativ la show"; pe „Relativ la show":
-  selector Înainte/După + input h:mm (stocat `offset_min` semnat). Itemii
-  existenți apar pe „Oră fixă" neschimbați.
+- **Pagină nouă în settings „Template-uri de program"** (hub-ul org, pattern
+  `file-categories` SP3b): listă template-uri cu redenumire, ștergere (soft),
+  creare goală; itemii editabili — titlu, toggle de ancoră „Oră fixă" (input
+  HH:mm, default) / „Relativ la show" (selector Înainte/După + ore+minute,
+  stocat `offset_min` semnat), durată în minute, tip, adăugare/ștergere/
+  reordonare. Itemii existenți apar pe „Oră fixă" neschimbați. Umple și golul
+  actual: template-urile nu pot fi azi nici șterse, nici redenumite.
 - **Tabul Deals al artistului** (C1): select nou „Template de program" în
   formular, sub categoriile obligatorii, cu template-urile org-ului; salvat pe
   deal template, rezumat pe rândul din listă.
