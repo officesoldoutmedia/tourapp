@@ -213,6 +213,7 @@ function TemplateForm({
                   onChange={(e) => {
                     const effectiveDir = item.dir ?? (item.offset_min < 0 ? -1 : 1);
                     patch(idx, {
+                      dir: effectiveDir,
                       offset_min:
                         effectiveDir * Math.min(1440, Math.abs(Number(e.target.value) || 0)),
                     });
