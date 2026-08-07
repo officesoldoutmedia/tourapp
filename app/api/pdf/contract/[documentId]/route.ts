@@ -30,9 +30,10 @@ export async function GET(
   // doc_number conține series_prefix liber (ex. „Anexă-”): non-Latin-1 în
   // header ar arunca ByteString conversion error la construcția Response,
   // deci sanitizăm ASCII pentru filename= și păstrăm numele real în
-  // filename* (RFC 5987) pentru agenții care îl citesc.
+  // filename* (RFC 5987) pentru agenții care îl citesc. " și \ sunt în
+  // range-ul ASCII păstrat, dar ar rupe delimitarea quoted-string, deci le înlocuim separat.
   const rawName = `${doc.doc_number}.pdf`;
-  const asciiName = rawName.replace(/[^\x20-\x7E]/g, "_");
+  const asciiName = rawName.replace(/[^\x20-\x7E]/g, "_").replace(/["\\]/g, "_");
   const utf8Name = encodeURIComponent(rawName);
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
