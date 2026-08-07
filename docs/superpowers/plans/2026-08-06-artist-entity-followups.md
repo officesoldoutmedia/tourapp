@@ -19,3 +19,21 @@
 - Client Supabase netipizat proiect-wide (as X[] mască mismatch-uri) — efort separat mare
 - Payload layout jsonb pe toate event-urile din istoric la timeline artist — de scoped la viitoare
 - Chei/idiomuri: al 3-lea idiom de toggle, hint doar title pe touch, revoke execute pe seed fn
+
+## Adăugat post-C1 (2026-08-07)
+
+- Helper comun pentru gruparea snapshot-urilor pe zi (blocul de ~12 linii duplicat
+  în day page / dashboard / artist timeline la construcția dealRequiredByDay)
+- Constanta CURRENCIES duplicată acum în 3 fișiere — de partajat
+- Erori non-conflict din applyDealToEvent nesemnalate în deal-card-client (fără
+  pattern de toast pe pagină); idem restul acțiunilor startTransition de pe costs
+- Withholding % neclampat server-side la ≤100 (doar max pe input-ul client)
+- moveDealTemplate scrie indici de listă ca sort_order (clonă moveArtistParty) —
+  drift la ties după soft-delete + insert; self-healing la mutări ulterioare
+- deal_templates fără index pe organization_id (query-ul din wizard filtrează pe
+  org) — irelevant la volumele actuale
+- „1 nopți" în cardul Deal (deals.nights refolosit fără plural ICU)
+- Prop dayPath mort în deal-card-client; title greșit (save) pe butonul de edit
+  din deals-client
+- Fluxul keepFee la conflict de fee folosește două window.confirm înlănțuite —
+  de înlocuit cu un dialog custom 3-way când apare un pattern de modale
