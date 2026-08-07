@@ -20,6 +20,9 @@ describe("numberToWordsRo", () => {
     [100000, "o sută de mii"],
     [1000000, "un milion"],
     [2500000, "două milioane cinci sute de mii"],
+    [12000, "douăsprezece mii"],
+    [112000, "o sută douăsprezece mii"],
+    [12000000, "douăsprezece milioane"],
   ])("%i → %s", (n, expected) => {
     expect(numberToWordsRo(n)).toBe(expected);
   });

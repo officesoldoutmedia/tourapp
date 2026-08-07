@@ -13,7 +13,11 @@ function roUnder100(n: number, feminine: boolean): string {
     const w = RO_UNITS[n];
     return feminine ? (RO_FEM[w] ?? w) : w;
   }
-  if (n < 20) return RO_TEENS[n - 10];
+  if (n < 20) {
+    // 12 e singurul „teen" cu formă feminină distinctă: doisprezece → douăsprezece
+    if (feminine && n === 12) return "douăsprezece";
+    return RO_TEENS[n - 10];
+  }
   const tens = RO_TENS[Math.floor(n / 10)];
   const rest = n % 10;
   if (!rest) return tens;
