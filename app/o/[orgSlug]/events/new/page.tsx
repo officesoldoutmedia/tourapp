@@ -15,8 +15,12 @@ export default async function NewEventPage({
   const { supabase, org, permission, tier } = await requireOrg(orgSlug);
   if (!can({ tier, permission }, "manage_tours")) redirect(`/o/${orgSlug}`);
 
-  const [{ data: artists }, { data: scheduleTemplates }, { data: advanceTemplates }] =
-    await Promise.all([
+  const [
+    { data: artists },
+    { data: scheduleTemplates },
+    { data: advanceTemplates },
+    { data: dealTemplateRows },
+  ] = await Promise.all([
       supabase
         .from("artists")
         .select("id, name")
@@ -36,6 +40,13 @@ export default async function NewEventPage({
         .eq("organization_id", org.id)
         .is("deleted_at", null)
         .order("title"),
+      supabase
+        .from("deal_templates")
+        .select("id, name, artist_id")
+        .eq("organization_id", org.id)
+        .is("deleted_at", null)
+        .order("sort_order")
+        .order("created_at"),
     ]);
 
   // Un artist arhivat (sau șters) poate ajunge pe acest link prin `?artist=`
@@ -46,12 +57,18 @@ export default async function NewEventPage({
   const artistIds = new Set((artists ?? []).map((a) => a.id));
   const defaultArtistId = artist && artistIds.has(artist) ? artist : undefined;
 
+  // Deal template-urile se leagă de artist prin FK, nu prin organization_id
+  // filtrat pe status — filtrăm aici pe artiștii activi deja încărcați mai
+  // sus, ca să nu afișăm deal-uri ale unor artiști arhivați/șterși.
+  const dealTemplates = (dealTemplateRows ?? []).filter((d) => artistIds.has(d.artist_id));
+
   return (
     <NewEventForm
       orgSlug={orgSlug}
       artists={artists ?? []}
       scheduleTemplates={scheduleTemplates ?? []}
       advanceTemplates={advanceTemplates ?? []}
+      dealTemplates={dealTemplates}
       defaultArtistId={defaultArtistId}
     />
   );

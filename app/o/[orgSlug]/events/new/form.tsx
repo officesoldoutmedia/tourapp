@@ -10,12 +10,14 @@ export function NewEventForm({
   artists,
   scheduleTemplates,
   advanceTemplates,
+  dealTemplates,
   defaultArtistId,
 }: {
   orgSlug: string;
   artists: { id: string; name: string }[];
   scheduleTemplates: { id: string; name: string }[];
   advanceTemplates: { id: string; title: string }[];
+  dealTemplates: { id: string; name: string; artist_id: string }[];
   defaultArtistId?: string;
 }) {
   const t = useTranslations("newEvent");
@@ -31,6 +33,7 @@ export function NewEventForm({
   const [stageTime, setStageTime] = useState("");
   const [scheduleTemplateId, setScheduleTemplateId] = useState("");
   const [advanceTemplateId, setAdvanceTemplateId] = useState("");
+  const [dealTemplateId, setDealTemplateId] = useState("");
 
   const [venueQuery, setVenueQuery] = useState("");
   const [venueHits, setVenueHits] = useState<VenueHit[]>([]);
@@ -52,6 +55,13 @@ export function NewEventForm({
       setVenueHits(hits.slice(0, 20));
     });
   }
+
+  // Deal-urile sunt per-artist — filtrare client-side pe artistul selectat;
+  // se golește la schimbarea artistului (handler-ul de mai jos).
+  const artistDealTemplates = useMemo(
+    () => dealTemplates.filter((d) => d.artist_id === artistId),
+    [dealTemplates, artistId],
+  );
 
   const selectedVenue = useMemo<OneOffPayload["venue"]>(() => {
     if (venueChoice === "none") return null;
@@ -77,6 +87,7 @@ export function NewEventForm({
         stageTime: stageTime || undefined,
         scheduleTemplateId: scheduleTemplateId || null,
         advanceTemplateId: advanceTemplateId || null,
+        dealTemplateId: dealTemplateId || null,
         venue: selectedVenue,
       });
       if (result?.error) setError(tc("error"));
@@ -92,7 +103,10 @@ export function NewEventForm({
           <span className="text-sm font-medium">{t("artistLabel")}</span>
           <select
             value={artistId}
-            onChange={(e) => setArtistId(e.target.value)}
+            onChange={(e) => {
+              setArtistId(e.target.value);
+              setDealTemplateId(""); // deal-urile sunt per-artist — se golește la schimbare
+            }}
             className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
           >
             <option value="" disabled>
@@ -180,6 +194,22 @@ export function NewEventForm({
             {advanceTemplates.map((tpl) => (
               <option key={tpl.id} value={tpl.id}>
                 {tpl.title}
+              </option>
+            ))}
+          </select>
+        </label>
+
+        <label className="block space-y-1">
+          <span className="text-sm font-medium">{t("dealLabel")}</span>
+          <select
+            value={dealTemplateId}
+            onChange={(e) => setDealTemplateId(e.target.value)}
+            className="w-full rounded-md border border-hairline bg-surface px-3 py-2 text-sm"
+          >
+            <option value="">{t("noDeal")}</option>
+            {artistDealTemplates.map((tpl) => (
+              <option key={tpl.id} value={tpl.id}>
+                {tpl.name}
               </option>
             ))}
           </select>

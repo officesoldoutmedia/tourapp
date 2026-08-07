@@ -10,6 +10,8 @@ import { resolveVenue, type VenueInput } from "../../t/[tourId]/d/[date]/e/venue
 import { applyScheduleTemplate } from "../../t/[tourId]/d/[date]/actions";
 import { createAdvance } from "../../t/[tourId]/d/[date]/e/[eventId]/advance/actions";
 import { copyArtistPartiesToTour } from "@/lib/partySnapshot";
+import { applyDealToEvent } from "../apply-deal";
+import { buildDealSnapshot } from "@/lib/dealSnapshot";
 
 export interface OneOffPayload {
   artistId: string;
@@ -20,6 +22,7 @@ export interface OneOffPayload {
   stageTime?: string; // HH:MM local
   scheduleTemplateId?: string | null;
   advanceTemplateId?: string | null;
+  dealTemplateId?: string | null;
   venue?: VenueInput | null;
 }
 
@@ -197,6 +200,38 @@ export async function createOneOffEvent(
       orgSlug, bucket.id, payload.date, ev.data.id, "Advance", payload.advanceTemplateId,
     );
     if (res.error) return { error: res.error };
+  }
+
+  // 7. Deal template (opțional) — snapshot + fee + reținere pe show-ul nou.
+  // Notă de permisiuni: `applyDealToEvent` cere `edit_accounting`, dar aici
+  // s-a verificat mai sus doar `manage_tours` — seturile pot diferi (manager
+  // fără drepturi de accounting). Dacă userul NU are `edit_accounting`,
+  // aplicăm doar snapshot-ul informativ pe event (fără fee/reținere) — deal-ul
+  // rămâne atașat, iar cineva cu drepturi financiare aplică banii ulterior
+  // din „Re-aplică" de pe pagina de costuri.
+  if (payload.dealTemplateId) {
+    if (can({ tier, permission }, "edit_accounting")) {
+      const dealRes = await applyDealToEvent(orgSlug, ev.data.id, payload.dealTemplateId, {
+        overwriteFee: true, // event nou — nu există fee manual de protejat
+      });
+      if (dealRes.error) return { error: dealRes.error };
+    } else {
+      const { data: template } = await supabase
+        .from("deal_templates")
+        .select(
+          "id, name, fee_amount, fee_currency, deal_basis, withholding_percent, landed_items, accommodation, required_category_ids",
+        )
+        .eq("id", payload.dealTemplateId)
+        .is("deleted_at", null)
+        .maybeSingle();
+      if (template) {
+        const { error } = await supabase
+          .from("events")
+          .update({ deal_template_id: template.id, deal_snapshot: buildDealSnapshot(template) })
+          .eq("id", ev.data.id);
+        if (error) return { error: error.message };
+      }
+    }
   }
 
   redirect(`/o/${orgSlug}/t/${bucket.id}/d/${payload.date}`);

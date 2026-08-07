@@ -959,6 +959,8 @@
     "scheduleTemplateLabel": "Template program",
     "advanceTemplateLabel": "Template advancing",
     "noTemplate": "—",
+    "dealLabel": "Deal",
+    "noDeal": "—",
     "venueLabel": "Venue",
     "venueSearch": "Caută venue",
     "venueNone": "Fără venue",

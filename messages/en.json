@@ -959,6 +959,8 @@
     "scheduleTemplateLabel": "Schedule template",
     "advanceTemplateLabel": "Advancing template",
     "noTemplate": "—",
+    "dealLabel": "Deal",
+    "noDeal": "—",
     "venueLabel": "Venue",
     "venueSearch": "Search venue",
     "venueNone": "No venue",
