@@ -36,7 +36,7 @@ export default async function CrewProfilePage({
 
   const tp = await getTranslations("personnel");
 
-  const [{ data: person }, { data: parties }, { data: crewEntities }] = await Promise.all([
+  const [{ data: person }, { data: parties }] = await Promise.all([
     supabase
       .from("tour_personnel")
       .select("*")
@@ -50,16 +50,22 @@ export default async function CrewProfilePage({
       .is("deleted_at", null)
       .order("sort_order")
       .order("created_at"),
-    // registrul juridic (C3) — vizibil doar accounting via RLS (00033);
-    // vine gol pentru restul, select-ul de mai jos e oricum gated pe UI.
-    supabase
-      .from("crew_entities")
-      .select("id, display_name")
-      .eq("organization_id", org.id)
-      .is("deleted_at", null)
-      .order("display_name"),
   ]);
   if (!person) notFound();
+
+  // registrul juridic (C3) — RLS (00033) cere is_pro() + accounting, adică
+  // EXACT canEditAccounting; un cont accounting pe org free ar primi un
+  // rezultat gol (nu o eroare), deci gatăm query-ul pe UI ca să nu facem
+  // un round-trip degeaba și, mai important, ca să nu confundăm "n-am
+  // putut citi" cu "nu-i legată nicio entitate" (vezi blocul de mai jos).
+  const { data: crewEntities } = canEditAccounting
+    ? await supabase
+        .from("crew_entities")
+        .select("id, display_name")
+        .eq("organization_id", org.id)
+        .is("deleted_at", null)
+        .order("display_name")
+    : { data: [] };
 
   const linkEntity = async (formData: FormData) => {
     "use server";
@@ -307,12 +313,18 @@ export default async function CrewProfilePage({
             {t("billingTitle")}
           </h2>
 
-          {/* C3 — entitatea juridică din registru (contracte-cadru trăiesc acolo) */}
-          <div className="mb-3 flex flex-wrap items-center gap-2 border-b border-hairline pb-3">
-            <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
-              {tr("linkedEntity")}
-            </span>
-            {canEditAccounting ? (
+          {/* C3 — entitatea juridică din registru (contracte-cadru trăiesc
+              acolo). Blocul întreg e gated pe canEditAccounting: registrul
+              e o funcție pro-only (RLS 00033), deci un cont accounting pe
+              org free n-ar putea citi entitățile deloc — mai bine ascuns
+              complet decât un fallback read-only care ar risca să afișeze
+              "—" (neconectat) când de fapt E o entitate legată, doar că
+              n-am putut-o citi. */}
+          {canEditAccounting && (
+            <div className="mb-3 flex flex-wrap items-center gap-2 border-b border-hairline pb-3">
+              <span className="text-xs font-semibold uppercase tracking-wider text-secondary">
+                {tr("linkedEntity")}
+              </span>
               <form action={linkEntity} className="flex items-center gap-2">
                 <select
                   name="crewEntityId"
@@ -328,18 +340,13 @@ export default async function CrewProfilePage({
                 </select>
                 <button className="btn-quiet h-7 px-2.5">{t("save")}</button>
               </form>
-            ) : (
-              <span className="text-sm">
-                {(crewEntities ?? []).find((ce) => ce.id === person.crew_entity_id)
-                  ?.display_name ?? "—"}
-              </span>
-            )}
-            {canEditAccounting && !person.crew_entity_id && (
-              <form action={createFromBilling}>
-                <button className="btn-quiet h-7 px-2.5">{tr("createFromBilling")}</button>
-              </form>
-            )}
-          </div>
+              {!person.crew_entity_id && (
+                <form action={createFromBilling}>
+                  <button className="btn-quiet h-7 px-2.5">{tr("createFromBilling")}</button>
+                </form>
+              )}
+            </div>
+          )}
 
           <form action={saveBilling} className="flex flex-wrap items-end gap-2">
             <label className="space-y-1 text-xs font-semibold uppercase tracking-wider text-secondary">
