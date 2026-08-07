@@ -166,15 +166,7 @@ export async function createOneOffEvent(
     .single();
   if (ev.error || !ev.data) return { error: ev.error?.message ?? "event_failed" };
 
-  // 4. Template de program — doar dacă ziua nu avea deja schedule (spec §1).
-  if (payload.scheduleTemplateId && !dayHadSchedule) {
-    const res = await applyScheduleTemplate(
-      orgSlug, bucket.id, payload.date, day.id, payload.scheduleTemplateId,
-    );
-    if (res.error) return { error: res.error };
-  }
-
-  // 5. Slotul Show la stage time (titlu canonic, confirmat).
+  // 4. Slotul Show la stage time (titlu canonic, confirmat).
   if (payload.stageTime) {
     const interval = scheduleInterval({
       date: payload.date,
@@ -192,6 +184,15 @@ export async function createOneOffEvent(
       updated_by: user.id,
     });
     if (error) return { error: error.message };
+  }
+
+  // 5. Template de program — doar dacă ziua nu avea deja schedule (spec §1).
+  // (după slotul Show — itemii "relativ la show" au nevoie de T la generare, C2)
+  if (payload.scheduleTemplateId && !dayHadSchedule) {
+    const res = await applyScheduleTemplate(
+      orgSlug, bucket.id, payload.date, day.id, payload.scheduleTemplateId,
+    );
+    if (res.error) return { error: res.error };
   }
 
   // 6. Advancing din template (mereu — advance-ul e al event-ului nou).

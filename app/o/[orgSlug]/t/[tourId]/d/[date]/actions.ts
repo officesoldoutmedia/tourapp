@@ -4,6 +4,13 @@ import { revalidatePath } from "next/cache";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { scheduleInterval } from "@/lib/datetime";
+import {
+  buildScheduleRows,
+  captureTemplateItems,
+  findShowSlot,
+  type CaptureItem,
+  type ScheduleTemplateItem,
+} from "@/lib/scheduleGeneration";
 
 async function requireEditor(orgSlug: string) {
   const ctx = await requireOrg(orgSlug);
@@ -155,7 +162,9 @@ export async function deleteScheduleItem(
   return {};
 }
 
-/** [C] "Save As Template" — orele devin offseturi relative la zi. */
+/** [C] "Save As Template" — cu slot Show timpat, itemii timpați devin
+ *  relativi la T (slotul Show e exclus — el e reperul); altfel oră fixă,
+ *  ca înainte (spec C2 §2). */
 export async function saveScheduleAsTemplate(
   orgSlug: string,
   tourId: string,
@@ -170,43 +179,19 @@ export async function saveScheduleAsTemplate(
     supabase.from("days").select("date, timezone").eq("id", dayId).single(),
     supabase
       .from("schedule_items")
-      .select("title, item_type, start_at, end_at, sort_order")
+      .select("id, title, item_type, start_at, end_at, sort_order")
       .eq("day_id", dayId)
       .is("deleted_at", null)
       .order("start_at", { ascending: true, nullsFirst: false }),
   ]);
   if (!day) return { error: "day_not_found" };
 
-  const dayStart = new Date(`${day.date}T00:00:00Z`).getTime();
-  void dayStart;
-  const templateItems = (items ?? []).map((item) => {
-    let offsetMin = 0;
-    let durationMin: number | undefined;
-    if (item.start_at) {
-      // offsetul = ora locală a itemului în fusul zilei
-      const local = new Intl.DateTimeFormat("en-GB", {
-        timeZone: day.timezone ?? "UTC",
-        hour: "2-digit",
-        minute: "2-digit",
-        hourCycle: "h23",
-      }).format(new Date(item.start_at));
-      const [h, m] = local.split(":").map(Number);
-      offsetMin = h * 60 + m;
-      if (item.end_at) {
-        durationMin = Math.round(
-          (new Date(item.end_at).getTime() -
-            new Date(item.start_at).getTime()) /
-            60000,
-        );
-      }
-    }
-    return {
-      title: item.title,
-      offset_min: offsetMin,
-      duration_min: durationMin,
-      type: item.item_type,
-    };
-  });
+  const show = findShowSlot(items ?? []);
+  const templateItems = captureTemplateItems(
+    (items ?? []) as CaptureItem[],
+    day.timezone ?? "UTC",
+    show?.start_at ? { id: show.id, startAt: new Date(show.start_at) } : null,
+  );
 
   const { error } = await supabase.from("schedule_templates").insert({
     organization_id: org.id,
@@ -217,7 +202,9 @@ export async function saveScheduleAsTemplate(
   return {};
 }
 
-/** [C] Aplicarea unui template pe ziua curentă. */
+/** [C] Aplicarea unui template pe ziua curentă. C2: itemii cu anchor "show"
+ *  se calculează din slotul Show al zilei; fără slot Show intră fără oră și
+ *  se așază la primul „Recalculează". */
 export async function applyScheduleTemplate(
   orgSlug: string,
   tourId: string,
@@ -227,45 +214,29 @@ export async function applyScheduleTemplate(
 ): Promise<{ error?: string }> {
   const { supabase, user } = await requireEditor(orgSlug);
 
-  const [{ data: day }, { data: template }] = await Promise.all([
+  const [{ data: day }, { data: template }, { data: existing }] = await Promise.all([
     supabase.from("days").select("date, timezone").eq("id", dayId).single(),
     supabase
       .from("schedule_templates")
       .select("items")
       .eq("id", templateId)
       .single(),
+    supabase
+      .from("schedule_items")
+      .select("id, title, start_at")
+      .eq("day_id", dayId)
+      .is("deleted_at", null)
+      .order("start_at", { ascending: true, nullsFirst: false }),
   ]);
   if (!day || !template) return { error: "not_found" };
 
-  const items = (template.items ?? []) as {
-    title: string;
-    offset_min: number;
-    duration_min?: number;
-    type?: "schedule" | "publicity";
-  }[];
-
-  const rows = items.map((item, idx) => {
-    const h = String(Math.floor((item.offset_min % 1440) / 60)).padStart(2, "0");
-    const m = String(item.offset_min % 60).padStart(2, "0");
-    const end = item.duration_min
-      ? minutesToClock(item.offset_min + item.duration_min)
-      : null;
-    const interval = scheduleInterval({
-      date: day.date,
-      tz: day.timezone ?? "UTC",
-      start: `${h}:${m}`,
-      end,
-    });
-    return {
-      day_id: dayId,
-      title: item.title,
-      item_type: item.type ?? "schedule",
-      start_at: interval.startAt.toISOString(),
-      end_at: interval.endAt?.toISOString() ?? null,
-      sort_order: idx,
-      updated_by: user.id,
-    };
-  });
+  const show = findShowSlot(existing ?? []);
+  const rows = buildScheduleRows({
+    items: (template.items ?? []) as ScheduleTemplateItem[],
+    date: day.date,
+    tz: day.timezone ?? "UTC",
+    showAt: show?.start_at ? new Date(show.start_at) : null,
+  }).map((row) => ({ ...row, day_id: dayId, updated_by: user.id }));
 
   if (rows.length > 0) {
     const { error } = await supabase.from("schedule_items").insert(rows);
@@ -273,11 +244,4 @@ export async function applyScheduleTemplate(
   }
   revalidatePath(dayPath(orgSlug, tourId, date));
   return {};
-}
-
-function minutesToClock(total: number): string {
-  const rest = total % 1440;
-  const h = String(Math.floor(rest / 60)).padStart(2, "0");
-  const m = String(rest % 60).padStart(2, "0");
-  return `${h}:${m}`;
 }
