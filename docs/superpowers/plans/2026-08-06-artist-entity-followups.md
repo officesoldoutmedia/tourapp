@@ -58,3 +58,30 @@
   scăpat de 3 review-uri și a fost prins doar la smoke pe producție — codul de
   editor UI cu stare derivată din semn merită test de interacțiune sau măcar
   smoke înainte de merge; fixat în 2 hotfix-uri pe main (a44dcb2 + 72d6f99)
+
+## Adăugat post-C3 (2026-08-07)
+
+- Trigger updated_at lipsă pe cele 4 tabele de contracte (migrare separată mică)
+- Link de download pentru contractul-cadru SEMNAT (signed_storage_path scris dar
+  niciun UI nu-l citește — spec gap, nu bug)
+- Hartă de tranziții de status pe documente + gates consistente între registru
+  (≠void) și Costs (≠signed); azi un void poate fi re-marcat
+- Codurile de eroare (series_conflict, not_found) afișate brut sub „Missing:" —
+  de i18n-izat
+- .eq-uri cross-org suplimentare: generateContractDocument (eventId/personnelId),
+  linkCrewEntity (tour_id) — teoretice, RLS backstop există
+- numberToWords: clamp ≥1 miliard + carry la bani=100; guard negativ/NaN pe
+  amountInWords (înainte să devină load-bearing în alte fluxuri)
+- FIELD_RE doar lowercase — {{Crew.CUI}} tastat manual scapă de dry-run și apare
+  literal în PDF; de făcut case-insensitive cu normalizare
+- Cardul Contracte vizibil (gol, inert) pentru admin free-tier pe Costs — de
+  ascuns ca la fix-ul din profil (96812d1)
+- deal.fee neformatat în text (3500.5) — fee_in_words compensează; formatare de
+  adăugat
+- Statusul cadru: expirat de tot rămâne 🟡 pentru totdeauna — de introdus 🔴 la
+  valid_until < azi
+- Upload-ul semnatului netestat manual la smoke (file input prin browser MCP);
+  fluxul e review-uit la nivel de cod pe pattern-ul storage existent — de
+  verificat la prima folosire reală
+- setDefaultEntity ne-atomic (fereastră zero-default) + fără constraint DB pe
+  „un singur default" — is_default e doar display azi
