@@ -823,7 +823,13 @@
     "dealWithholding": "Withholding {p}%",
     "dealLanded": "Provided by promoter",
     "dealAccommodation": "Accommodation",
-    "dealNone": "No deal applied"
+    "dealNone": "No deal applied",
+    "contractsTitle": "Contracts",
+    "contractGenerate": "Generate annex",
+    "contractMissing": "Missing:",
+    "contractNoEntity": "No legal entity — link it from the crew profile.",
+    "contractNoTemplate": "No matching annex template.",
+    "contractNone": "No annexes yet."
   },
   "tourDashboard": {
     "title": "Tour overview",

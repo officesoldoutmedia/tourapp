@@ -823,7 +823,13 @@
     "dealWithholding": "Reținere {p}%",
     "dealLanded": "Incluse de organizator",
     "dealAccommodation": "Cazare",
-    "dealNone": "Fără deal aplicat"
+    "dealNone": "Fără deal aplicat",
+    "contractsTitle": "Contracte",
+    "contractGenerate": "Generează anexa",
+    "contractMissing": "Lipsesc:",
+    "contractNoEntity": "Fără entitate juridică — leagă-o din profilul de crew.",
+    "contractNoTemplate": "Niciun template de anexă potrivit.",
+    "contractNone": "Nicio anexă încă."
   },
   "tourDashboard": {
     "title": "Privire de ansamblu",

@@ -14,7 +14,13 @@ import {
 } from "@/lib/costCalc";
 import { computeGroundDistance } from "@/lib/googlePlaces";
 import { parseDealSnapshot } from "@/lib/dealSnapshot";
+import { findMatchingTemplate, type ContractBlock } from "@/lib/contractMerge";
+import {
+  generateContractDocument,
+  type TemplateRow,
+} from "@/app/o/[orgSlug]/crew/contract-actions";
 import { DealCard } from "./deal-card-client";
+import { ContractsClient, type AnnexRow, type CrewAnnexRow } from "./contracts-client";
 
 type GeneratedLine = { key: string; label: string; amount: number; currency: string };
 
@@ -74,7 +80,7 @@ export default async function ShowCostsPage({
   params: Promise<{ orgSlug: string; tourId: string; date: string; eventId: string }>;
 }) {
   const { orgSlug, tourId, date, eventId } = await params;
-  const { supabase, permission, tier } = await requireOrg(orgSlug);
+  const { supabase, permission, tier, org } = await requireOrg(orgSlug);
   const t = await getTranslations("showCosts");
   const tc = await getTranslations("common");
   if (!can({ tier, permission }, "view_accounting")) notFound();
@@ -89,6 +95,9 @@ export default async function ShowCostsPage({
     { data: parties },
     { data: partyPersonnel },
     { data: dayRow },
+    { data: contractDocuments },
+    { data: crewEntities },
+    { data: contractTemplates },
   ] = await Promise.all([
     supabase
       .from("events")
@@ -109,7 +118,9 @@ export default async function ShowCostsPage({
       .order("created_at"),
     supabase
       .from("tour_personnel")
-      .select("id, first_name, last_name, role, cost_per_show, cost_currency, payment_type")
+      .select(
+        "id, first_name, last_name, role, cost_per_show, cost_currency, payment_type, crew_entity_id",
+      )
       .eq("tour_id", tourId)
       .is("deleted_at", null)
       .order("last_name"),
@@ -138,6 +149,27 @@ export default async function ShowCostsPage({
       .eq("date", date)
       .is("deleted_at", null)
       .maybeSingle(),
+    // C3 §13.6 — anexele acestui event (indiferent de status, inclusiv void, pentru audit)
+    supabase
+      .from("contract_documents")
+      .select("id, doc_number, status, crew_entity_id, signed_storage_path")
+      .eq("event_id", eventId)
+      .eq("kind", "annex")
+      .is("deleted_at", null)
+      .order("doc_number"),
+    supabase
+      .from("crew_entities")
+      .select("id, display_name, entity_type")
+      .eq("organization_id", org.id)
+      .is("deleted_at", null),
+    supabase
+      .from("contract_templates")
+      .select(
+        "id, name, doc_kind, body, match_role, match_entity_type, issuing_entity_id, series_prefix, series_next, sort_order",
+      )
+      .eq("organization_id", org.id)
+      .is("deleted_at", null)
+      .order("sort_order"),
   ]);
   if (!event) notFound();
 
@@ -145,6 +177,48 @@ export default async function ShowCostsPage({
   const currency = finance?.fee_currency ?? "RON";
   const bookingPercent = finance?.booking_percent ?? tour?.booking_percent ?? 0;
   const onShow = new Set((costs ?? []).filter((c) => c.personnel_id).map((c) => c.personnel_id));
+
+  // ── cardul „Contracte" (C3 §13.6) — anexele acestui event + rândul de
+  // crew fără anexă vie (buton manual „Generează anexa") ─────────────
+  const entityMap = new Map(
+    (crewEntities ?? []).map((e) => [
+      e.id as string,
+      { displayName: e.display_name as string, entityType: e.entity_type as string },
+    ]),
+  );
+  const liveAnnexEntityIds = new Set(
+    (contractDocuments ?? [])
+      .filter((d) => d.status !== "void")
+      .map((d) => d.crew_entity_id as string),
+  );
+  const annexes: AnnexRow[] = (contractDocuments ?? []).map((d) => ({
+    id: d.id as string,
+    docNumber: d.doc_number as string,
+    status: d.status as string,
+    entityName: entityMap.get(d.crew_entity_id as string)?.displayName ?? "—",
+  }));
+  const crewRows: CrewAnnexRow[] = (crew ?? [])
+    .filter((p) => onShow.has(p.id))
+    .map((p) => ({
+      personnelId: p.id as string,
+      personnelName: [p.first_name, p.last_name].filter(Boolean).join(" "),
+      role: p.role as string | null,
+      crewEntityId: p.crew_entity_id as string | null,
+      entityType: p.crew_entity_id ? (entityMap.get(p.crew_entity_id)?.entityType ?? null) : null,
+      hasAnnex: p.crew_entity_id ? liveAnnexEntityIds.has(p.crew_entity_id) : false,
+    }));
+  const templateRows: TemplateRow[] = (contractTemplates ?? []).map((tpl) => ({
+    id: tpl.id as string,
+    name: tpl.name as string,
+    doc_kind: tpl.doc_kind as string,
+    body: (tpl.body ?? []) as ContractBlock[],
+    match_role: tpl.match_role as string | null,
+    match_entity_type: tpl.match_entity_type as string | null,
+    issuing_entity_id: tpl.issuing_entity_id as string | null,
+    series_prefix: tpl.series_prefix as string,
+    series_next: tpl.series_next as number,
+    sort_order: tpl.sort_order as number,
+  }));
 
   // ── panoul „Calculat" — diurnă + transport terestru ────────────────
   const artistData = tour?.artists as unknown as {
@@ -227,7 +301,7 @@ export default async function ShowCostsPage({
 
   async function toggleCrew(formData: FormData) {
     "use server";
-    const { supabase, user } = await requireOrg(orgSlug);
+    const { supabase, user, tier, permission, org } = await requireOrg(orgSlug);
     const personnelId = String(formData.get("personnelId"));
     const { data: existing } = await supabase
       .from("show_costs")
@@ -244,7 +318,9 @@ export default async function ShowCostsPage({
     } else {
       const { data: person } = await supabase
         .from("tour_personnel")
-        .select("first_name, last_name, role, cost_per_show, cost_currency, payment_type")
+        .select(
+          "first_name, last_name, role, cost_per_show, cost_currency, payment_type, crew_entity_id",
+        )
         .eq("id", personnelId)
         .maybeSingle();
       if (!person) return;
@@ -260,6 +336,44 @@ export default async function ShowCostsPage({
         payment_type: person.payment_type,
         updated_by: user.id,
       });
+
+      // C3 §13.6: auto-generarea anexei la asignare — doar dacă persoana
+      // are entitate juridică legată și există template de anexă potrivit.
+      // Blocarea (profil incomplet) NU e eroare aici — butonul manual de pe
+      // rând arată lista lipsurilor.
+      if (person.crew_entity_id && can({ tier, permission }, "edit_accounting")) {
+        const [{ data: entity }, { data: templates }] = await Promise.all([
+          supabase
+            .from("crew_entities")
+            .select("entity_type")
+            .eq("id", person.crew_entity_id)
+            .is("deleted_at", null)
+            .maybeSingle(),
+          supabase
+            .from("contract_templates")
+            .select("id, name, doc_kind, body, match_role, match_entity_type, issuing_entity_id, series_prefix, series_next, sort_order")
+            .eq("organization_id", org.id)
+            .is("deleted_at", null),
+        ]);
+        if (entity) {
+          const template = findMatchingTemplate(
+            (templates ?? []) as TemplateRow[],
+            "annex",
+            person.role,
+            entity.entity_type,
+          );
+          if (template) {
+            await generateContractDocument(orgSlug, {
+              kind: "annex",
+              crewEntityId: person.crew_entity_id,
+              templateId: template.id,
+              eventId,
+              personnelId,
+            });
+            // rezultatul (missing/documentId) se ignoră aici — best-effort
+          }
+        }
+      }
     }
     revalidatePath(path);
   }
@@ -723,6 +837,19 @@ export default async function ShowCostsPage({
           </form>
         )}
       </section>
+
+      {/* C3 §13.6 — anexele acestui event + generare manuală per rând */}
+      <ContractsClient
+        orgSlug={orgSlug}
+        orgId={org.id}
+        tourId={tourId}
+        path={path}
+        eventId={eventId}
+        canAccounting={canEdit}
+        annexes={annexes}
+        crewRows={crewRows}
+        templates={templateRows}
+      />
 
       {/* totaluri + profit */}
       <section className="rounded-[12px] border border-hairline bg-surface p-4">
