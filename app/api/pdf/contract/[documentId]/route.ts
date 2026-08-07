@@ -27,10 +27,17 @@ export async function GET(
     docDate: String(doc.created_at).slice(0, 10),
     snapshot,
   });
+  // doc_number conține series_prefix liber (ex. „Anexă-”): non-Latin-1 în
+  // header ar arunca ByteString conversion error la construcția Response,
+  // deci sanitizăm ASCII pentru filename= și păstrăm numele real în
+  // filename* (RFC 5987) pentru agenții care îl citesc.
+  const rawName = `${doc.doc_number}.pdf`;
+  const asciiName = rawName.replace(/[^\x20-\x7E]/g, "_");
+  const utf8Name = encodeURIComponent(rawName);
   return new NextResponse(new Uint8Array(pdf), {
     headers: {
       "Content-Type": "application/pdf",
-      "Content-Disposition": `inline; filename="${doc.doc_number}.pdf"`,
+      "Content-Disposition": `inline; filename="${asciiName}"; filename*=UTF-8''${utf8Name}`,
     },
   });
 }

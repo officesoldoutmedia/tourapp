@@ -152,6 +152,10 @@ function TemplateForm({
   const [issuingEntityId, setIssuingEntityId] = useState(initial?.issuingEntityId ?? "");
   const [seriesPrefix, setSeriesPrefix] = useState(initial?.seriesPrefix ?? "");
   const [seriesNext, setSeriesNext] = useState(initial?.seriesNext ?? 1);
+  // Baseline încărcat la deschiderea formularului — NU se schimbă odată cu
+  // editarea câmpului de mai sus; server action-ul îl folosește ca să
+  // detecteze dacă seria a fost chiar modificată (vezi actions.ts).
+  const [initialSeriesNext] = useState(initial?.seriesNext ?? 1);
   const [body, setBody] = useState<ContractBlock[]>(initial?.body ?? []);
   const [focusedIdx, setFocusedIdx] = useState<number | null>(null);
 
@@ -370,6 +374,7 @@ function TemplateForm({
               issuingEntityId,
               seriesPrefix,
               seriesNext,
+              initialSeriesNext,
             })
           }
           className="btn-primary h-8 px-3 disabled:opacity-50"

@@ -16,6 +16,17 @@ import {
 import { findShowSlot } from "@/lib/scheduleGeneration";
 import { formatTimeInZone } from "@/lib/datetime";
 
+// Gate-ul TS de aici e "edit_accounting" (administrator + accounting), dar
+// scrierile efective (insert pe contract_documents/attachments, upload-ul
+// semnatului în storage) trec prin RLS-ul "private.can_edit_tour_content",
+// care e un RANK check: has_min_permission(org, 'manager') ⇒ rank(member)
+// <= rank('manager'). Cu administrator=1, accounting=2, manager=3
+// (00002_rls_foundation.sql), accounting (rank 2) trece pragul de manager
+// (rank 3) — deci utilizatorii accounting POT insera attachments/urca în
+// storage, deși TS `can(..., "edit_tour_content")` îi exclude explicit.
+// Divergența e LOAD-BEARING: dacă "reparăm" oglinda SQL ca să reflecte
+// exact TS (blocând accounting), generarea/upload-ul semnat pentru
+// accounting se rupe la RLS, chiar dacă gate-ul TS de mai jos le permite.
 async function requireAccounting(orgSlug: string) {
   const ctx = await requireOrg(orgSlug);
   if (!can({ tier: ctx.tier, permission: ctx.permission }, "edit_accounting")) {

@@ -29,6 +29,9 @@ export interface ContractTemplateInput {
   issuingEntityId: string;
   seriesPrefix: string;
   seriesNext: number;
+  /** Valoarea series_next încărcată de formular la deschidere — folosită
+   *  ca să detectăm dacă utilizatorul chiar a modificat seria. */
+  initialSeriesNext: number;
 }
 
 function normalizeBody(body: ContractBlock[]): ContractBlock[] | null {
@@ -65,7 +68,7 @@ export async function saveContractTemplate(
   }
 
   const seriesNext = Math.max(1, Math.round(Number(input.seriesNext) || 1));
-  const payload = {
+  const basePayload = {
     name,
     doc_kind: input.docKind,
     body,
@@ -73,17 +76,27 @@ export async function saveContractTemplate(
     match_entity_type: ENTITY_TYPES.has(input.matchEntityType) ? input.matchEntityType : null,
     issuing_entity_id: issuingEntityId,
     series_prefix: input.seriesPrefix.trim(),
-    series_next: seriesNext,
   };
 
   let error;
   if (input.id) {
+    // Formularul a încărcat series_next la deschidere, dar între timp
+    // generările pot fi incrementat-o atomic (Task 6) — dacă rescriem
+    // necondiționat valoarea din state-ul stale, "resetăm" seria înapoi și
+    // provocăm coliziuni pe indexul unic al doc_number. Trimitem
+    // series_next DOAR dacă utilizatorul chiar l-a schimbat în formular;
+    // series_prefix rămâne necondiționat (nu colidează — indexul unic e pe
+    // doc_number complet, iar modificarea de prefix e mereu deliberată).
+    const initialSeriesNext = Math.max(1, Math.round(Number(input.initialSeriesNext) || 1));
+    const payload =
+      seriesNext !== initialSeriesNext ? { ...basePayload, series_next: seriesNext } : basePayload;
     ({ error } = await supabase
       .from("contract_templates")
       .update(payload)
       .eq("id", input.id)
       .eq("organization_id", org.id));
   } else {
+    const payload = { ...basePayload, series_next: seriesNext };
     const { count } = await supabase
       .from("contract_templates")
       .select("id", { count: "exact", head: true })
