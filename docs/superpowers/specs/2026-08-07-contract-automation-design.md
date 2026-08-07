@@ -45,8 +45,10 @@ Seed la migrare din `organizations.settings.billing` (dacă există).
 **`contract_templates`**: `name`, `doc_kind` (`framework`/`annex`; enum-ul
 permite extinderi, UI-ul v1 expune doar cele două), `body jsonb` (blocuri de
 text cu `{{merge.fields}}`), reguli de asignare opționale (`match_role`,
-`match_department`, `match_entity_type` — null = orice), `issuing_entity_id`
-FK, `series_prefix text` + `series_next integer`, `sort_order`, soft-delete.
+`match_entity_type` — null = orice; §13.4 listează și department, dar
+`tour_personnel` nu are câmpul — se adaugă la C3b odată cu consola),
+`issuing_entity_id` FK, `series_prefix text` + `series_next integer`,
+`sort_order`, soft-delete.
 
 **`contract_documents`**: `kind` (`framework`/`annex`), `crew_entity_id` FK
 cascade, `template_id` FK set null, `issuing_entity_id` FK set null,
