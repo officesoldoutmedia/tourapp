@@ -5,6 +5,7 @@ import { can } from "@/lib/permissions";
 import { formatDayHeader, isDstTransitionDay } from "@/lib/datetime";
 import { DEFAULT_TZ } from "@/lib/tzLookup";
 import { computeProgressOfDays } from "@/lib/advanceProgressData";
+import { parseDealSnapshot, requiredCategoriesForDay } from "@/lib/dealSnapshot";
 import {
   NotesSection,
   ScheduleSection,
@@ -81,7 +82,9 @@ export default async function DayPage({
       .order("name"),
     supabase
       .from("events")
-      .select("id, title, venues(name, address_line1, city, postal_code, country, urls, phones), advances(status, deleted_at, layout)")
+      .select(
+        "id, title, venues(name, address_line1, city, postal_code, country, urls, phones), advances(status, deleted_at, layout), deal_snapshot",
+      )
       .eq("day_id", day.id)
       .is("deleted_at", null)
       .order("created_at"),
@@ -437,6 +440,18 @@ export default async function DayPage({
   );
   const dayOfEvent = new Map(eventIds.map((id) => [id, day.id]));
 
+  // C1 T7: categoriile obligatorii per-deal — dacă vreunul din event-urile
+  // zilei are un `deal_snapshot` cu `required_category_ids` ne-goale, ele
+  // înlocuiesc setul org pentru ziua asta (vezi lib/dealSnapshot.ts). Zilele
+  // fără niciun snapshot cu obligatorii rămân pe fallback-ul org, identic.
+  const liveCategoryIds = new Set((fileCategories ?? []).map((c) => c.id));
+  const dealSnapshots = (events ?? []).map((e) =>
+    parseDealSnapshot((e as unknown as { deal_snapshot?: unknown }).deal_snapshot),
+  );
+  const dealRequired = requiredCategoriesForDay(dealSnapshots, liveCategoryIds);
+  const dealRequiredByDay = new Map<string, string[]>();
+  if (dealRequired !== null) dealRequiredByDay.set(day.id, dealRequired);
+
   // Regulile UNICE de calcul al procentului de advancing (helper comun cu
   // dashboard-ul și timeline-ul de artist) — vezi lib/advanceProgressData.ts
   // [review fix #2]: categoriile obligatorii intră în total doar pe zile
@@ -456,6 +471,7 @@ export default async function DayPage({
       status: a.status,
     })),
     requiredCategoryIds: requiredCats.map((c) => c.id),
+    dealRequiredByDay,
   });
   const progress = progressOfDay.get(day.id)!;
   const advanceTotal = progress.total;

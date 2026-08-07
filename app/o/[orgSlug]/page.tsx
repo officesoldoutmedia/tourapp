@@ -7,6 +7,7 @@ import { MetricStrip, type Metric } from "@/components/ui/MetricStrip";
 import { buildUpcoming, type DashboardDay, type UpcomingShow } from "@/lib/dashboard";
 import { SHOW_SLOT_TITLE } from "@/lib/showSlot";
 import { computeProgressOfDays } from "@/lib/advanceProgressData";
+import { parseDealSnapshot, requiredCategoriesForDay } from "@/lib/dealSnapshot";
 import { DashboardClient } from "./dashboard-client";
 
 // Rând brut de attachment pt. calculul bulk al procentului de advancing
@@ -283,7 +284,7 @@ export default async function OrgDashboard({
     ? await Promise.all([
         supabase
           .from("events")
-          .select("id, day_id, title")
+          .select("id, day_id, title, deal_snapshot")
           .in("day_id", futureShowDayIds)
           .is("deleted_at", null),
         supabase
@@ -359,6 +360,26 @@ export default async function OrgDashboard({
     .filter((c) => c.is_required)
     .map((c) => c.id);
 
+  // C1 T7: categoriile obligatorii per-deal, per zi — o zi cu mai multe
+  // event-uri unește required_category_ids din TOATE snapshot-urile lor
+  // (vezi lib/dealSnapshot.ts, requiredCategoriesForDay). Zilele fără
+  // niciun snapshot cu obligatorii rămân pe fallback-ul org, identic.
+  const liveCategoryIds = new Set((fileCategories ?? []).map((c) => c.id));
+  const dealSnapshotsByDay = new Map<string, ReturnType<typeof parseDealSnapshot>[]>();
+  for (const e of events) {
+    const list = dealSnapshotsByDay.get(e.day_id) ?? [];
+    list.push(parseDealSnapshot((e as unknown as { deal_snapshot?: unknown }).deal_snapshot));
+    dealSnapshotsByDay.set(e.day_id, list);
+  }
+  const dealRequiredByDay = new Map<string, string[]>();
+  for (const dayId of futureShowDayIds) {
+    const dealRequired = requiredCategoriesForDay(
+      dealSnapshotsByDay.get(dayId) ?? [],
+      liveCategoryIds,
+    );
+    if (dealRequired !== null) dealRequiredByDay.set(dayId, dealRequired);
+  }
+
   // Regulile UNICE de calcul (helper comun cu pagina de zi și timeline-ul
   // de artist) — vezi lib/advanceProgressData.ts. `futureShowDayIds` sunt
   // deja doar zile show (filtrate mai sus), deci regula (a) e mereu activă.
@@ -369,6 +390,7 @@ export default async function OrgDashboard({
     fieldValueRows: fieldValueRows ?? [],
     fileRows: dayAttachmentRows ?? [],
     requiredCategoryIds,
+    dealRequiredByDay,
   });
   // Zilele fără obligatorii ȘI fără advance-uri (progress.total === 0)
   // rămân neincluse — comportamentul vechi (advance: null) persistă,
