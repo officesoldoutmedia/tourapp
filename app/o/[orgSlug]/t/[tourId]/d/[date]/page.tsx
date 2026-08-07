@@ -67,7 +67,7 @@ export default async function DayPage({
     supabase
       .from("schedule_items")
       .select(
-        "id, title, details, item_type, start_at, end_at, is_confirmed, is_complete, time_priority, sort_order",
+        "id, title, details, item_type, start_at, end_at, is_confirmed, is_complete, time_priority, sort_order, generated_anchor, generated_offset_min",
       )
       .eq("day_id", day.id)
       .is("deleted_at", null)

@@ -137,6 +137,8 @@
     "unconfirmed": "Neconfirmat",
     "complete": "Finalizat",
     "confirmAll": "Confirmă tot",
+    "recalc": "Recalculează",
+    "recalcNoShow": "Adaugă întâi slotul „Show” cu oră — el e reperul offset-urilor.",
     "publicity": "Publicity",
     "scheduleType": "Program",
     "saveAsTemplate": "Salvează ca template",

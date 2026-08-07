@@ -137,6 +137,8 @@
     "unconfirmed": "Unconfirmed",
     "complete": "Complete",
     "confirmAll": "Confirm all",
+    "recalc": "Recalculate",
+    "recalcNoShow": "Add the \"Show\" slot with a time first — it anchors the offsets.",
     "publicity": "Publicity",
     "scheduleType": "Schedule",
     "saveAsTemplate": "Save as template",

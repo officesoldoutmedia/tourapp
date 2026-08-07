@@ -4,10 +4,13 @@ import { useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { formatTimeInZone, isPlusOne } from "@/lib/datetime";
 import { useDayRealtime } from "@/components/useDayRealtime";
+import { formatShowOffset } from "@/lib/scheduleGeneration";
+import { SHOW_SLOT_TITLE } from "@/lib/showSlot";
 import {
   applyScheduleTemplate,
   confirmAllSchedule,
   deleteScheduleItem,
+  recalcSchedule,
   saveScheduleAsTemplate,
   toggleScheduleFlag,
   updateDayNotes,
@@ -33,6 +36,8 @@ export interface ScheduleItemData {
   end_at: string | null;
   is_confirmed: boolean;
   is_complete: boolean;
+  generated_anchor: string | null;
+  generated_offset_min: number | null;
 }
 
 // ─── Notes (3 zone [C]) ─────────────────────────────────────────────
@@ -112,6 +117,10 @@ export function ScheduleSection({
     });
   }
 
+  const hasShowSlot = items.some(
+    (i) => i.title === SHOW_SLOT_TITLE && i.start_at,
+  );
+
   return (
     <section className="space-y-3">
       <div className="flex flex-wrap items-center gap-2">
@@ -151,6 +160,14 @@ export function ScheduleSection({
               className="rounded border border-hairline px-2 py-1 text-xs font-medium disabled:opacity-40"
             >
               {t("confirmAll")}
+            </button>
+            <button
+              disabled={pending || !hasShowSlot}
+              title={hasShowSlot ? undefined : t("recalcNoShow")}
+              onClick={() => run(() => recalcSchedule(orgSlug, tourId, day.date, day.id))}
+              className="rounded border border-hairline px-2 py-1 text-xs font-medium disabled:opacity-40"
+            >
+              {t("recalc")}
             </button>
             <button
               onClick={() => setAdding(true)}
@@ -211,6 +228,13 @@ export function ScheduleSection({
                   </span>
                 )}
               </span>
+              {item.generated_anchor === "show" &&
+                item.generated_offset_min != null &&
+                !item.is_confirmed && (
+                  <span className="shrink-0 rounded-full bg-fill-control px-2 py-0.5 font-mono text-[10px] text-secondary">
+                    {formatShowOffset(item.generated_offset_min)}
+                  </span>
+                )}
               <span
                 className={`rounded-full px-2 py-0.5 text-[10px] font-semibold ${item.is_confirmed ? "bg-success-subtle text-success" : "bg-inset text-secondary"}`}
               >

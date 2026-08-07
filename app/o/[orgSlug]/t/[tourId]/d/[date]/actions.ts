@@ -8,6 +8,7 @@ import {
   buildScheduleRows,
   captureTemplateItems,
   findShowSlot,
+  recalcScheduleUpdates,
   type CaptureItem,
   type ScheduleTemplateItem,
 } from "@/lib/scheduleGeneration";
@@ -144,6 +145,37 @@ export async function confirmAllSchedule(
   if (error) return { error: error.message };
   revalidatePath(dayPath(orgSlug, tourId, date));
   return {};
+}
+
+/** [C2] Recalculează — mută itemii generați relativ la show (neconfirmați)
+ *  la noul T. Confirmații și itemii manuali nu se ating. */
+export async function recalcSchedule(
+  orgSlug: string,
+  tourId: string,
+  date: string,
+  dayId: string,
+): Promise<{ error?: string; moved?: number }> {
+  const { supabase } = await requireEditor(orgSlug);
+  const { data: items } = await supabase
+    .from("schedule_items")
+    .select("id, title, start_at, end_at, is_confirmed, generated_anchor, generated_offset_min")
+    .eq("day_id", dayId)
+    .is("deleted_at", null)
+    .order("start_at", { ascending: true, nullsFirst: false });
+
+  const show = findShowSlot(items ?? []);
+  if (!show?.start_at) return { error: "no_show_slot" };
+
+  const updates = recalcScheduleUpdates(items ?? [], new Date(show.start_at));
+  for (const u of updates) {
+    const { error } = await supabase
+      .from("schedule_items")
+      .update({ start_at: u.start_at, end_at: u.end_at })
+      .eq("id", u.id);
+    if (error) return { error: error.message };
+  }
+  revalidatePath(dayPath(orgSlug, tourId, date));
+  return { moved: updates.length };
 }
 
 export async function deleteScheduleItem(
