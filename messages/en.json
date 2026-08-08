@@ -127,6 +127,26 @@
     "inspCall": "Call",
     "inspNote": "Note"
   },
+  "vendorShare": {
+    "button": "Share with vendor",
+    "title": "Vendor access",
+    "event": "Show",
+    "company": "Company",
+    "noCategory": "no department — files won't be visible",
+    "create": "Create link + send email",
+    "created": "Link created",
+    "emailWarning": "The email didn't go out — copy the link manually.",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "resend": "Resend email",
+    "resent": "Sent.",
+    "revoke": "Revoke",
+    "revokeConfirm": "Revoke access? The link dies immediately.",
+    "stateLive": "live",
+    "stateExpired": "expired",
+    "stateRevoked": "revoked",
+    "empty": "No links yet."
+  },
   "schedule": {
     "add": "Add",
     "title": "Title",

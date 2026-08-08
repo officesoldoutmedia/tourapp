@@ -20,9 +20,12 @@ import {
   DayActionsBar,
   TasksSection,
   type AttachmentData,
+  type CompanyData,
+  type DayEventOption,
   type FileCategoryData,
   type InheritedFileData,
   type TaskData,
+  type VendorLinkData,
 } from "./extras-client";
 import { formatTimeInZone, dayInstant, dayKeyInZone } from "@/lib/datetime";
 import { DayFocus, type FocusItem } from "@/components/ui/DayFocus";
@@ -170,8 +173,13 @@ export default async function DayPage({
     }),
   ];
 
-  const [{ data: dayTasks }, { data: dayAttachments }, { data: fileCategories }, { data: tourForArtist }] =
-    await Promise.all([
+  const [
+    { data: dayTasks },
+    { data: dayAttachments },
+    { data: fileCategories },
+    { data: tourForArtist },
+    { data: companies },
+  ] = await Promise.all([
       supabase
         .from("tasks")
         .select("id, title, due_at, is_complete")
@@ -195,6 +203,13 @@ export default async function DayPage({
         .order("sort_order")
         .order("created_at"),
       supabase.from("tours").select("artist_id").eq("id", tourId).maybeSingle(),
+      // [C4 T4] companiile org-ului — pentru selectul de destinatar din share-ul de vendor
+      supabase
+        .from("companies")
+        .select("id, name, email, file_category_id")
+        .eq("organization_id", org.id)
+        .is("deleted_at", null)
+        .order("name"),
     ]);
 
   // Fișierele permanente ale artistului (SP1) — moștenite read-only [Task 4].
@@ -382,7 +397,9 @@ export default async function DayPage({
     }];
   });
   const eventIds = (events ?? []).map((e) => e.id);
-  const [{ data: contactValues }, { data: fieldValueRows }] = eventIds.length
+  // [C4 T4] events-urile zilei, pentru selectul din panoul de share vendor
+  const eventOptions: DayEventOption[] = (events ?? []).map((e) => ({ id: e.id, title: e.title }));
+  const [{ data: contactValues }, { data: fieldValueRows }, { data: vendorLinks }] = eventIds.length
     ? await Promise.all([
         supabase
           .from("event_field_values")
@@ -393,10 +410,17 @@ export default async function DayPage({
           .from("event_field_values")
           .select("event_id, field_key, value")
           .in("event_id", eventIds),
+        // [C4 T4] link-urile de vendor create pentru show-urile zilei
+        supabase
+          .from("vendor_links")
+          .select("id, company_id, event_id, expires_at, revoked_at, token, created_at")
+          .in("event_id", eventIds)
+          .order("created_at", { ascending: false }),
       ])
     : [
         { data: [] as { value: string | null }[] },
         { data: [] as { event_id: string; field_key: string; value: string | null }[] },
+        { data: [] as VendorLinkData[] },
       ];
   const keyContactsText = (contactValues ?? [])
     .map((r) => r.value ?? "")
@@ -577,7 +601,17 @@ export default async function DayPage({
       </header>
 
       <div className="mx-auto w-full max-w-[960px] space-y-7 pt-6">
-      <DayActionsBar orgSlug={orgSlug} dayId={day.id} canEdit={canEdit} />
+      <DayActionsBar
+        orgSlug={orgSlug}
+        tourId={tourId}
+        date={date}
+        dayId={day.id}
+        canEdit={canEdit}
+        companies={(companies ?? []) as CompanyData[]}
+        vendorLinks={(vendorLinks ?? []) as VendorLinkData[]}
+        eventOptions={eventOptions}
+        categories={(fileCategories ?? []) as FileCategoryData[]}
+      />
       {isDstTransitionDay(day.date, tz) && (
         <p className="rounded-md border border-warning bg-warning-subtle px-3 py-1.5 text-xs text-warning">
           {t("dstNotice")}

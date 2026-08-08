@@ -127,6 +127,26 @@
     "inspCall": "Sună",
     "inspNote": "Notă"
   },
+  "vendorShare": {
+    "button": "Share cu vendor",
+    "title": "Acces vendor",
+    "event": "Show-ul",
+    "company": "Compania",
+    "noCategory": "fără departament — fișierele nu vor fi vizibile",
+    "create": "Creează link + trimite email",
+    "created": "Link creat",
+    "emailWarning": "Emailul nu a plecat — copiază link-ul manual.",
+    "copy": "Copiază",
+    "copied": "Copiat!",
+    "resend": "Retrimite email",
+    "resent": "Trimis.",
+    "revoke": "Revocă",
+    "revokeConfirm": "Revoci accesul? Link-ul moare imediat.",
+    "stateLive": "activ",
+    "stateExpired": "expirat",
+    "stateRevoked": "revocat",
+    "empty": "Niciun link încă."
+  },
   "schedule": {
     "add": "Adaugă",
     "title": "Titlu",

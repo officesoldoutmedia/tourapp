@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
+import { sendEmail } from "@/lib/email";
 
 async function requireEditor(orgSlug: string) {
   const ctx = await requireOrg(orgSlug);
@@ -267,4 +268,112 @@ export async function createShareLink(
   if (error || !data) return { error: error?.message ?? "failed" };
   const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
   return { url: `${base}/share/day/${data.token}` };
+}
+
+// ── Vendor share [C4 §11] ───────────────────────────────────────────
+export async function createVendorLink(
+  orgSlug: string,
+  tourId: string,
+  date: string,
+  eventId: string,
+  companyId: string,
+): Promise<{ url?: string; emailWarning?: boolean; error?: string }> {
+  const { supabase, org, user } = await requireEditor(orgSlug);
+  const { data: company } = await supabase
+    .from("companies")
+    .select("id, name, email")
+    .eq("id", companyId)
+    .eq("organization_id", org.id)
+    .is("deleted_at", null)
+    .maybeSingle();
+  if (!company) return { error: "not_found" };
+
+  // un singur link viu per (companie, show): revocă-l pe cel existent
+  await supabase
+    .from("vendor_links")
+    .update({ revoked_at: new Date().toISOString() })
+    .eq("company_id", companyId)
+    .eq("event_id", eventId)
+    .is("revoked_at", null);
+
+  const { data, error } = await supabase
+    .from("vendor_links")
+    .insert({
+      organization_id: org.id,
+      company_id: companyId,
+      event_id: eventId,
+      created_by: user.id,
+    })
+    .select("token, expires_at")
+    .single();
+  if (error || !data) return { error: error?.message ?? "failed" };
+
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const url = `${base}/share/vendor/${data.token}`;
+
+  let emailWarning = false;
+  if (company.email) {
+    const sent = await sendEmail({
+      to: company.email,
+      subject: `${org.name} — acces vendor / vendor access`,
+      html: vendorEmailHtml(org.name, url, data.expires_at),
+    });
+    if (sent.error) emailWarning = true;
+  } else {
+    emailWarning = true; // fără email pe companie — doar link copiabil
+  }
+  revalidatePath(dayPath(orgSlug, tourId, date));
+  return { url, emailWarning };
+}
+
+function vendorEmailHtml(orgName: string, url: string, expiresAt: string): string {
+  const until = String(expiresAt).slice(0, 10);
+  return [
+    `<p>${orgName} v-a invitat în portalul de vendor al unui show.</p>`,
+    `<p>${orgName} invited you to a show's vendor portal.</p>`,
+    `<p><a href="${url}">${url}</a></p>`,
+    `<p>Link valabil până la / valid until: ${until}</p>`,
+  ].join("\n");
+}
+
+export async function revokeVendorLink(
+  orgSlug: string,
+  tourId: string,
+  date: string,
+  linkId: string,
+): Promise<{ error?: string }> {
+  const { supabase, org } = await requireEditor(orgSlug);
+  const { error } = await supabase
+    .from("vendor_links")
+    .update({ revoked_at: new Date().toISOString() })
+    .eq("id", linkId)
+    .eq("organization_id", org.id);
+  if (error) return { error: error.message };
+  revalidatePath(dayPath(orgSlug, tourId, date));
+  return {};
+}
+
+export async function resendVendorEmail(
+  orgSlug: string,
+  tourId: string,
+  date: string,
+  linkId: string,
+): Promise<{ error?: string }> {
+  const { supabase, org } = await requireEditor(orgSlug);
+  const { data: link } = await supabase
+    .from("vendor_links")
+    .select("token, expires_at, revoked_at, companies!inner(email)")
+    .eq("id", linkId)
+    .eq("organization_id", org.id)
+    .maybeSingle();
+  const email = (link?.companies as unknown as { email: string | null } | null)?.email;
+  if (!link || link.revoked_at) return { error: "not_found" };
+  if (!email) return { error: "no_email" };
+  const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
+  const sent = await sendEmail({
+    to: email,
+    subject: `${org.name} — acces vendor / vendor access`,
+    html: vendorEmailHtml(org.name, `${base}/share/vendor/${link.token}`, link.expires_at),
+  });
+  return sent.error ? { error: sent.error } : {};
 }

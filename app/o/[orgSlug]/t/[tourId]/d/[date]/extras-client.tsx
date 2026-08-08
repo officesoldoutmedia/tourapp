@@ -4,13 +4,17 @@ import { useMemo, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/browser";
 import { versionChains } from "@/lib/fileVersions";
+import { vendorLinkState } from "@/lib/vendorPortal";
 import {
   createExpectedFile,
   createShareLink,
+  createVendorLink,
   deleteAttachment,
   deleteTask,
   getAttachmentUrl,
   recordAttachment,
+  resendVendorEmail,
+  revokeVendorLink,
   toggleTaskComplete,
   updateAttachmentMeta,
   upsertTask,
@@ -594,56 +598,277 @@ export function AttachmentsSection({
   );
 }
 
+// ── Vendor share [C4 §11]: link-uri magice per (companie, show) ────
+export interface CompanyData {
+  id: string;
+  name: string;
+  email: string | null;
+  file_category_id: string | null;
+}
+
+export interface VendorLinkData {
+  id: string;
+  company_id: string;
+  event_id: string;
+  expires_at: string;
+  revoked_at: string | null;
+  token: string;
+  created_at: string;
+}
+
+export interface DayEventOption {
+  id: string;
+  title: string;
+}
+
+type VendorState = ReturnType<typeof vendorLinkState>;
+const VENDOR_STATE_CLS: Record<VendorState, string> = {
+  live: "bg-success-subtle text-success",
+  expired: "bg-inset text-tertiary",
+  revoked: "bg-danger-subtle text-danger",
+};
+const VENDOR_STATE_KEY: Record<VendorState, "stateLive" | "stateExpired" | "stateRevoked"> = {
+  live: "stateLive",
+  expired: "stateExpired",
+  revoked: "stateRevoked",
+};
+
 // ── Bara de share + PDF a zilei [N §6.3.4] ──────────────────────────
 export function DayActionsBar({
   orgSlug,
+  tourId,
+  date,
   dayId,
   canEdit,
+  companies,
+  vendorLinks,
+  eventOptions,
+  categories,
 }: {
   orgSlug: string;
+  tourId: string;
+  date: string;
   dayId: string;
   canEdit: boolean;
+  companies: CompanyData[];
+  vendorLinks: VendorLinkData[];
+  eventOptions: DayEventOption[];
+  categories: FileCategoryData[];
 }) {
   const t = useTranslations("day");
+  const tv = useTranslations("vendorShare");
   const [pending, startTransition] = useTransition();
   const [url, setUrl] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
 
+  const [vendorOpen, setVendorOpen] = useState(false);
+  const [vendorPending, startVendorTransition] = useTransition();
+  const [eventId, setEventId] = useState(eventOptions[0]?.id ?? "");
+  const [companyId, setCompanyId] = useState("");
+  const [createdUrl, setCreatedUrl] = useState<string | null>(null);
+  const [createdWarning, setCreatedWarning] = useState(false);
+  const [createdCopied, setCreatedCopied] = useState(false);
+  const [busyLinkId, setBusyLinkId] = useState<string | null>(null);
+  const [resentLinkId, setResentLinkId] = useState<string | null>(null);
+  const [copiedLinkId, setCopiedLinkId] = useState<string | null>(null);
+
+  const categoriesById = useMemo(() => new Map(categories.map((c) => [c.id, c.name])), [categories]);
+  const companiesById = useMemo(() => new Map(companies.map((c) => [c.id, c])), [companies]);
+
+  function vendorUrl(token: string) {
+    const origin = typeof window !== "undefined" ? window.location.origin : "";
+    return `${origin}/share/vendor/${token}`;
+  }
+
+  function copyRowLink(link: VendorLinkData) {
+    void navigator.clipboard.writeText(vendorUrl(link.token));
+    setCopiedLinkId(link.id);
+    setTimeout(() => setCopiedLinkId((cur) => (cur === link.id ? null : cur)), 2000);
+  }
+
   return (
-    <div className="flex flex-wrap items-center gap-2 text-xs">
-      <a
-        href={`/api/pdf/daysheet/${dayId}?rooms=1`}
-        target="_blank"
-        className="rounded border border-hairline px-3 py-1 font-medium"
-      >
-        🖨 {t("pdf")}
-      </a>
-      {canEdit && !url && (
-        <button
-          disabled={pending}
-          onClick={() =>
-            startTransition(async () => {
-              const r = await createShareLink(orgSlug, dayId, null);
-              if (r.url) setUrl(r.url);
-            })
-          }
-          className="rounded border border-hairline px-3 py-1 font-medium disabled:opacity-40"
+    <div className="flex flex-col gap-2 text-xs">
+      <div className="flex flex-wrap items-center gap-2">
+        <a
+          href={`/api/pdf/daysheet/${dayId}?rooms=1`}
+          target="_blank"
+          className="rounded border border-hairline px-3 py-1 font-medium"
         >
-          🔗 {t("share")}
-        </button>
-      )}
-      {url && (
-        <button
-          onClick={() => {
-            void navigator.clipboard.writeText(url);
-            setCopied(true);
-            setTimeout(() => setCopied(false), 2000);
-          }}
-          className="max-w-72 truncate rounded bg-inset px-3 py-1 font-mono"
-          title={url}
-        >
-          {copied ? t("copied") : url}
-        </button>
+          🖨 {t("pdf")}
+        </a>
+        {canEdit && !url && (
+          <button
+            disabled={pending}
+            onClick={() =>
+              startTransition(async () => {
+                const r = await createShareLink(orgSlug, dayId, null);
+                if (r.url) setUrl(r.url);
+              })
+            }
+            className="rounded border border-hairline px-3 py-1 font-medium disabled:opacity-40"
+          >
+            🔗 {t("share")}
+          </button>
+        )}
+        {url && (
+          <button
+            onClick={() => {
+              void navigator.clipboard.writeText(url);
+              setCopied(true);
+              setTimeout(() => setCopied(false), 2000);
+            }}
+            className="max-w-72 truncate rounded bg-inset px-3 py-1 font-mono"
+            title={url}
+          >
+            {copied ? t("copied") : url}
+          </button>
+        )}
+        {canEdit && eventOptions.length > 0 && (
+          <button
+            onClick={() => setVendorOpen((v) => !v)}
+            className="rounded border border-hairline px-3 py-1 font-medium"
+          >
+            📦 {tv("button")}
+          </button>
+        )}
+      </div>
+
+      {canEdit && vendorOpen && eventOptions.length > 0 && (
+        <div className="space-y-3 rounded-[10px] border border-hairline bg-surface p-3">
+          <p className="font-display text-[13px] font-semibold text-primary">{tv("title")}</p>
+
+          <div className="flex flex-wrap items-center gap-2">
+            {eventOptions.length > 1 && (
+              <select
+                value={eventId}
+                onChange={(e) => setEventId(e.target.value)}
+                aria-label={tv("event")}
+                className="rounded border border-hairline px-2 py-1 text-xs"
+              >
+                {eventOptions.map((ev) => (
+                  <option key={ev.id} value={ev.id}>
+                    {ev.title}
+                  </option>
+                ))}
+              </select>
+            )}
+            <select
+              value={companyId}
+              onChange={(e) => setCompanyId(e.target.value)}
+              aria-label={tv("company")}
+              className="min-w-40 rounded border border-hairline px-2 py-1 text-xs"
+            >
+              <option value="">{tv("company")}…</option>
+              {companies.map((c) => (
+                <option key={c.id} value={c.id}>
+                  {c.name} · {c.file_category_id ? (categoriesById.get(c.file_category_id) ?? tv("noCategory")) : tv("noCategory")}
+                </option>
+              ))}
+            </select>
+            <button
+              disabled={vendorPending || !companyId || !(eventOptions.length > 1 ? eventId : eventOptions[0])}
+              onClick={() => {
+                const evId = eventOptions.length > 1 ? eventId : eventOptions[0]?.id;
+                if (!evId || !companyId) return;
+                startVendorTransition(async () => {
+                  const r = await createVendorLink(orgSlug, tourId, date, evId, companyId);
+                  if (r.url) {
+                    setCreatedUrl(r.url);
+                    setCreatedWarning(!!r.emailWarning);
+                    setCreatedCopied(false);
+                  }
+                });
+              }}
+              className="btn-quiet h-7 px-2.5 disabled:opacity-40"
+            >
+              {tv("create")}
+            </button>
+          </div>
+
+          {createdUrl && (
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="text-secondary">{tv("created")}</span>
+              <button
+                onClick={() => {
+                  void navigator.clipboard.writeText(createdUrl);
+                  setCreatedCopied(true);
+                  setTimeout(() => setCreatedCopied(false), 2000);
+                }}
+                className="max-w-72 truncate rounded bg-inset px-3 py-1 font-mono"
+                title={createdUrl}
+              >
+                {createdCopied ? tv("copied") : createdUrl}
+              </button>
+              {createdWarning && <span className="text-warning">{tv("emailWarning")}</span>}
+            </div>
+          )}
+
+          {vendorLinks.length === 0 ? (
+            <p className="text-tertiary">{tv("empty")}</p>
+          ) : (
+            <ul className="divide-y divide-hairline rounded-[10px] border border-hairline bg-inset/40">
+              {vendorLinks.map((link) => {
+                const state = vendorLinkState(link);
+                const company = companiesById.get(link.company_id);
+                const busy = busyLinkId === link.id;
+                return (
+                  <li key={link.id} className="flex flex-wrap items-center gap-2 px-3 py-2">
+                    <span className="min-w-0 flex-1 truncate font-medium text-primary">
+                      {company?.name ?? "—"}
+                    </span>
+                    <span className={`rounded-full px-2 py-0.5 text-[10px] font-medium ${VENDOR_STATE_CLS[state]}`}>
+                      {tv(VENDOR_STATE_KEY[state])}
+                    </span>
+                    <button
+                      onClick={() => copyRowLink(link)}
+                      className="rounded border border-hairline px-2 py-0.5 text-[10px]"
+                    >
+                      {copiedLinkId === link.id ? tv("copied") : tv("copy")}
+                    </button>
+                    {state === "live" && (
+                      <>
+                        <button
+                          disabled={busy}
+                          onClick={() => {
+                            setBusyLinkId(link.id);
+                            startVendorTransition(async () => {
+                              const r = await resendVendorEmail(orgSlug, tourId, date, link.id);
+                              setBusyLinkId(null);
+                              if (!r.error) {
+                                setResentLinkId(link.id);
+                                setTimeout(
+                                  () => setResentLinkId((cur) => (cur === link.id ? null : cur)),
+                                  2000,
+                                );
+                              }
+                            });
+                          }}
+                          className="rounded border border-hairline px-2 py-0.5 text-[10px] disabled:opacity-40"
+                        >
+                          {resentLinkId === link.id ? tv("resent") : tv("resend")}
+                        </button>
+                        <button
+                          disabled={busy}
+                          onClick={() => {
+                            if (!window.confirm(tv("revokeConfirm"))) return;
+                            setBusyLinkId(link.id);
+                            startVendorTransition(async () => {
+                              await revokeVendorLink(orgSlug, tourId, date, link.id);
+                              setBusyLinkId(null);
+                            });
+                          }}
+                          className="rounded px-2 py-0.5 text-[10px] text-danger hover:bg-danger-subtle disabled:opacity-40"
+                        >
+                          {tv("revoke")}
+                        </button>
+                      </>
+                    )}
+                  </li>
+                );
+              })}
+            </ul>
+          )}
+        </div>
       )}
     </div>
   );
