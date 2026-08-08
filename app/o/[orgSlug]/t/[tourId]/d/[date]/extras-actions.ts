@@ -288,6 +288,27 @@ export async function createVendorLink(
     .maybeSingle();
   if (!company) return { error: "not_found" };
 
+  // Ownership (plan defect, fix C4-T4): eventId vine de la client ca simplă
+  // referință, nevalidată — un user membru în MAI MULTE org-uri ar putea,
+  // printr-un request manual, să trimită eventId-ul unui show din ALT org
+  // în timp ce operează sub orgSlug-ul ăsta. Fără verificarea lanțului
+  // event → day → tour → organization_id (pattern-ul din apply-deal.ts),
+  // link-ul creat ar purta organization_id-ul org-ului curent dar
+  // resolveVendorLink() (portalul public) ar rezolva programul/hotelul
+  // org-ului STRĂIN — o scurgere cross-tenant prin link-ul public de
+  // vendor. companyId e deja org-verificat mai sus; eventId trebuie
+  // verificat separat, înainte de orice scriere.
+  const { data: event } = await supabase
+    .from("events")
+    .select("id, days!inner(tours!inner(organization_id))")
+    .eq("id", eventId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  const eventOrgId = (
+    event?.days as unknown as { tours: { organization_id: string } | null } | undefined
+  )?.tours?.organization_id;
+  if (eventOrgId !== org.id) return { error: "not_found" };
+
   // un singur link viu per (companie, show): revocă-l pe cel existent
   await supabase
     .from("vendor_links")
@@ -343,6 +364,10 @@ export async function revokeVendorLink(
   linkId: string,
 ): Promise<{ error?: string }> {
   const { supabase, org } = await requireEditor(orgSlug);
+  // Ownership: linkId e filtrat direct pe organization_id (câmp propriu pe
+  // vendor_links, nu prin lanț) — un linkId dintr-un alt org nu potrivește
+  // nicio linie, update-ul e no-op. Deja sigur, spre deosebire de eventId
+  // în createVendorLink (vezi comentariul de-acolo).
   const { error } = await supabase
     .from("vendor_links")
     .update({ revoked_at: new Date().toISOString() })
@@ -360,6 +385,9 @@ export async function resendVendorEmail(
   linkId: string,
 ): Promise<{ error?: string }> {
   const { supabase, org } = await requireEditor(orgSlug);
+  // Ownership: la fel ca revokeVendorLink — linkId e filtrat direct pe
+  // organization_id (câmp propriu pe vendor_links), deci un linkId străin
+  // nu se potrivește și cade pe ramura not_found de mai jos. Sigur.
   const { data: link } = await supabase
     .from("vendor_links")
     .select("token, expires_at, revoked_at, companies!inner(email)")
