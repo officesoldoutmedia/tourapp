@@ -85,3 +85,24 @@
   verificat la prima folosire reală
 - setDefaultEntity ne-atomic (fereastră zero-default) + fără constraint DB pe
   „un singur default" — is_default e doar display azi
+
+## Adăugat post-C4 (2026-08-08)
+
+- Re-derivarea org-ului din lanțul event în resolveVendorLink (belt-and-suspenders
+  pe suprafața publică; azi garantat de validarea de la creare)
+- Allowlist de content-type pe upload-ul de vendor (HTML/SVG servite inline de pe
+  originul storage — comportament SP3b pre-existent, nu expunere nouă)
+- error.message brut întors clientului anonim pe upload/acțiuni (constraint/table
+  names) — de mapat pe coduri generice
+- resolve nu respinge day/tour soft-deleted pe căile de SCRIERE (pagina e
+  protejată prin getDaySheetData)
+- Vizibilitatea categoriei partajate: vendorul vede TOATE fișierele categoriei lui
+  pe zi (by design = pachetul departamentului); ghid operațional: nu folosi
+  „Show files" ca departament de vendor; opțional filtru per companie la C4b
+- Test de regresie pe validarea org din createVendorLink (fix-ul de securitate
+  cel mai probabil să regreseze silențios)
+- Butonul Revoke cu window.confirm — nesmoke-uit prin browser MCP (dialogurile
+  native blochează extensia); revocarea verificată prin DB + 404 pe ambele
+  endpoint-uri; de înlocuit confirm-urile native cu modale custom (temă veche)
+- Ecranul obligatoriu de share la Create Event + share-ul către parties pe email
+  (partea de sus a §11) — follow-up-ul mare rămas din §11
