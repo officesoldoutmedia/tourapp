@@ -4,6 +4,29 @@ import { getTranslations } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 
+/**
+ * Re-validează server-side id-ul de categorie trimis dintr-un <select> —
+ * nu are voie să aparțină altui org sau să fie o categorie ștearsă.
+ * Folosit atât la creare (addCompany), cât și la editarea unei companii
+ * existente (setCompanyCategory).
+ */
+async function resolveCategoryId(
+  supabase: Awaited<ReturnType<typeof requireOrg>>["supabase"],
+  orgId: string,
+  raw: FormDataEntryValue | null,
+): Promise<string | null> {
+  const id = String(raw ?? "").trim();
+  if (!id) return null;
+  const { data: category } = await supabase
+    .from("file_categories")
+    .select("id")
+    .eq("id", id)
+    .eq("organization_id", orgId)
+    .is("deleted_at", null)
+    .maybeSingle();
+  return category?.id ?? null;
+}
+
 /** Companies & Contacts — agenda de business a organizației [C §6.14]. */
 export default async function ContactsPage({
   params,
@@ -44,20 +67,7 @@ export default async function ContactsPage({
     const { supabase, org } = await requireOrg(orgSlug);
     const name = String(formData.get("name") ?? "").trim();
     if (!name) return;
-    // id-ul categoriei trebuie re-validat server-side (nu doar afișat din
-    // select) — nu are voie să aparțină altui org sau să fie ștearsă.
-    const fileCategoryId = String(formData.get("fileCategoryId") ?? "").trim();
-    let validCategoryId: string | null = null;
-    if (fileCategoryId) {
-      const { data: category } = await supabase
-        .from("file_categories")
-        .select("id")
-        .eq("id", fileCategoryId)
-        .eq("organization_id", org.id)
-        .is("deleted_at", null)
-        .maybeSingle();
-      validCategoryId = category?.id ?? null;
-    }
+    const validCategoryId = await resolveCategoryId(supabase, org.id, formData.get("fileCategoryId"));
     await supabase.from("companies").insert({
       organization_id: org.id,
       name,
@@ -66,6 +76,22 @@ export default async function ContactsPage({
       email: String(formData.get("email") ?? "").trim() || null,
       file_category_id: validCategoryId,
     });
+    revalidatePath(`/o/${orgSlug}/contacts`);
+  }
+
+  async function setCompanyCategory(formData: FormData) {
+    "use server";
+    const { supabase, org } = await requireOrg(orgSlug);
+    const id = String(formData.get("id") ?? "");
+    if (!id) return;
+    const validCategoryId = await resolveCategoryId(supabase, org.id, formData.get("fileCategoryId"));
+    // dublu-filtrat pe organization_id — id-ul companiei vine din formular,
+    // nu are voie să atingă un rând din alt org.
+    await supabase
+      .from("companies")
+      .update({ file_category_id: validCategoryId })
+      .eq("id", id)
+      .eq("organization_id", org.id);
     revalidatePath(`/o/${orgSlug}/contacts`);
   }
 
@@ -112,16 +138,34 @@ export default async function ContactsPage({
         ) : (
           <ul className="divide-y divide-hairline rounded-[12px] border border-hairline bg-surface">
             {(companies ?? []).map((company) => (
-              <li key={company.id} className="flex items-center gap-2 px-4 py-2 text-sm">
+              <li key={company.id} className="flex flex-wrap items-center gap-2 px-4 py-2 text-sm">
                 <span className="min-w-0 flex-1">
                   <b>{company.name}</b>
                   {company.kind && <span className="ml-2 text-xs text-secondary">{company.kind}</span>}
-                  {company.file_category_id && categoryName.get(company.file_category_id) && (
+                  {/* view-only (fără edit_tour_content): doar text; canEdit vede selectul de mai jos */}
+                  {!canEdit && company.file_category_id && categoryName.get(company.file_category_id) && (
                     <span className="ml-2 text-xs text-tertiary">{categoryName.get(company.file_category_id)}</span>
                   )}
                 </span>
                 {company.phone && <a href={`tel:${company.phone}`} className="text-xs text-secondary hover:underline">{company.phone}</a>}
                 {company.email && <a href={`mailto:${company.email}`} className="text-xs text-secondary hover:underline">{company.email}</a>}
+                {canEdit && (
+                  <form action={setCompanyCategory} className="flex shrink-0 items-center gap-1">
+                    <input type="hidden" name="id" value={company.id} />
+                    <select
+                      name="fileCategoryId"
+                      aria-label={t("department")}
+                      defaultValue={company.file_category_id ?? ""}
+                      className={inputCls}
+                    >
+                      <option value="">{t("department")}: {t("none")}</option>
+                      {(fileCategories ?? []).map((cat) => (
+                        <option key={cat.id} value={cat.id}>{cat.name}</option>
+                      ))}
+                    </select>
+                    <button className="btn-quiet h-7 shrink-0 px-2">{tc("save")}</button>
+                  </form>
+                )}
                 {canEdit && (
                   <form action={remove}>
                     <input type="hidden" name="table" value="companies" />
