@@ -17,10 +17,10 @@ export default async function ContactsPage({
   const canEdit = can({ tier, permission }, "edit_tour_content");
   if (!canEdit && permission !== "mobile_access") notFound();
 
-  const [{ data: companies }, { data: contacts }] = await Promise.all([
+  const [{ data: companies }, { data: contacts }, { data: fileCategories }] = await Promise.all([
     supabase
       .from("companies")
-      .select("id, name, kind, phone, email")
+      .select("id, name, kind, phone, email, file_category_id")
       .eq("organization_id", org.id)
       .is("deleted_at", null)
       .order("name"),
@@ -30,6 +30,13 @@ export default async function ContactsPage({
       .eq("organization_id", org.id)
       .is("deleted_at", null)
       .order("last_name"),
+    supabase
+      .from("file_categories")
+      .select("id, name")
+      .eq("organization_id", org.id)
+      .is("deleted_at", null)
+      .order("sort_order")
+      .order("created_at"),
   ]);
 
   async function addCompany(formData: FormData) {
@@ -37,12 +44,27 @@ export default async function ContactsPage({
     const { supabase, org } = await requireOrg(orgSlug);
     const name = String(formData.get("name") ?? "").trim();
     if (!name) return;
+    // id-ul categoriei trebuie re-validat server-side (nu doar afișat din
+    // select) — nu are voie să aparțină altui org sau să fie ștearsă.
+    const fileCategoryId = String(formData.get("fileCategoryId") ?? "").trim();
+    let validCategoryId: string | null = null;
+    if (fileCategoryId) {
+      const { data: category } = await supabase
+        .from("file_categories")
+        .select("id")
+        .eq("id", fileCategoryId)
+        .eq("organization_id", org.id)
+        .is("deleted_at", null)
+        .maybeSingle();
+      validCategoryId = category?.id ?? null;
+    }
     await supabase.from("companies").insert({
       organization_id: org.id,
       name,
       kind: String(formData.get("kind") ?? "").trim() || null,
       phone: String(formData.get("phone") ?? "").trim() || null,
       email: String(formData.get("email") ?? "").trim() || null,
+      file_category_id: validCategoryId,
     });
     revalidatePath(`/o/${orgSlug}/contacts`);
   }
@@ -76,6 +98,7 @@ export default async function ContactsPage({
   }
 
   const companyName = new Map((companies ?? []).map((c) => [c.id, c.name]));
+  const categoryName = new Map((fileCategories ?? []).map((c) => [c.id, c.name]));
   const inputCls = "rounded border border-hairline px-2 py-1 text-sm";
 
   return (
@@ -93,6 +116,9 @@ export default async function ContactsPage({
                 <span className="min-w-0 flex-1">
                   <b>{company.name}</b>
                   {company.kind && <span className="ml-2 text-xs text-secondary">{company.kind}</span>}
+                  {company.file_category_id && categoryName.get(company.file_category_id) && (
+                    <span className="ml-2 text-xs text-tertiary">{categoryName.get(company.file_category_id)}</span>
+                  )}
                 </span>
                 {company.phone && <a href={`tel:${company.phone}`} className="text-xs text-secondary hover:underline">{company.phone}</a>}
                 {company.email && <a href={`mailto:${company.email}`} className="text-xs text-secondary hover:underline">{company.email}</a>}
@@ -111,6 +137,12 @@ export default async function ContactsPage({
           <form action={addCompany} className="flex flex-wrap gap-2">
             <input name="name" required placeholder={t("companies")} className={`${inputCls} min-w-36 flex-1`} />
             <input name="kind" placeholder={t("kind")} className={`${inputCls} w-32`} />
+            <select name="fileCategoryId" aria-label={t("department")} className={inputCls} defaultValue="">
+              <option value="">{t("department")}: {t("none")}</option>
+              {(fileCategories ?? []).map((cat) => (
+                <option key={cat.id} value={cat.id}>{cat.name}</option>
+              ))}
+            </select>
             <input name="phone" placeholder="Tel" className={`${inputCls} w-28`} />
             <input name="email" placeholder="Email" className={`${inputCls} w-40`} />
             <button className="btn-quiet h-7 px-2.5">+ {t("addCompany")}</button>

@@ -634,6 +634,7 @@
     "addCompany": "Add company",
     "addContact": "Add contact",
     "kind": "Kind (e.g. Booking)",
+    "department": "Department (files)",
     "role": "Role",
     "company": "Company",
     "none": "—",

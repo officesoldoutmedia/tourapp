@@ -634,6 +634,7 @@
     "addCompany": "Adaugă companie",
     "addContact": "Adaugă contact",
     "kind": "Tip (ex. Booking)",
+    "department": "Departament (fișiere)",
     "role": "Rol",
     "company": "Companie",
     "none": "—",
