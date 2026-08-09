@@ -45,7 +45,7 @@ export default async function SharedDayPage({
           {[day.city, day.country].filter(Boolean).join(", ") || day.day_type}
         </h1>
         <p className="text-sm text-secondary">
-          {formatDayHeader(day.date, tz, "ro")} · {day.day_type}
+          {formatDayHeader(day.date, tz, "en")} · {day.day_type}
         </p>
       </header>
 

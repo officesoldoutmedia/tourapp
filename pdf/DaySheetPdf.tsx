@@ -168,7 +168,7 @@ function DaySheetPage({
 
 export async function buildDaySheetPdf(
   days: DaySheetData[],
-  locale = "ro",
+  locale = "en",
   logoUrl: string | null = null,
 ): Promise<Buffer> {
   const doc = (
