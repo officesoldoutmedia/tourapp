@@ -80,7 +80,7 @@ export default async function UsersSettingsPage({
       // email opțional [C §4.3.3] — mod log fără RESEND_API_KEY
       await sendEmail({
         to: email,
-        subject: `Invitație în ${ctx.org.name} pe TourApp`,
+        subject: `Invitație în ${ctx.org.name} pe Toura`,
         html: `<p>Ai fost invitat(ă) în organizația <b>${ctx.org.name}</b>.</p><p><a href="${url}">Acceptă invitația</a></p>`,
       });
     }

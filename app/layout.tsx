@@ -28,7 +28,7 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "TourApp",
+  title: "Toura Pro",
   description: "Tour & event logistics",
 };
 

@@ -115,7 +115,7 @@ export default async function SharedDayPage({
       )}
 
       <footer className="border-t border-hairline pt-3 text-xs text-tertiary">
-        TourApp · read-only day sheet
+        Toura · read-only day sheet
       </footer>
     </main>
   );

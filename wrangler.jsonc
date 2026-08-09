@@ -1,5 +1,5 @@
 {
-  // TourApp pe Cloudflare Workers via OpenNext (blueprint §2.1)
+  // Toura (fost TourApp) pe Cloudflare Workers via OpenNext (blueprint §2.1)
   "$schema": "node_modules/wrangler/config-schema.json",
   "name": "tourapp",
   "main": ".open-next/worker.js",
@@ -12,7 +12,7 @@
   "observability": { "enabled": true },
   // Expeditorul emailurilor (Resend) — domeniul toura.pro verificat în
   // contul soldoutmedia (2026-08-09). Secretele rămân în `wrangler secret`.
-  "vars": { "EMAIL_FROM": "TourApp <no-reply@toura.pro>" },
+  "vars": { "EMAIL_FROM": "Toura <no-reply@toura.pro>" },
   // Domeniul custom: toura.pro + www (zona trebuie să fie ACTIVĂ înainte de
   // deploy — atașarea pe zonă pending a produs 1042 pe tot workerul, 2026-08-09).
   "routes": [

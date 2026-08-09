@@ -5,7 +5,7 @@ import "server-only";
  * (dev local, §2.4) → mod log: emailul se scrie în consolă, nu se trimite.
  */
 
-const FROM = process.env.EMAIL_FROM ?? "TourApp <onboarding@resend.dev>";
+const FROM = process.env.EMAIL_FROM ?? "Toura <onboarding@resend.dev>";
 
 export async function sendEmail(input: {
   to: string;

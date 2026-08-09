@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
 const L10N = {
   ro: {
     title: "Raport anual plăți per persoană",
-    generated: "Generat din TourApp",
+    generated: "Generat din Toura",
     paid: "plătită",
     pending: "de plată",
     person: ["persoană", "persoane"],
@@ -73,7 +73,7 @@ const L10N = {
   },
   en: {
     title: "Annual per-person payment report",
-    generated: "Generated from TourApp",
+    generated: "Generated from Toura",
     paid: "paid",
     pending: "due",
     person: ["person", "people"],

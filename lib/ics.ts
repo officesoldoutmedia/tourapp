@@ -70,12 +70,12 @@ function vevent(lines: string[]): string[] {
 export function buildIcs(
   mode: 'summary' | 'items',
   days: IcsFeedDay[],
-  calendarName = 'TourApp',
+  calendarName = 'Toura',
 ): string {
   const out: string[] = [
     'BEGIN:VCALENDAR',
     'VERSION:2.0',
-    'PRODID:-//TourApp//RO',
+    'PRODID:-//Toura//RO',
     'CALSCALE:GREGORIAN',
     `X-WR-CALNAME:${icsEscape(calendarName)}`,
   ]

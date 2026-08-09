@@ -281,7 +281,7 @@ export default async function VendorPortalPage({
         />
       </section>
 
-      <footer className="border-t border-hairline pt-3 text-xs text-tertiary">TourApp</footer>
+      <footer className="border-t border-hairline pt-3 text-xs text-tertiary">Toura</footer>
     </main>
   );
 }

@@ -58,7 +58,7 @@ export default async function OrgLayout({
             T
           </span>
           <span className="font-display text-[13px] font-semibold tracking-[-0.01em] text-primary">
-            TourApp
+            Toura
           </span>
         </Link>
 

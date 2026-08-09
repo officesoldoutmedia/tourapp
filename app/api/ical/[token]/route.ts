@@ -29,7 +29,7 @@ export async function GET(
   return new NextResponse(ics, {
     headers: {
       "Content-Type": "text/calendar; charset=utf-8",
-      "Content-Disposition": `attachment; filename="tourapp-${mode}.ics"`,
+      "Content-Disposition": `attachment; filename="toura-${mode}.ics"`,
       "Cache-Control": "private, max-age=300",
     },
   });
