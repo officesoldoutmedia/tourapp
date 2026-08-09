@@ -4,6 +4,20 @@ import { NextResponse, type NextRequest } from "next/server";
 const PROTECTED_PREFIXES = ["/app", "/o"];
 
 export async function middleware(request: NextRequest) {
+  // Host canonic: toura.pro. workers.dev (URL-ul istoric) redirecționează
+  // permanent cu path+query păstrate — link-urile vechi (share, emailuri)
+  // continuă să meargă. Rezolvă și 1042-ul de pe workers.dev: subrequestul
+  // intern OpenNext spre URL-ul canonic e blocat de Cloudflare ca self-fetch
+  // când hostul requestului diferă de cel canonic. [2026-08-09]
+  const host = request.headers.get("host") ?? "";
+  if (host === "tourapp.office-2e5.workers.dev") {
+    const url = new URL(request.url);
+    url.protocol = "https:";
+    url.host = "toura.pro";
+    url.port = "";
+    return NextResponse.redirect(url, 308);
+  }
+
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient(

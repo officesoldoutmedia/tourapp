@@ -9,7 +9,13 @@
     "directory": ".open-next/assets",
     "binding": "ASSETS"
   },
-  "observability": { "enabled": true }
+  "observability": { "enabled": true },
+  // Domeniul custom: toura.pro + www (zona trebuie să fie ACTIVĂ înainte de
+  // deploy — atașarea pe zonă pending a produs 1042 pe tot workerul, 2026-08-09).
+  "routes": [
+    { "pattern": "toura.pro", "custom_domain": true },
+    { "pattern": "www.toura.pro", "custom_domain": true }
+  ]
   // Secretele (SUPABASE_SERVICE_ROLE_KEY, GOOGLE_MAPS_API_KEY, RESEND_API_KEY)
   // se setează cu `wrangler secret put`, NU aici. Publicele merg în [vars]
   // sau în dashboard. Vezi docs/DEPLOY.md.
