@@ -26,7 +26,18 @@
     "invalidCredentials": "Invalid email or password.",
     "firstName": "First name",
     "lastName": "Last name",
-    "heading": "Sign in"
+    "heading": "Sign in",
+    "forgotPassword": "Forgot password?",
+    "resetEmailSent": "Check your email — we sent you a password reset link.",
+    "resetHeading": "Set a new password",
+    "newPassword": "New password",
+    "confirmPassword": "Confirm password",
+    "passwordMismatch": "Passwords do not match.",
+    "passwordTooShort": "Password must be at least 8 characters.",
+    "passwordSaved": "Password changed. Taking you to the app…",
+    "resetLinkInvalid": "This reset link is invalid or has expired. Request a new one from the sign-in page.",
+    "savePassword": "Save password",
+    "backToLogin": "Back to sign in"
   },
   "invite": {
     "title": "Organization invitation",

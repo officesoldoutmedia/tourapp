@@ -37,6 +37,22 @@ function LoginForm() {
     router.refresh();
   }
 
+  async function sendPasswordReset() {
+    if (!email) return;
+    setPending(true);
+    setError(null);
+    const supabase = createClient();
+    // Template-ul Recovery duce la /auth/confirm?type=recovery&next=/reset-password
+    // (token_hash — merge indiferent de browserul în care se deschide linkul).
+    const { error } = await supabase.auth.resetPasswordForEmail(email);
+    setPending(false);
+    if (error) {
+      setError(tc("error"));
+      return;
+    }
+    setMessage(t("resetEmailSent"));
+  }
+
   async function sendMagicLink() {
     if (!email) return;
     setPending(true);
@@ -89,7 +105,18 @@ function LoginForm() {
               />
             </label>
             <label className="block space-y-1">
-              <span className="text-[11.5px] font-medium text-secondary">{t("password")}</span>
+              <div className="flex items-baseline justify-between">
+                <span className="text-[11.5px] font-medium text-secondary">{t("password")}</span>
+                <button
+                  type="button"
+                  onClick={sendPasswordReset}
+                  disabled={pending || !email}
+                  title={!email ? t("email") : undefined}
+                  className="text-[11.5px] font-medium text-tertiary underline disabled:opacity-50"
+                >
+                  {t("forgotPassword")}
+                </button>
+              </div>
               <input
                 type="password"
                 autoComplete="current-password"

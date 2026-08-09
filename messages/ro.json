@@ -26,7 +26,18 @@
     "invalidCredentials": "Email sau parolă incorecte.",
     "firstName": "Prenume",
     "lastName": "Nume",
-    "heading": "Autentificare"
+    "heading": "Autentificare",
+    "forgotPassword": "Ai uitat parola?",
+    "resetEmailSent": "Verifică-ți emailul — ți-am trimis un link de resetare a parolei.",
+    "resetHeading": "Setează o parolă nouă",
+    "newPassword": "Parola nouă",
+    "confirmPassword": "Confirmă parola",
+    "passwordMismatch": "Parolele nu coincid.",
+    "passwordTooShort": "Parola trebuie să aibă cel puțin 8 caractere.",
+    "passwordSaved": "Parola a fost schimbată. Te ducem în aplicație…",
+    "resetLinkInvalid": "Linkul de resetare e invalid sau a expirat. Cere unul nou de pe pagina de autentificare.",
+    "savePassword": "Salvează parola",
+    "backToLogin": "Înapoi la autentificare"
   },
   "invite": {
     "title": "Invitație în organizație",
