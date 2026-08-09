@@ -106,3 +106,18 @@
   endpoint-uri; de înlocuit confirm-urile native cu modale custom (temă veche)
 - Ecranul obligatoriu de share la Create Event + share-ul către parties pe email
   (partea de sus a §11) — follow-up-ul mare rămas din §11
+
+## Adăugat post-domeniu toura.pro (2026-08-09)
+
+- workers.dev dă „error code: 1042" la edge (fără invocarea workerului) după
+  atașarea domeniilor custom — corelat inițial cu NEXT_PUBLIC_APP_URL dar
+  bundle-ul nu conține niciun fetch spre domeniu; probabil stare edge
+  tranzitorie/bug Cloudflare. De monitorizat; dacă persistă: ticket Cloudflare
+  sau dezactivarea URL-ului workers.dev (link-urile vechi mor oricum curat).
+- Redirect-ul canonic 308 workers.dev→toura.pro există în middleware (rulează
+  doar când edge-ul invocă workerul).
+- ATENȚIE la refolosirea rețetei: NU atașa custom domains pe o zonă PENDING
+  (primul deploy cu routes a coincis cu outage 1042 pe tot workerul).
+- Email-urile Resend pleacă de pe onboarding@resend.dev (EMAIL_FROM nesetat) —
+  de configurat un domeniu de trimitere pe toura.pro în Resend + EMAIL_FROM
+  (ex. TourApp <no-reply@toura.pro>) acum că domeniul există.
