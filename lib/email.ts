@@ -1,5 +1,7 @@
 import "server-only";
 
+import { buildGuestApprovalEmail } from "./emailMessages";
+
 /**
  * Email tranzacțional prin Resend (blueprint §2.1). Fără RESEND_API_KEY
  * (dev local, §2.4) → mod log: emailul se scrie în consolă, nu se trimite.
@@ -46,27 +48,14 @@ export async function sendEmail(input: {
  */
 export async function sendGuestApprovalEmail(input: {
   to: string;
+  orgName: string;
   guestName: string;
   eventTitle: string;
   eventDate: string;
   numTickets: number;
   passes: { name: string; quantity: number }[];
 }): Promise<{ error?: string }> {
-  const passLines = input.passes
-    .map((p) => `<li>${p.quantity} × ${p.name}</li>`)
-    .join("");
-  return sendEmail({
-    to: input.to,
-    subject: `Guest list confirmat — ${input.eventTitle} (${input.eventDate})`,
-    html: `
-      <p>Salut,</p>
-      <p><b>${input.guestName}</b> este pe guest list la
-         <b>${input.eventTitle}</b> — ${input.eventDate}.</p>
-      <ul>
-        ${input.numTickets > 0 ? `<li>${input.numTickets} bilete</li>` : ""}
-        ${passLines}
-      </ul>
-      <p>Ne vedem acolo!</p>
-    `,
-  });
+  const { to, ...rest } = input;
+  const message = buildGuestApprovalEmail(rest);
+  return sendEmail({ to, subject: message.subject, html: message.html });
 }

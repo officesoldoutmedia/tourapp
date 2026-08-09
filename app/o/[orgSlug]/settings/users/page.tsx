@@ -4,6 +4,7 @@ import { getTranslations } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { sendEmail } from "@/lib/email";
+import { buildInvitationEmail } from "@/lib/emailMessages";
 import { CopyButton } from "@/components/CopyButton";
 
 const PERMISSIONS = [
@@ -78,11 +79,8 @@ export default async function UsersSettingsPage({
     if (inviteRow) {
       const url = `${process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000"}/invite/${inviteRow.token}`;
       // email opțional [C §4.3.3] — mod log fără RESEND_API_KEY
-      await sendEmail({
-        to: email,
-        subject: `Invitație în ${ctx.org.name} pe Toura`,
-        html: `<p>Ai fost invitat(ă) în organizația <b>${ctx.org.name}</b>.</p><p><a href="${url}">Acceptă invitația</a></p>`,
-      });
+      const message = buildInvitationEmail({ orgName: ctx.org.name, url });
+      await sendEmail({ to: email, subject: message.subject, html: message.html });
     }
     revalidatePath(`/o/${orgSlug}/settings/users`);
   }

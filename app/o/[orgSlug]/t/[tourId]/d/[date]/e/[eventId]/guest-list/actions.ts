@@ -146,6 +146,7 @@ export async function setGuestStatus(
         if (!request.email_notify) continue;
         await sendGuestApprovalEmail({
           to: request.email_notify,
+          orgName: org.name,
           guestName: [request.first_name, request.last_name].filter(Boolean).join(" "),
           eventTitle,
           eventDate: date,

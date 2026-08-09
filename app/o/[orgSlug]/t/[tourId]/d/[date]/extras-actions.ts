@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { sendEmail } from "@/lib/email";
+import { buildVendorEmail } from "@/lib/emailMessages";
 
 async function requireEditor(orgSlug: string) {
   const ctx = await requireOrg(orgSlug);
@@ -334,27 +335,14 @@ export async function createVendorLink(
 
   let emailWarning = false;
   if (company.email) {
-    const sent = await sendEmail({
-      to: company.email,
-      subject: `${org.name} — acces vendor / vendor access`,
-      html: vendorEmailHtml(org.name, url, data.expires_at),
-    });
+    const message = buildVendorEmail({ orgName: org.name, url, expiresAt: data.expires_at });
+    const sent = await sendEmail({ to: company.email, subject: message.subject, html: message.html });
     if (sent.error) emailWarning = true;
   } else {
     emailWarning = true; // fără email pe companie — doar link copiabil
   }
   revalidatePath(dayPath(orgSlug, tourId, date));
   return { url, emailWarning };
-}
-
-function vendorEmailHtml(orgName: string, url: string, expiresAt: string): string {
-  const until = String(expiresAt).slice(0, 10);
-  return [
-    `<p>${orgName} v-a invitat în portalul de vendor al unui show.</p>`,
-    `<p>${orgName} invited you to a show's vendor portal.</p>`,
-    `<p><a href="${url}">${url}</a></p>`,
-    `<p>Link valabil până la / valid until: ${until}</p>`,
-  ].join("\n");
 }
 
 export async function revokeVendorLink(
@@ -398,10 +386,11 @@ export async function resendVendorEmail(
   if (!link || link.revoked_at) return { error: "not_found" };
   if (!email) return { error: "no_email" };
   const base = process.env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
-  const sent = await sendEmail({
-    to: email,
-    subject: `${org.name} — acces vendor / vendor access`,
-    html: vendorEmailHtml(org.name, `${base}/share/vendor/${link.token}`, link.expires_at),
+  const message = buildVendorEmail({
+    orgName: org.name,
+    url: `${base}/share/vendor/${link.token}`,
+    expiresAt: link.expires_at,
   });
+  const sent = await sendEmail({ to: email, subject: message.subject, html: message.html });
   return sent.error ? { error: sent.error } : {};
 }
