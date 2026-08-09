@@ -24,7 +24,7 @@ export function perDiemLine(
   const currency = party.per_diem_currency || "EUR";
   return {
     key: `${PER_DIEM_KEY_PREFIX}${party.id}`,
-    label: `Diurnă ${party.name} — ${headcount} × ${rate} ${currency} × ${days} zile`,
+    label: `Per diem ${party.name} — ${headcount} × ${rate} ${currency} × ${days} days`,
     amount: round2(headcount * rate * days),
     currency,
   };

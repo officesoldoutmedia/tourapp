@@ -77,7 +77,7 @@ describe("convertCostLines", () => {
     const r = convertCostLines(
       [
         { kind: "crew", label: "TM", amount: 500, currency: "EUR" },
-        { kind: "extra", label: "Diurnă", amount: 1000, currency: "RON" },
+        { kind: "extra", label: "Per diem", amount: 1000, currency: "RON" },
       ],
       "RON",
       { EUR: 5.05 },

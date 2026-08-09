@@ -1,5 +1,4 @@
 import { NextResponse } from "next/server";
-import { getLocale } from "next-intl/server";
 import { requireOrg } from "@/lib/org";
 import { can } from "@/lib/permissions";
 import { fetchAnnualReport } from "@/lib/annualReportQuery";
@@ -23,7 +22,7 @@ export async function GET(
       : new Date().getFullYear();
 
   const people = await fetchAnnualReport(supabase, org.id, year);
-  const pdf = await buildAnnualReportPdf(org.name, year, people, await getLocale());
+  const pdf = await buildAnnualReportPdf(org.name, year, people);
 
   return new NextResponse(new Uint8Array(pdf), {
     headers: {

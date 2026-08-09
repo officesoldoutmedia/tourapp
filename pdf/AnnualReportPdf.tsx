@@ -60,36 +60,23 @@ const styles = StyleSheet.create({
   },
 });
 
-const L10N = {
-  ro: {
-    title: "Raport anual plăți per persoană",
-    generated: "Generat din Toura",
-    paid: "plătită",
-    pending: "de plată",
-    person: ["persoană", "persoane"],
-    annex: ["anexă", "anexe"],
-    outstanding: "rest de plată",
-    allPaid: "totul plătit",
-  },
-  en: {
-    title: "Annual per-person payment report",
-    generated: "Generated from Toura",
-    paid: "paid",
-    pending: "due",
-    person: ["person", "people"],
-    annex: ["annex", "annexes"],
-    outstanding: "outstanding",
-    allPaid: "all paid",
-  },
+const T = {
+  title: "Annual per-person payment report",
+  generated: "Generated from Toura",
+  paid: "paid",
+  pending: "due",
+  person: ["person", "people"],
+  annex: ["annex", "annexes"],
+  outstanding: "outstanding",
+  allPaid: "all paid",
 };
 
 export async function buildAnnualReportPdf(
   orgName: string,
   year: number,
   people: PersonYearReport[],
-  locale = "ro",
 ): Promise<Buffer> {
-  const t = L10N[locale === "en" ? "en" : "ro"];
+  const t = T;
   const doc = (
     <Document title={`${t.title} ${year} — ${orgName}`}>
       <Page size="A4" style={styles.page}>

@@ -73,7 +73,7 @@ describe("withholdingLine", () => {
   it("p% din fee, round2, eticheta și cheia fixă", () => {
     expect(withholdingLine(5, 3500, "EUR")).toEqual({
       key: "withholding",
-      label: "Impozit reținut 5% — 175 EUR",
+      label: "Withholding tax 5% — 175 EUR",
       amount: 175,
       currency: "EUR",
     });

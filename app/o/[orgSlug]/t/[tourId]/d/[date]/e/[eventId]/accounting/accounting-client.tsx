@@ -76,7 +76,7 @@ interface Ctx {
 
 const num = (v: number | null | undefined) => v ?? 0;
 const fmt = (v: number) =>
-  v.toLocaleString("ro-RO", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  v.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 
 export function AccountingClient({
   ctx,

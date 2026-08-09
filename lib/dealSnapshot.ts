@@ -134,7 +134,7 @@ export function withholdingLine(
   const amount = round2((percent / 100) * fee);
   return {
     key: "withholding",
-    label: `Impozit reținut ${percent}% — ${amount} ${currency}`,
+    label: `Withholding tax ${percent}% — ${amount} ${currency}`,
     amount,
     currency,
   };

@@ -6,7 +6,7 @@ describe("perDiemLine", () => {
   it("headcount × rate × zile, cu eticheta descriptivă și cheia stabilă", () => {
     expect(perDiemLine(party, 6, 2)).toEqual({
       key: "per_diem:p1",
-      label: "Diurnă Crew — 6 × 45 EUR × 2 zile",
+      label: "Per diem Crew — 6 × 45 EUR × 2 days",
       amount: 540,
       currency: "EUR",
     });

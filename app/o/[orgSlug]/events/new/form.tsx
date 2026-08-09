@@ -33,7 +33,7 @@ export function NewEventForm({
   );
   const [date, setDate] = useState("");
   const [city, setCity] = useState("");
-  const [country, setCountry] = useState("România");
+  const [country, setCountry] = useState("Romania");
   const [eventName, setEventName] = useState("");
   const [stageTime, setStageTime] = useState("");
   const [scheduleTemplateId, setScheduleTemplateId] = useState("");

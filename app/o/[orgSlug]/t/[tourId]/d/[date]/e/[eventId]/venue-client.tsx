@@ -101,9 +101,9 @@ export function VenueSection({
           )}
           <div className="flex flex-wrap gap-2">
             <input value={form.name} onChange={(e) => setForm({ ...form, name: e.target.value })} placeholder={t("venueName")} className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-sm" />
-            <input value={form.address_line1} onChange={(e) => setForm({ ...form, address_line1: e.target.value })} placeholder="Adresă / Address" className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-sm" />
-            <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="Oraș / City" className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
-            <input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} placeholder="Țară / Country" className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
+            <input value={form.address_line1} onChange={(e) => setForm({ ...form, address_line1: e.target.value })} placeholder="Address" className="min-w-40 flex-1 rounded border border-hairline px-2 py-1 text-sm" />
+            <input value={form.city} onChange={(e) => setForm({ ...form, city: e.target.value })} placeholder="City" className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
+            <input value={form.country} onChange={(e) => setForm({ ...form, country: e.target.value })} placeholder="Country" className="w-32 rounded border border-hairline px-2 py-1 text-sm" />
             <input type="number" value={form.capacity} onChange={(e) => setForm({ ...form, capacity: e.target.value })} placeholder={t("capacity")} className="w-24 rounded border border-hairline px-2 py-1 text-sm" />
           </div>
           <div className="flex gap-2">

@@ -168,13 +168,13 @@ export function EventsSection({
               <input
                 value={newVenue.city}
                 onChange={(e) => setNewVenue({ ...newVenue, city: e.target.value })}
-                placeholder="Oraș / City"
+                placeholder="City"
                 className="w-32 rounded border border-hairline px-2 py-1 text-sm"
               />
               <input
                 value={newVenue.country}
                 onChange={(e) => setNewVenue({ ...newVenue, country: e.target.value })}
-                placeholder="Țară / Country"
+                placeholder="Country"
                 className="w-32 rounded border border-hairline px-2 py-1 text-sm"
               />
               <button
