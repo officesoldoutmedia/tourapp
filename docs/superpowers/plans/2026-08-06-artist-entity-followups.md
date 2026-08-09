@@ -121,6 +121,7 @@
 - ~~Email-urile Resend pleacă de pe onboarding@resend.dev (EMAIL_FROM nesetat)~~
   REZOLVAT 2026-08-09: domeniul toura.pro verificat în Resend (DKIM + SPF/MX pe
   subdomeniul `send`, regiune eu-west-1), `EMAIL_FROM="TourApp <no-reply@toura.pro>"`
-  în wrangler.jsonc `vars`, deployat. Rămas opțional: SMTP custom în Supabase
-  pentru emailurile de auth (magic link/reset) — pleacă tot de pe senderul
-  default Supabase; necesită un API key Resend creat de Ștefan.
+  în wrangler.jsonc `vars`, deployat. SMTP custom în Supabase configurat și el
+  (smtp.resend.com:465, user `resend`, sender TourApp <no-reply@toura.pro>,
+  cheie API dedicată creată de Ștefan) — verificat end-to-end cu un password
+  recovery livrat prin Resend. Auth-emailurile pleacă acum tot de pe toura.pro.
