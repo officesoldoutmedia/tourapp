@@ -125,3 +125,16 @@
   (smtp.resend.com:465, user `resend`, sender Toura <no-reply@toura.pro>,
   cheie API dedicată creată de Ștefan) — verificat end-to-end cu un password
   recovery livrat prin Resend. Auth-emailurile pleacă acum tot de pe toura.pro.
+
+## Adăugat post-reset-password (2026-08-09)
+
+- Fluxul de resetare a parolei e live (/reset-password + „Forgot password?" pe
+  login + template-ul Recovery repointat la /auth/confirm?token_hash=...&
+  type=recovery&next=/reset-password). NU da „Reset template" în Supabase pe
+  emailul Reset password — pierde ruta custom.
+- Template-ul „Magic link or OTP" folosește încă {{ .ConfirmationURL }} — merge
+  doar prin PKCE (/auth/callback), deci linkul trebuie deschis în ACELAȘI
+  browser din care s-a cerut. De repointat și el la token_hash (ca Recovery)
+  pentru robustețe cross-browser.
+- Emailurile de recovery se invalidează reciproc (fiecare email nou anulează
+  linkurile precedente) — la debugging, folosește mereu cel mai nou email.
