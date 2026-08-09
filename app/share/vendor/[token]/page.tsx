@@ -1,5 +1,4 @@
 import { notFound } from "next/navigation";
-import { headers } from "next/headers";
 import { createServiceClient } from "@/lib/supabase/service";
 import { getDaySheetData } from "@/lib/daysheet";
 import { formatDayHeader, formatTimeInZone } from "@/lib/datetime";
@@ -16,57 +15,31 @@ export const dynamic = "force-dynamic";
  * fără nav, fără next-intl (L10N local mai jos).
  */
 
-type Lang = "ro" | "en";
-
-const L10N: Record<Lang, Record<string, string>> = {
-  ro: {
-    schedule: "Program",
-    hotel: "Hotel",
-    files: "Fișierele voastre",
-    team: "Echipa voastră",
-    addPerson: "Adaugă persoană",
-    uploadFile: "Urcă fișier",
-    noCategory: "Departament neconfigurat — cere organizatorului.",
-    invalidLink: "Link invalid sau expirat",
-    firstName: "Prenume",
-    lastName: "Nume",
-    role: "Rol",
-    phone: "Telefon",
-    email: "Email",
-    remove: "Elimină",
-    confirmRemove: "Sigur elimini această persoană?",
-    errorGeneric: "A apărut o eroare. Încearcă din nou.",
-    errorLimit: "Ai atins limita maximă.",
-    uploadErrorNoCategory: "Departament neconfigurat — cere organizatorului.",
-    uploadErrorTooLarge: "Fișierul e prea mare (limită 50 MB).",
-    guestOf: "invitat de",
-  },
-  en: {
-    schedule: "Schedule",
-    hotel: "Hotel",
-    files: "Your files",
-    team: "Your team",
-    addPerson: "Add person",
-    uploadFile: "Upload file",
-    noCategory: "No department configured — ask the organizer.",
-    invalidLink: "Invalid or expired link",
-    firstName: "First name",
-    lastName: "Last name",
-    role: "Role",
-    phone: "Phone",
-    email: "Email",
-    remove: "Remove",
-    confirmRemove: "Remove this person?",
-    errorGeneric: "Something went wrong. Try again.",
-    errorLimit: "You've reached the limit.",
-    uploadErrorNoCategory: "No department configured — ask the organizer.",
-    uploadErrorTooLarge: "File is too large (50 MB limit).",
-    guestOf: "guest of",
-  },
+const T: Record<string, string> = {
+  schedule: "Schedule",
+  hotel: "Hotel",
+  files: "Your files",
+  team: "Your team",
+  addPerson: "Add person",
+  uploadFile: "Upload file",
+  noCategory: "No department configured — ask the organizer.",
+  invalidLink: "Invalid or expired link",
+  firstName: "First name",
+  lastName: "Last name",
+  role: "Role",
+  phone: "Phone",
+  email: "Email",
+  remove: "Remove",
+  confirmRemove: "Remove this person?",
+  errorGeneric: "Something went wrong. Try again.",
+  errorLimit: "You've reached the limit.",
+  uploadErrorNoCategory: "No department configured — ask the organizer.",
+  uploadErrorTooLarge: "File is too large (50 MB limit).",
+  guestOf: "guest of",
 };
 
-function formatShortDate(date: string, lang: Lang): string {
-  return new Intl.DateTimeFormat(lang === "ro" ? "ro-RO" : "en-US", {
+function formatShortDate(date: string): string {
+  return new Intl.DateTimeFormat("en-US", {
     day: "numeric",
     month: "short",
   }).format(new Date(`${date}T00:00:00`));
@@ -87,10 +60,7 @@ export default async function VendorPortalPage({
   const ctx = await resolveVendorLink(token);
   if (!ctx) notFound();
 
-  const lang: Lang = (await headers()).get("accept-language")?.toLowerCase().startsWith("ro")
-    ? "ro"
-    : "en";
-  const t = L10N[lang];
+  const t = T;
 
   const supabase = createServiceClient();
 
@@ -181,7 +151,7 @@ export default async function VendorPortalPage({
     <main className="mx-auto w-full max-w-2xl space-y-8 p-6">
       <header className="space-y-1">
         <h1 className="font-display text-2xl font-semibold tracking-tight">{eventTitle}</h1>
-        <p className="text-sm text-secondary">{formatDayHeader(dayRow.date, tz, lang)}</p>
+        <p className="text-sm text-secondary">{formatDayHeader(dayRow.date, tz, "en")}</p>
         {(dayRow.city || dayRow.country) && (
           <p className="text-sm text-secondary">
             {[dayRow.city, dayRow.country].filter(Boolean).join(", ")}
@@ -226,10 +196,10 @@ export default async function VendorPortalPage({
                 </p>
                 {(hotel.check_in_date || hotel.check_out_date) && (
                   <p className="text-xs text-tertiary">
-                    {hotel.check_in_date && formatShortDate(hotel.check_in_date, lang)}
+                    {hotel.check_in_date && formatShortDate(hotel.check_in_date)}
                     {hotel.check_in_time && ` ${hotel.check_in_time.slice(0, 5)}`}
                     {" – "}
-                    {hotel.check_out_date && formatShortDate(hotel.check_out_date, lang)}
+                    {hotel.check_out_date && formatShortDate(hotel.check_out_date)}
                     {hotel.check_out_time && ` ${hotel.check_out_time.slice(0, 5)}`}
                   </p>
                 )}
@@ -274,7 +244,6 @@ export default async function VendorPortalPage({
 
         <PortalClient
           token={token}
-          lang={lang}
           canUpload={Boolean(ctx.fileCategoryId)}
           employees={employees}
           t={t}

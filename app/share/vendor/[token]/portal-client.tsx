@@ -32,13 +32,11 @@ function mapUploadError(code: string | undefined, t: Record<string, string>): st
 
 export function PortalClient({
   token,
-  lang,
   canUpload,
   employees,
   t,
 }: {
   token: string;
-  lang: string;
   canUpload: boolean;
   employees: VendorEmployeeRow[];
   t: Record<string, string>;
@@ -110,7 +108,7 @@ export function PortalClient({
   }
 
   return (
-    <div lang={lang} className="contents">
+    <div lang="en" className="contents">
       {/* continuarea secțiunii Fișiere: butonul de upload */}
       <div className="mt-3">
         <label
