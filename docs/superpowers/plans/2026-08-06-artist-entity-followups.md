@@ -120,8 +120,8 @@
   (primul deploy cu routes a coincis cu outage 1042 pe tot workerul).
 - ~~Email-urile Resend pleacă de pe onboarding@resend.dev (EMAIL_FROM nesetat)~~
   REZOLVAT 2026-08-09: domeniul toura.pro verificat în Resend (DKIM + SPF/MX pe
-  subdomeniul `send`, regiune eu-west-1), `EMAIL_FROM="TourApp <no-reply@toura.pro>"`
+  subdomeniul `send`, regiune eu-west-1), `EMAIL_FROM="Toura <no-reply@toura.pro>"` (rebrand Toura, 2026-08-09)
   în wrangler.jsonc `vars`, deployat. SMTP custom în Supabase configurat și el
-  (smtp.resend.com:465, user `resend`, sender TourApp <no-reply@toura.pro>,
+  (smtp.resend.com:465, user `resend`, sender Toura <no-reply@toura.pro>,
   cheie API dedicată creată de Ștefan) — verificat end-to-end cu un password
   recovery livrat prin Resend. Auth-emailurile pleacă acum tot de pe toura.pro.
