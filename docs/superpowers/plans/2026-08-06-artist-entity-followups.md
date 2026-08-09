@@ -109,11 +109,11 @@
 
 ## Adăugat post-domeniu toura.pro (2026-08-09)
 
-- workers.dev dă „error code: 1042" la edge (fără invocarea workerului) după
-  atașarea domeniilor custom — corelat inițial cu NEXT_PUBLIC_APP_URL dar
-  bundle-ul nu conține niciun fetch spre domeniu; probabil stare edge
-  tranzitorie/bug Cloudflare. De monitorizat; dacă persistă: ticket Cloudflare
-  sau dezactivarea URL-ului workers.dev (link-urile vechi mor oricum curat).
+- ~~workers.dev dă „error code: 1042"~~ REZOLVAT 2026-08-10, cauză găsită:
+  atașarea de `routes` cu custom_domain DEZACTIVEAZĂ implicit ruta workers.dev
+  (1042/404 la edge, workerul nu era invocat — nu bug Cloudflare, ci default
+  wrangler). Fix: `"workers_dev": true` în wrangler.jsonc; acum workers.dev
+  lovește workerul și middleware-ul face 308 spre toura.pro (verificat).
 - Redirect-ul canonic 308 workers.dev→toura.pro există în middleware (rulează
   doar când edge-ul invocă workerul).
 - ATENȚIE la refolosirea rețetei: NU atașa custom domains pe o zonă PENDING

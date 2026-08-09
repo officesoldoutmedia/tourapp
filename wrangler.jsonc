@@ -15,6 +15,9 @@
   "vars": { "EMAIL_FROM": "Toura <no-reply@toura.pro>" },
   // Domeniul custom: toura.pro + www (zona trebuie să fie ACTIVĂ înainte de
   // deploy — atașarea pe zonă pending a produs 1042 pe tot workerul, 2026-08-09).
+  // workers_dev rămâne pornit ca URL-ul istoric să lovească workerul și
+  // middleware-ul să-l redirecteze 308 spre toura.pro (linkurile vechi trăiesc).
+  "workers_dev": true,
   "routes": [
     { "pattern": "toura.pro", "custom_domain": true },
     { "pattern": "www.toura.pro", "custom_domain": true }
