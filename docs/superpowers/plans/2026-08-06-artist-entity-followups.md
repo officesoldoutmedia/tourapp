@@ -132,9 +132,22 @@
   login + template-ul Recovery repointat la /auth/confirm?token_hash=...&
   type=recovery&next=/reset-password). NU da „Reset template" în Supabase pe
   emailul Reset password — pierde ruta custom.
-- Template-ul „Magic link or OTP" folosește încă {{ .ConfirmationURL }} — merge
-  doar prin PKCE (/auth/callback), deci linkul trebuie deschis în ACELAȘI
-  browser din care s-a cerut. De repointat și el la token_hash (ca Recovery)
-  pentru robustețe cross-browser.
+- ~~Template-ul „Magic link or OTP" pe ConfirmationURL/PKCE~~ REZOLVAT
+  2026-08-09 (proiectul Toura emails): toate template-urile auth (Recovery,
+  Magic link, Confirm signup) sunt pe token_hash prin /auth/confirm, cu
+  designul dark Toura; sursele în docs/email-templates/ (sincronizate prin
+  lib/authEmailTemplates.test.ts — regenerare cu WRITE_EMAIL_TEMPLATES=1).
 - Emailurile de recovery se invalidează reciproc (fiecare email nou anulează
   linkurile precedente) — la debugging, folosește mereu cel mai nou email.
+
+## Adăugat post-Toura-emails + English-only (2026-08-09)
+
+- Minore rămase din review-ul final: opțiunea „Română" (endonim) în pickerul
+  de limbă al anexelor (personnel/page.tsx) — defensibil, de uniformizat la
+  „Romanian" dacă deranjează; un check slim de chei en.json ar înlocui util
+  fostul check-i18n (retras odată cu ro.json); lib/annualReport.ts sortează
+  numele cu colație „ro" (corect pentru nume românești, lăsat intenționat).
+- La schimbări de layout email: modifică lib/emailTemplate.ts, apoi
+  WRITE_EMAIL_TEMPLATES=1 pnpm vitest run lib/authEmailTemplates.test.ts și
+  RE-LIPEȘTE cele 3 template-uri în Supabase (dashboardul nu se actualizează
+  singur). NU da „Reset template" în Supabase.
